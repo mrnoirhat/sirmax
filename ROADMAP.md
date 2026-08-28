@@ -134,11 +134,30 @@ direcciones, configuración, migraciones, fundación de auditoría.
 - [ ] Wiring del `CompositionRoot` en el arranque de la app y pantallas de login / primer arranque
       (Fase 5).
 
-## Fase 4 — Motor configurable de servicios ⚪
+## Fase 4 — Motor configurable de servicios 🟡
 
 Catálogo de servicios, definiciones de servicio, requisitos, formularios dinámicos donde aplique,
 flujo de trabajo, reglas de tasas, plantillas de documentos, versionado de servicios,
 activación/desactivación.
+
+- [x] `V0003__service_engine.sql`: `service_category`, `service_definition`,
+      `service_definition_version` (columnas tipadas + JSON validado para lo flexible).
+- [x] Dominio `service`: `ServiceCategory`, `ServiceDefinition` (metadatos + `currentVersionId`),
+      `ServiceDefinitionVersion` (editable solo en `DRAFT`, inmutable al publicar; `publish` /
+      `deactivate` / `reactivate` / `archive` / `copyAsNewDraft`), `RequirementDef` (declarativo,
+      por etapa, condicional), `Sla`, `Validity`, `ServiceVersionValidator`.
+- [x] Casos de uso (permiso `service.configure`, auditados): `CreateServiceDraft`,
+      `ConfigureServiceDraft`, `PublishServiceVersion` (valida + supersede la versión ACTIVE),
+      `CreateServiceDraftVersion` (clona la ACTIVE), `SetServiceAvailability`.
+- [x] `ServiceCatalogRepository` + `SqliteServiceCatalogRepository` (JSON vía Jackson en infra;
+      el dominio no depende de Jackson). Cableado en `CompositionRoot`.
+- [ ] Motor de requisitos: evaluación contra un trámite (checklist "faltan N requisitos").
+- [ ] Motor de flujo de trabajo tipado (ADR 0007): `WorkflowDefinition`/`Step`/transiciones,
+      evaluador de expresiones restringido.
+- [ ] Motor de tasas tipado (ADR 0008): `FeeRule` + `ChargeType` + `FeeCalculator` → `Charge`.
+- [ ] Form schema tipado (campos dinámicos).
+- [ ] Catálogo semilla editable (plantillas dominicanas, master prompt §54).
+- [ ] UI de configuración de servicios (puede solaparse con Fase 5).
 
 ## Fase 5 — Ciudadano y front-office ⚪
 

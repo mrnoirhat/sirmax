@@ -8,6 +8,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 4 (en curso) — Motor configurable de servicios.**
+  - `V0003__service_engine.sql`: catálogo de servicios, definiciones y versiones (columnas tipadas +
+    JSON validado).
+  - Dominio `service`: `ServiceCategory`, `ServiceDefinition`, `ServiceDefinitionVersion` (editable
+    solo en `DRAFT`, inmutable al publicar), `RequirementDef`/`RequirementKind`/`RequirementStage`,
+    `Sla`, `Validity`, `ServiceVersionValidator`. `shared`: `JsonDoc`.
+  - Casos de uso: `CreateServiceDraft`, `ConfigureServiceDraft`, `PublishServiceVersion` (valida +
+    supersede la ACTIVE), `CreateServiceDraftVersion`, `SetServiceAvailability` — permiso
+    `service.configure`, auditados.
+  - `SqliteServiceCatalogRepository` (JSON de config vía **Jackson 2.18**, solo en infraestructura).
+  - Tests: `ServiceDefinitionVersionTest`, `ServiceEngineTest`, `SqliteServiceCatalogRepositoryTest`.
 - **Fase 3 ✅ — Dominio central y base de datos.**
   - Runner de migraciones: `SqlScript` (splitter consciente de `BEGIN`/`END`, literales y
     comentarios), `MigrationRunner` (una transacción por migración, `schema_migrations`, rechazo de

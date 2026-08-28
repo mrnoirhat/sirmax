@@ -22,8 +22,9 @@ issue de revisión de licencia.
 | OpenJDK 25 | Runtime / compilación | GPL-2.0-with-Classpath-Exception | Empaquetado con jpackage; la excepción de classpath permite la distribución |
 | OpenJFX (JavaFX) | UI de escritorio | GPL-2.0-with-Classpath-Exception | — |
 | SQLite | Base de datos embebida | Public Domain | — |
-| _driver JDBC de SQLite_ | Acceso a datos | _por fijar (Apache-2.0 esperado)_ | p. ej. `org.xerial:sqlite-jdbc` |
-| _motor de migraciones_ | Migraciones de esquema | _por fijar_ | Flyway Community (Apache-2.0) o runner propio |
+| `org.xerial:sqlite-jdbc` 3.49.x | Driver JDBC de SQLite | Apache-2.0 | — |
+| `com.fasterxml.jackson.core:jackson-databind` 2.18.x | (De)serialización JSON de la config de servicios | Apache-2.0 | Solo `sirmax-infrastructure`; el dominio no depende de Jackson |
+| _motor de migraciones_ | Migraciones de esquema | N/A (runner propio) | `MigrationRunner` en `sirmax-infrastructure` |
 | _librería PDF_ | Generación de PDF | _por fijar_ | Debe ser compatible con AGPL (evitar iText comercial) |
 | _generación de QR_ | Códigos de verificación | _por fijar (Apache-2.0 esperado)_ | p. ej. ZXing |
 | JUnit 5 | Pruebas | EPL-2.0 | Solo test |

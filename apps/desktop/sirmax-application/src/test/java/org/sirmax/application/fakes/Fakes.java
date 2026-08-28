@@ -297,4 +297,107 @@ public final class Fakes {
                     .findFirst();
         }
     }
+
+    public static final class InMemoryServiceCatalog
+            implements org.sirmax.application.port.ServiceCatalogRepository {
+        public final Map<String, org.sirmax.domain.service.ServiceCategory> categories =
+                new LinkedHashMap<>();
+        public final Map<String, org.sirmax.domain.service.ServiceDefinition> definitions =
+                new LinkedHashMap<>();
+        public final Map<String, org.sirmax.domain.service.ServiceDefinitionVersion> versions =
+                new LinkedHashMap<>();
+
+        @Override
+        public void saveCategory(org.sirmax.domain.service.ServiceCategory category) {
+            categories.put(category.id(), category);
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceCategory> findCategoryById(String id) {
+            return Optional.ofNullable(categories.get(id));
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceCategory> findCategoryByCode(String code) {
+            return categories.values().stream()
+                    .filter(c -> c.code().equalsIgnoreCase(code))
+                    .findFirst();
+        }
+
+        @Override
+        public List<org.sirmax.domain.service.ServiceCategory> listActiveCategories() {
+            return categories.values().stream().filter(c -> c.isActive()).toList();
+        }
+
+        @Override
+        public void saveDefinition(org.sirmax.domain.service.ServiceDefinition definition) {
+            definitions.put(definition.id(), definition);
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceDefinition> findDefinitionById(String id) {
+            return Optional.ofNullable(definitions.get(id));
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceDefinition> findDefinitionByCode(
+                String code) {
+            return definitions.values().stream()
+                    .filter(d -> d.code().equalsIgnoreCase(code))
+                    .findFirst();
+        }
+
+        @Override
+        public List<org.sirmax.domain.service.ServiceDefinition> listDefinitions(
+                boolean includeArchived) {
+            return definitions.values().stream()
+                    .filter(
+                            d ->
+                                    includeArchived
+                                            || d.archiveStatus()
+                                                    == org.sirmax.domain.common.ArchiveStatus.ACTIVE)
+                    .toList();
+        }
+
+        @Override
+        public void saveVersion(org.sirmax.domain.service.ServiceDefinitionVersion version) {
+            versions.put(version.id(), version);
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceDefinitionVersion> findVersionById(
+                String id) {
+            return Optional.ofNullable(versions.get(id));
+        }
+
+        @Override
+        public List<org.sirmax.domain.service.ServiceDefinitionVersion> listVersions(
+                String serviceDefinitionId) {
+            return versions.values().stream()
+                    .filter(v -> v.serviceDefinitionId().equals(serviceDefinitionId))
+                    .sorted(java.util.Comparator.comparingInt(v -> v.versionNumber()))
+                    .toList();
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.service.ServiceDefinitionVersion> findActiveVersion(
+                String serviceDefinitionId) {
+            return versions.values().stream()
+                    .filter(
+                            v ->
+                                    v.serviceDefinitionId().equals(serviceDefinitionId)
+                                            && v.status()
+                                                    == org.sirmax.domain.service.ServiceStatus.ACTIVE)
+                    .findFirst();
+        }
+
+        @Override
+        public int nextVersionNumber(String serviceDefinitionId) {
+            return listVersions(serviceDefinitionId).stream()
+                            .mapToInt(v -> v.versionNumber())
+                            .max()
+                            .orElse(0)
+                    + 1;
+        }
+    }
 }

@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":sirmax-shared"))
 
     implementation(libs.sqlite.jdbc)
+    implementation(libs.jackson.databind)
     implementation(libs.slf4j.api)
     runtimeOnly(libs.logback.classic)
 

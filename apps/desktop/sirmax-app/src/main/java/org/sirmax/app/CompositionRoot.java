@@ -9,13 +9,19 @@ import org.sirmax.application.port.OrganizationRepository;
 import org.sirmax.application.port.PasswordHasher;
 import org.sirmax.application.port.PersonRepository;
 import org.sirmax.application.port.RoleRepository;
+import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.SettingsRepository;
 import org.sirmax.application.port.UnitOfWork;
 import org.sirmax.application.port.UserRepository;
 import org.sirmax.application.security.Audit;
 import org.sirmax.application.usecase.Authenticate;
+import org.sirmax.application.usecase.ConfigureServiceDraft;
+import org.sirmax.application.usecase.CreateServiceDraft;
+import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
+import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
+import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.infrastructure.AppPaths;
 import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
@@ -26,6 +32,7 @@ import org.sirmax.infrastructure.persistence.SqliteOrganizationPartyRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationRepository;
 import org.sirmax.infrastructure.persistence.SqlitePersonRepository;
 import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
+import org.sirmax.infrastructure.persistence.SqliteServiceCatalogRepository;
 import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
 import org.sirmax.infrastructure.persistence.SqliteUserRepository;
 import org.sirmax.infrastructure.security.Pbkdf2PasswordHasher;
@@ -53,12 +60,18 @@ public final class CompositionRoot implements AutoCloseable {
     private final PersonRepository personRepository;
     private final IdentificationRepository identificationRepository;
     private final SettingsRepository settingsRepository;
+    private final ServiceCatalogRepository serviceCatalogRepository;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
 
     private final Authenticate authenticate;
     private final ProvisionInitialAdmin provisionInitialAdmin;
     private final RegisterPerson registerPerson;
+    private final CreateServiceDraft createServiceDraft;
+    private final ConfigureServiceDraft configureServiceDraft;
+    private final PublishServiceVersion publishServiceVersion;
+    private final CreateServiceDraftVersion createServiceDraftVersion;
+    private final SetServiceAvailability setServiceAvailability;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -71,6 +84,7 @@ public final class CompositionRoot implements AutoCloseable {
         this.personRepository = new SqlitePersonRepository(database);
         this.identificationRepository = new SqliteIdentificationRepository(database);
         this.settingsRepository = new SqliteSettingsRepository(database);
+        this.serviceCatalogRepository = new SqliteServiceCatalogRepository(database);
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -89,6 +103,17 @@ public final class CompositionRoot implements AutoCloseable {
         this.registerPerson =
                 new RegisterPerson(
                         personRepository, identificationRepository, ids, clock, unitOfWork, audit);
+
+        this.createServiceDraft =
+                new CreateServiceDraft(serviceCatalogRepository, ids, clock, unitOfWork, audit);
+        this.configureServiceDraft =
+                new ConfigureServiceDraft(serviceCatalogRepository, unitOfWork, audit);
+        this.publishServiceVersion =
+                new PublishServiceVersion(serviceCatalogRepository, clock, unitOfWork, audit);
+        this.createServiceDraftVersion =
+                new CreateServiceDraftVersion(serviceCatalogRepository, ids, clock, unitOfWork, audit);
+        this.setServiceAvailability =
+                new SetServiceAvailability(serviceCatalogRepository, clock, unitOfWork, audit);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -115,6 +140,30 @@ public final class CompositionRoot implements AutoCloseable {
 
     public RegisterPerson registerPerson() {
         return registerPerson;
+    }
+
+    public CreateServiceDraft createServiceDraft() {
+        return createServiceDraft;
+    }
+
+    public ConfigureServiceDraft configureServiceDraft() {
+        return configureServiceDraft;
+    }
+
+    public PublishServiceVersion publishServiceVersion() {
+        return publishServiceVersion;
+    }
+
+    public CreateServiceDraftVersion createServiceDraftVersion() {
+        return createServiceDraftVersion;
+    }
+
+    public SetServiceAvailability setServiceAvailability() {
+        return setServiceAvailability;
+    }
+
+    public ServiceCatalogRepository serviceCatalogRepository() {
+        return serviceCatalogRepository;
     }
 
     public UserRepository userRepository() {
