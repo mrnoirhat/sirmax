@@ -38,10 +38,13 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2);
+        assertThat(applied).contains(1, 2, 3);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
-                .isGreaterThanOrEqualTo(2);
+                .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
+        // V0003 tables exist and are queryable
+        assertThat(intQuery("SELECT count(*) FROM service_category")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM service_definition_version")).isZero();
         assertThat(intQuery("SELECT count(*) FROM role WHERE is_system = 1")).isEqualTo(4);
         assertThat(
                         intQuery(
@@ -65,8 +68,10 @@ class MigrationRunnerTest {
         new MigrationRunner(onlyV1, Clock.systemUTC()).migrate(connection);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations")).isEqualTo(1);
 
+        List<Integer> expectedNew =
+                all.stream().map(Migration::version).filter(v -> v > 1).toList();
         List<Integer> upgraded = runner.migrate(connection);
-        assertThat(upgraded).containsExactly(2);
+        assertThat(upgraded).isEqualTo(expectedNew).doesNotContain(1);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
     }
 
