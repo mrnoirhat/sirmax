@@ -67,13 +67,12 @@ jobs:
           language: ${{ matrix.language }}
 
       - if: matrix.language == 'java-kotlin'
-        name: Build Java for analysis
+        name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.12"
       - if: matrix.language == 'java-kotlin'
+        name: Build Java for analysis
         working-directory: apps/desktop
-        run: gradle --no-daemon compileJava
+        run: ./gradlew --no-daemon compileJava
 
       - name: Analyze
         uses: github/codeql-action/analyze@v3

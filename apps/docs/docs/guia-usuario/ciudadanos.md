@@ -1,7 +1,7 @@
 ---
-title: Ciudadanos
+title: "Ciudadanos"
 sidebar_position: 2
-description: Buscar y registrar personas y organizaciones; ficha maestra y detección de duplicados.
+description: "Buscar y registrar personas y organizaciones; ficha maestra y detección de duplicados."
 ---
 
 # Ciudadanos

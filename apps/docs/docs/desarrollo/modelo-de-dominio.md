@@ -1,7 +1,7 @@
 ---
-title: Modelo de dominio
+title: "Modelo de dominio"
 sidebar_position: 3
-description: Entidades, agregados y la columna vertebral compartida.
+description: "Entidades, agregados y la columna vertebral compartida."
 ---
 
 # Modelo de dominio

@@ -1,7 +1,7 @@
 ---
-title: Introducción
+title: "Introducción"
 sidebar_position: 1
-description: SIRMAX: plataforma open source, local-first y orientada a municipios para servicios, trámites, registros, facturación e impresión.
+description: "SIRMAX: plataforma open source, local-first y orientada a municipios para servicios, trámites, registros, facturación e impresión."
 slug: /
 ---
 

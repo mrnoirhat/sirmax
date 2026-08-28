@@ -1,7 +1,7 @@
 ---
-title: Registro de documentos
+title: "Registro de documentos"
 sidebar_position: 5
-description: Presentación, metadatos de registro, libro y folio, y copias certificadas.
+description: "Presentación, metadatos de registro, libro y folio, y copias certificadas."
 ---
 
 # Registro de documentos

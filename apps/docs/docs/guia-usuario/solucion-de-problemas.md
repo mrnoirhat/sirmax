@@ -1,7 +1,7 @@
 ---
-title: Solución de problemas
+title: "Solución de problemas"
 sidebar_position: 17
-description: Errores frecuentes y cómo resolverlos.
+description: "Errores frecuentes y cómo resolverlos."
 ---
 
 # Solución de problemas

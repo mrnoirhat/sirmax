@@ -1,7 +1,7 @@
 ---
-title: Guía de usuario
+title: "Guía de usuario"
 sidebar_position: 1
-description: Documentación práctica para el personal municipal, en lenguaje claro y con ejemplos.
+description: "Documentación práctica para el personal municipal, en lenguaje claro y con ejemplos."
 ---
 
 # Guía de usuario

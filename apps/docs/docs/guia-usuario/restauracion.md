@@ -1,7 +1,7 @@
 ---
-title: Restauración
+title: "Restauración"
 sidebar_position: 15
-description: Restauración segura con backup de emergencia previo y confirmación.
+description: "Restauración segura con backup de emergencia previo y confirmación."
 ---
 
 # Restauración

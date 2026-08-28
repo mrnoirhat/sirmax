@@ -1,7 +1,7 @@
 ---
-title: Documentos oficiales
+title: "Documentos oficiales"
 sidebar_position: 10
-description: Certificaciones, cartas y permisos: plantillas, numeración y verificación.
+description: "Certificaciones, cartas y permisos: plantillas, numeración y verificación."
 ---
 
 # Documentos oficiales

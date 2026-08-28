@@ -1,7 +1,7 @@
 ---
-title: Reglas de negocio
+title: "Reglas de negocio"
 sidebar_position: 3
-description: Versionado de tasas, requisitos, flujos y roles de aprobación.
+description: "Versionado de tasas, requisitos, flujos y roles de aprobación."
 ---
 
 # Reglas de negocio

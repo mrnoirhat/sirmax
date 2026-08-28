@@ -1,7 +1,7 @@
 ---
-title: Motor de tasas
+title: "Motor de tasas"
 sidebar_position: 6
-description: Tipos de regla, vigencia, versionado y taxonomía de cargos.
+description: "Tipos de regla, vigencia, versionado y taxonomía de cargos."
 ---
 
 # Motor de tasas

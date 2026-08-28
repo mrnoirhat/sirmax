@@ -1,7 +1,7 @@
 ---
-title: Pagos
+title: "Pagos"
 sidebar_position: 7
-description: Métodos de pago, pagos parciales, reembolsos y anulaciones.
+description: "Métodos de pago, pagos parciales, reembolsos y anulaciones."
 ---
 
 # Pagos

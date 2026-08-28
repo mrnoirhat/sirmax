@@ -1,7 +1,7 @@
 ---
-title: Instalación
+title: "Instalación"
 sidebar_position: 2
-description: Requisitos e instalación del cliente de escritorio para Windows. El instalador incluye el runtime.
+description: "Requisitos e instalación del cliente de escritorio para Windows. El instalador incluye el runtime."
 ---
 
 # Instalación

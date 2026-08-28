@@ -1,7 +1,7 @@
 ---
-title: Configuración
+title: "Configuración"
 sidebar_position: 13
-description: Municipio, departamentos, servicios, tasas, plantillas y secuencias de numeración.
+description: "Municipio, departamentos, servicios, tasas, plantillas y secuencias de numeración."
 ---
 
 # Configuración

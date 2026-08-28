@@ -59,10 +59,11 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] GitHub Actions (`desktop`, `landing`, `docs`, `security`) + `dependabot.yml`.
 - [x] Plantillas de issues (bug, feature) y PR.
 - [x] `backend/`, `database/` y `scripts/` con README y migración baseline (`V0001__baseline.sql`).
-- [ ] Gradle wrapper jar comiteado (`gradle wrapper --gradle-version 8.12`).
+- [x] Gradle wrapper (scripts + jar oficial 8.12.0) comiteado.
+- [x] Rama `experiment` publicada en el remoto.
 - [ ] `npm install` reproducible con `package-lock.json` comiteado.
 - [ ] Guía de configuración de protección de ramas aplicada en GitHub.
-- [ ] Primera ejecución verde de los cuatro workflows.
+- [ ] Primera ejecución verde de los cuatro workflows (Landing ✅; Desktop/Docs/Security en corrección).
 
 ## Fase 2 — Shell de escritorio y Design System ⚪
 

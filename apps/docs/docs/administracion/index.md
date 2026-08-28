@@ -1,7 +1,7 @@
 ---
-title: Administración
+title: "Administración"
 sidebar_position: 1
-description: Configuración avanzada del municipio y de las reglas de negocio.
+description: "Configuración avanzada del municipio y de las reglas de negocio."
 ---
 
 # Administración

@@ -1,7 +1,7 @@
 ---
-title: Integraciones
+title: "Integraciones"
 sidebar_position: 8
-description: Impresión de Windows, Google Drive y almacenamiento de secretos.
+description: "Impresión de Windows, Google Drive y almacenamiento de secretos."
 ---
 
 # Integraciones

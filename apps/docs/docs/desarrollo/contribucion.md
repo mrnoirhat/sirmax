@@ -1,7 +1,7 @@
 ---
-title: Contribución
+title: "Contribución"
 sidebar_position: 11
-description: Flujo diario, commits y Pull Requests.
+description: "Flujo diario, commits y Pull Requests."
 ---
 
 # Contribución

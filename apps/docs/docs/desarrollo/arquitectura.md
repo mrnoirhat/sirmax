@@ -1,7 +1,7 @@
 ---
-title: Arquitectura
+title: "Arquitectura"
 sidebar_position: 2
-description: Capas, límites entre módulos y decisiones estructurales.
+description: "Capas, límites entre módulos y decisiones estructurales."
 ---
 
 # Arquitectura

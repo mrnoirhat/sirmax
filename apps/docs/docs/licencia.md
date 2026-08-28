@@ -1,7 +1,7 @@
 ---
-title: Licencia
+title: "Licencia"
 sidebar_position: 99
-description: El código de SIRMAX se publica bajo GNU AGPL-3.0-or-later. El nombre y el logo están reservados.
+description: "El código de SIRMAX se publica bajo GNU AGPL-3.0-or-later. El nombre y el logo están reservados."
 ---
 
 # Licencia

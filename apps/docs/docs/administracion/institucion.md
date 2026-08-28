@@ -1,7 +1,7 @@
 ---
-title: Perfil de institución
+title: "Perfil de institución"
 sidebar_position: 2
-description: Nombre, logo, colores, RNC, dirección y pie de factura; render en documentos.
+description: "Nombre, logo, colores, RNC, dirección y pie de factura; render en documentos."
 ---
 
 # Perfil de institución

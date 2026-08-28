@@ -1,7 +1,7 @@
 ---
-title: Impresión
+title: "Impresión"
 sidebar_position: 9
-description: Impresión angosta de mostrador y factura US Letter; perfiles de impresora y reimpresión.
+description: "Impresión angosta de mostrador y factura US Letter; perfiles de impresora y reimpresión."
 ---
 
 # Impresión

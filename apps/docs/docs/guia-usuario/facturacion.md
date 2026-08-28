@@ -1,7 +1,7 @@
 ---
-title: Facturación
+title: "Facturación"
 sidebar_position: 6
-description: Del cargo a la factura: líneas, descuentos, numeración y estados.
+description: "Del cargo a la factura: líneas, descuentos, numeración y estados."
 ---
 
 # Facturación

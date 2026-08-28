@@ -1,7 +1,7 @@
 ---
-title: Base de datos
+title: "Base de datos"
 sidebar_position: 4
-description: Esquema, migraciones, representación del dinero e integridad.
+description: "Esquema, migraciones, representación del dinero e integridad."
 ---
 
 # Base de datos

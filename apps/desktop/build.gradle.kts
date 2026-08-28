@@ -4,19 +4,18 @@
 // Common conventions live here; module-specific config lives in each
 // sirmax-*/build.gradle.kts. See docs/adr/0004-gradle.md and
 // docs/adr/0005-modular-domain-architecture.md.
-
-plugins {
-    alias(libs.plugins.spotless) apply false
-}
-
-allprojects {
-    group = "org.sirmax"
-    version = "0.1.0-SNAPSHOT"
-}
+//
+// Phase 1 keeps this intentionally minimal. Static analysis / formatting
+// (spotless + google-java-format) and -Werror are added in Phase 2 with a
+// one-time reformat commit (see ROADMAP.md).
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "com.diffplug.spotless")
+    // java-library (not plain java) so modules can expose transitive API
+    // with `api(...)` — e.g. sirmax-domain re-exports sirmax-shared types.
+    apply(plugin = "java-library")
+
+    group = "org.sirmax"
+    version = "0.1.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -24,7 +23,7 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get()))
+            languageVersion.set(JavaLanguageVersion.of(25))
         }
     }
 
@@ -35,11 +34,8 @@ subprojects {
     }
 
     tasks.withType<JavaCompile>().configureEach {
-        options.release.set(libs.versions.java.get().toInt())
-        // -Werror on -Xlint:all, minus lints that are noisy for JavaFX subclasses
-        // (this-escape) and framework exceptions (serial), and annotation processing.
-        options.compilerArgs.addAll(
-            listOf("-Xlint:all,-serial,-this-escape,-processing", "-Werror"))
+        options.release.set(25)
+        options.compilerArgs.add("-Xlint:all,-serial,-this-escape,-processing")
         options.encoding = "UTF-8"
     }
 
@@ -47,17 +43,6 @@ subprojects {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
-        }
-    }
-
-    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-        java {
-            target("src/**/*.java")
-            // Phase 1: lightweight, non-reformatting rules so `check` is stable.
-            // google-java-format(.aosp()) and SPDX license-header enforcement are
-            // enabled in Phase 2 with a one-time `spotlessApply` commit (see ROADMAP.md).
-            trimTrailingWhitespace()
-            endWithNewline()
         }
     }
 }

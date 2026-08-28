@@ -1,7 +1,7 @@
 ---
-title: Reportes
+title: "Reportes"
 sidebar_position: 11
-description: Reportes financieros, de servicio, de ciudadano y operativos.
+description: "Reportes financieros, de servicio, de ciudadano y operativos."
 ---
 
 # Reportes

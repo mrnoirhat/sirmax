@@ -1,7 +1,7 @@
 ---
-title: Primeros pasos
+title: "Primeros pasos"
 sidebar_position: 3
-description: Primer arranque, creación del municipio, usuarios iniciales y configuración mínima.
+description: "Primer arranque, creación del municipio, usuarios iniciales y configuración mínima."
 ---
 
 # Primeros pasos

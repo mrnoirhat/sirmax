@@ -27,14 +27,17 @@ public final class SqliteConnectionFactory {
 
     private final String jdbcUrl;
 
+    private SqliteConnectionFactory(String jdbcUrl) {
+        this.jdbcUrl = jdbcUrl;
+    }
+
     public SqliteConnectionFactory(Path databaseFile) {
-        Objects.requireNonNull(databaseFile, "databaseFile");
-        this.jdbcUrl = "jdbc:sqlite:" + databaseFile.toAbsolutePath();
+        this("jdbc:sqlite:" + Objects.requireNonNull(databaseFile, "databaseFile").toAbsolutePath());
     }
 
     /** An in-memory database, for tests and throwaway bootstrapping. */
     public static SqliteConnectionFactory inMemory() {
-        return new SqliteConnectionFactory(Path.of(":memory:"));
+        return new SqliteConnectionFactory("jdbc:sqlite::memory:");
     }
 
     public Connection open() {

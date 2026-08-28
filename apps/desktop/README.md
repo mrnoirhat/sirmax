@@ -29,14 +29,11 @@ shared}`; `app → all`. Verified by `sirmax-architecture-tests`.
 ./gradlew build                 # compile every module + run tests
 ./gradlew test                  # tests only
 ./gradlew :sirmax-app:run       # launch the shell (JavaFX)
-./gradlew check                 # tests + static analysis (spotless)
-./gradlew spotlessApply         # auto-format
 ```
 
 On Windows use `gradlew.bat`. Requires **JDK 25** (`java -version` must report 25).
 
-> First-time setup: the Gradle wrapper jar is not committed yet — see
-> [`gradle/wrapper/README.md`](gradle/wrapper/README.md).
+> Static analysis / formatting (spotless + google-java-format) and `-Werror` are added in Phase 2.
 
 ## Status
 

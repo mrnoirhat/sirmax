@@ -1,7 +1,7 @@
 ---
-title: Servicios
+title: "Servicios"
 sidebar_position: 3
-description: Catálogo de servicios: qué son, cómo se configuran y cómo se usan en el mostrador.
+description: "Catálogo de servicios: qué son, cómo se configuran y cómo se usan en el mostrador."
 ---
 
 # Servicios

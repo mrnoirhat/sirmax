@@ -1,7 +1,7 @@
 ---
-title: API futura
+title: "API futura"
 sidebar_position: 9
-description: Frontera para reutilizar dominio y aplicación en un servicio en red.
+description: "Frontera para reutilizar dominio y aplicación en un servicio en red."
 ---
 
 # API futura

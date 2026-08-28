@@ -1,7 +1,7 @@
 ---
-title: Usuarios y permisos
+title: "Usuarios y permisos"
 sidebar_position: 12
-description: Roles, permisos y buenas prácticas de acceso.
+description: "Roles, permisos y buenas prácticas de acceso."
 ---
 
 # Usuarios y permisos

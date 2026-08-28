@@ -1,7 +1,7 @@
 ---
-title: Seguridad
+title: "Seguridad"
 sidebar_position: 16
-description: Sesión, bloqueo, contraseñas y protección de datos locales.
+description: "Sesión, bloqueo, contraseñas y protección de datos locales."
 ---
 
 # Seguridad

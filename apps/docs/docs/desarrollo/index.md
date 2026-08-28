@@ -1,7 +1,7 @@
 ---
-title: Desarrollo
+title: "Desarrollo"
 sidebar_position: 1
-description: Documentación técnica para quien contribuye al proyecto.
+description: "Documentación técnica para quien contribuye al proyecto."
 ---
 
 # Desarrollo

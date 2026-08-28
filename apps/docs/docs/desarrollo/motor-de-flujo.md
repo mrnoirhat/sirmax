@@ -1,7 +1,7 @@
 ---
-title: Motor de flujo de trabajo
+title: "Motor de flujo de trabajo"
 sidebar_position: 5
-description: Pasos, transiciones, SLA y checkpoints de pago/documento.
+description: "Pasos, transiciones, SLA y checkpoints de pago/documento."
 ---
 
 # Motor de flujo de trabajo

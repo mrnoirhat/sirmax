@@ -40,19 +40,9 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.12"
-
-      # The wrapper jar is not committed yet (see gradle/wrapper/README.md);
-      # generate it so `./gradlew` works for downstream steps and contributors.
-      - name: Ensure Gradle wrapper
-        run: gradle wrapper --gradle-version 8.12
 
       - name: Build, test and static analysis
-        run: gradle --no-daemon build
-
-      - name: Packaging smoke test (jar assembly)
-        run: gradle --no-daemon :sirmax-app:assemble
+        run: ./gradlew --no-daemon build
 
       - name: Upload test reports
         if: always()

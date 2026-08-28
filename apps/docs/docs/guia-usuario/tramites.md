@@ -1,7 +1,7 @@
 ---
-title: Trámites
+title: "Trámites"
 sidebar_position: 4
-description: Abrir un trámite, completar requisitos, avanzar el flujo y cerrar el expediente.
+description: "Abrir un trámite, completar requisitos, avanzar el flujo y cerrar el expediente."
 ---
 
 # Trámites

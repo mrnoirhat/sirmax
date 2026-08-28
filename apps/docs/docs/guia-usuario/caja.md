@@ -1,7 +1,7 @@
 ---
-title: Caja
+title: "Caja"
 sidebar_position: 8
-description: Abrir y cerrar caja, arqueo y conciliación.
+description: "Abrir y cerrar caja, arqueo y conciliación."
 ---
 
 # Caja

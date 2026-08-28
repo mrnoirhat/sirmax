@@ -1,7 +1,7 @@
 ---
-title: Releases
+title: "Releases"
 sidebar_position: 10
-description: Promoción de ramas, Release Gate y artefactos.
+description: "Promoción de ramas, Release Gate y artefactos."
 ---
 
 # Releases
