@@ -1,0 +1,304 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+ * SIRMAX Design System — JavaFX theme.
+ *
+ * One stylesheet, loaded once by SirmaxApplication. Sections:
+ *   1. Design tokens (looked-up colors on .root; dark overrides on .sirmax-dark)
+ *   2. Typography
+ *   3. Base controls (Button, TextField, Label, ScrollPane, Tooltip…)
+ *   4. Shell (top bar, task navigation, content host)
+ *   5. Components (cards, task cards, toasts, banners, tables, form fields,
+ *      stateful content: loading / empty / error / success)
+ *
+ * Calm, modern, professional; never childish, bureaucratic or noisy
+ * (master prompt §12). Colours must stay legible in black & white and are
+ * never the sole semantic signal.
+ */
+
+/* ============================================================
+ * 1. Design tokens
+ * ============================================================ */
+.root {
+    /* Brand + surfaces */
+    -sirmax-bg:            #f4f6f9;
+    -sirmax-surface:       #ffffff;
+    -sirmax-surface-2:     #eef1f5;
+    -sirmax-border:        #d7dce3;
+    -sirmax-border-strong: #b9c1cc;
+
+    /* Text */
+    -sirmax-text:          #1f2430;
+    -sirmax-text-soft:     #454d5c;
+    -sirmax-text-muted:    #6b7480;
+    -sirmax-text-on-accent:#ffffff;
+
+    /* Accent (primary) */
+    -sirmax-primary:       #1f5fa6;
+    -sirmax-primary-hover: #1b5595;
+    -sirmax-primary-press: #174a82;
+    -sirmax-primary-soft:  derive(#1f5fa6, 82%);
+
+    /* Semantic — always paired with an icon/label, never colour alone */
+    -sirmax-success:       #1f7a44;
+    -sirmax-success-soft:  derive(#1f7a44, 84%);
+    -sirmax-warning:       #9a6b00;
+    -sirmax-warning-soft:  derive(#9a6b00, 84%);
+    -sirmax-danger:        #b4232a;
+    -sirmax-danger-soft:   derive(#b4232a, 84%);
+    -sirmax-info:          #1f5fa6;
+    -sirmax-info-soft:     derive(#1f5fa6, 84%);
+
+    /* Focus ring */
+    -sirmax-focus:         #2f7bce;
+
+    /* Only <paint> values can be looked-up tokens in JavaFX CSS; radii/padding
+       are literals in the rules below. */
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -sirmax-bg;
+    -fx-focus-color: -sirmax-focus;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Dark theme — redefine only the tokens; every rule below is theme-agnostic.
+ * Applied by adding the "sirmax-dark" style class to the scene root. */
+.sirmax-dark {
+    -sirmax-bg:            #12151b;
+    -sirmax-surface:       #1b2029;
+    -sirmax-surface-2:     #232a34;
+    -sirmax-border:        #2b323c;
+    -sirmax-border-strong: #3a424e;
+    -sirmax-text:          #eef1f5;
+    -sirmax-text-soft:     #c7cdd7;
+    -sirmax-text-muted:    #97a0ac;
+    -sirmax-text-on-accent:#0c1116;
+    -sirmax-primary:       #5aa2e0;
+    -sirmax-primary-hover: #6caee6;
+    -sirmax-primary-press: #4c93d2;
+    -sirmax-primary-soft:  derive(#5aa2e0, -62%);
+    -sirmax-success:       #57b979;
+    -sirmax-success-soft:  derive(#57b979, -66%);
+    -sirmax-warning:       #d0a24a;
+    -sirmax-warning-soft:  derive(#d0a24a, -66%);
+    -sirmax-danger:        #e0676d;
+    -sirmax-danger-soft:   derive(#e0676d, -66%);
+    -sirmax-info:          #5aa2e0;
+    -sirmax-info-soft:     derive(#5aa2e0, -66%);
+    -sirmax-focus:         #7db8ea;
+}
+
+/* ============================================================
+ * 2. Typography
+ * ============================================================ */
+.sirmax-display  { -fx-font-size: 22px; -fx-font-weight: bold;   -fx-text-fill: -sirmax-text; }
+.sirmax-title    { -fx-font-size: 17px; -fx-font-weight: bold;   -fx-text-fill: -sirmax-text; }
+.sirmax-subtitle { -fx-font-size: 14px; -fx-font-weight: bold;   -fx-text-fill: -sirmax-text-soft; }
+.sirmax-body     { -fx-font-size: 13px;                          -fx-text-fill: -sirmax-text; }
+.sirmax-muted    { -fx-font-size: 12px;                          -fx-text-fill: -sirmax-text-muted; }
+.sirmax-mono     { -fx-font-family: "Cascadia Code", "Consolas", monospace; -fx-font-size: 12px; }
+
+/* ============================================================
+ * 3. Base controls
+ * ============================================================ */
+.label { -fx-text-fill: -sirmax-text; }
+
+.scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; }
+
+.tooltip {
+    -fx-background-color: #2b323c;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6 10 6 10;
+}
+
+.text-field, .text-area, .password-field, .combo-box, .date-picker, .spinner {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border-strong;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 7 10 7 10;
+    -fx-prompt-text-fill: -sirmax-text-muted;
+}
+.text-field:focused, .text-area:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: -sirmax-focus;
+    -fx-border-width: 2;
+}
+
+/* Button — default (secondary) */
+.button {
+    -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text;
+    -fx-border-color: -sirmax-border-strong;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+}
+.button:hover  { -fx-border-color: -sirmax-primary; }
+.button:armed  { -fx-background-color: -sirmax-surface-2; }
+.button:focused { -fx-border-color: -sirmax-focus; -fx-border-width: 2; }
+.button:disabled { -fx-opacity: 0.5; -fx-cursor: default; }
+
+.button.sirmax-primary {
+    -fx-background-color: -sirmax-primary;
+    -fx-text-fill: -sirmax-text-on-accent;
+    -fx-border-color: -sirmax-primary;
+}
+.button.sirmax-primary:hover { -fx-background-color: -sirmax-primary-hover; -fx-border-color: -sirmax-primary-hover; }
+.button.sirmax-primary:armed { -fx-background-color: -sirmax-primary-press; }
+
+.button.sirmax-danger {
+    -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-danger;
+    -fx-border-color: -sirmax-danger;
+}
+.button.sirmax-danger:hover { -fx-background-color: -sirmax-danger-soft; }
+
+.button.sirmax-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -sirmax-primary;
+}
+.button.sirmax-ghost:hover { -fx-background-color: -sirmax-primary-soft; }
+
+/* ============================================================
+ * 4. Shell
+ * ============================================================ */
+.sirmax-shell { -fx-background-color: -sirmax-bg; }
+
+.sirmax-topbar {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: transparent transparent -sirmax-border transparent;
+    -fx-padding: 8 16 8 16;
+}
+.sirmax-brand { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: -sirmax-primary; }
+
+.sirmax-global-search {
+    -fx-min-width: 320px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.sirmax-tasknav {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: transparent -sirmax-border transparent transparent;
+    -fx-padding: 14 10 14 10;
+    -fx-min-width: 224px;
+    -fx-pref-width: 224px;
+}
+.sirmax-nav-section {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -sirmax-text-muted;
+    -fx-padding: 12 8 4 8;
+}
+.sirmax-navitem {
+    -fx-background-color: transparent;
+    -fx-text-fill: -sirmax-text;
+    -fx-border-color: transparent;
+    -fx-alignment: center-left;
+    -fx-padding: 8 10 8 10;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.sirmax-navitem:hover { -fx-background-color: -sirmax-surface-2; }
+.sirmax-navitem:focused { -fx-border-color: -sirmax-focus; -fx-border-width: 2; }
+.sirmax-navitem.selected {
+    -fx-background-color: -sirmax-primary-soft;
+    -fx-text-fill: -sirmax-primary;
+    -fx-font-weight: bold;
+}
+
+.sirmax-content { -fx-background-color: -sirmax-bg; -fx-padding: 28; }
+.sirmax-breadcrumb { -fx-text-fill: -sirmax-text-muted; -fx-font-size: 12px; }
+
+/* ============================================================
+ * 5. Components
+ * ============================================================ */
+.sirmax-card {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+}
+
+.sirmax-taskcard {
+    -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text;
+    -fx-font-size: 14px;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-alignment: center-left;
+    -fx-padding: 16;
+    -fx-wrap-text: true;
+    -fx-cursor: hand;
+}
+.sirmax-taskcard:hover  { -fx-border-color: -sirmax-primary; }
+.sirmax-taskcard:armed  { -fx-background-color: -sirmax-primary-soft; }
+.sirmax-taskcard:focused { -fx-border-color: -sirmax-focus; -fx-border-width: 2; }
+
+/* Banners + toasts — icon/label carries meaning; tint is secondary */
+.sirmax-banner {
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14 10 14;
+    -fx-border-width: 1;
+}
+.sirmax-banner.info    { -fx-background-color: -sirmax-info-soft;    -fx-border-color: -sirmax-info; }
+.sirmax-banner.success { -fx-background-color: -sirmax-success-soft; -fx-border-color: -sirmax-success; }
+.sirmax-banner.warning { -fx-background-color: -sirmax-warning-soft; -fx-border-color: -sirmax-warning; }
+.sirmax-banner.danger  { -fx-background-color: -sirmax-danger-soft;  -fx-border-color: -sirmax-danger; }
+.sirmax-banner .sirmax-banner-title { -fx-font-weight: bold; }
+
+.sirmax-toast {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border-strong;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 16 12 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 16, 0.1, 0, 4);
+}
+.sirmax-toast.success { -fx-border-color: -sirmax-success; }
+.sirmax-toast.danger  { -fx-border-color: -sirmax-danger; }
+.sirmax-toast-host { -fx-padding: 16; }
+
+/* Data table */
+.sirmax-table .column-header-background { -fx-background-color: -sirmax-surface-2; }
+.sirmax-table .column-header, .sirmax-table .filler { -fx-background-color: transparent; }
+.sirmax-table .column-header .label { -fx-font-weight: bold; -fx-text-fill: -sirmax-text-soft; }
+.sirmax-table {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.sirmax-table .table-row-cell { -fx-background-color: -sirmax-surface; -fx-border-color: transparent transparent -sirmax-border transparent; }
+.sirmax-table .table-row-cell:selected { -fx-background-color: -sirmax-primary-soft; }
+.sirmax-table .table-row-cell:odd { -fx-background-color: derive(-sirmax-surface, -1.5%); }
+
+/* Form field wrapper */
+.sirmax-field-label { -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: -sirmax-text-soft; }
+.sirmax-field-hint  { -fx-font-size: 11px; -fx-text-fill: -sirmax-text-muted; }
+.sirmax-field-error { -fx-font-size: 11px; -fx-text-fill: -sirmax-danger; }
+.sirmax-field.invalid .text-field,
+.sirmax-field.invalid .text-area,
+.sirmax-field.invalid .combo-box { -fx-border-color: -sirmax-danger; }
+
+/* Stateful content: loading / empty / error / success */
+.sirmax-state { -fx-alignment: center; -fx-spacing: 10; -fx-padding: 40; }
+.sirmax-state .sirmax-state-title { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: -sirmax-text; }
+.sirmax-state .sirmax-state-detail { -fx-font-size: 12px; -fx-text-fill: -sirmax-text-muted; -fx-wrap-text: true; -fx-text-alignment: center; }
+.sirmax-state .sirmax-state-tech {
+    -fx-font-family: "Cascadia Code", "Consolas", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: -sirmax-text-muted;
+}
+
+.sirmax-spinner { -fx-progress-color: -sirmax-primary; }
+
+/* Dialog */
+.sirmax-dialog .header-panel { -fx-background-color: -sirmax-surface; }
+.sirmax-dialog { -fx-background-color: -sirmax-surface; }

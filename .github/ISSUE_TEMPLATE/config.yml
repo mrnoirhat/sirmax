@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+blank_issues_enabled: false
+contact_links:
+  - name: Pregunta o idea (Discussions)
+    url: https://github.com/mrnoirhat/sirmax/discussions
+    about: Para preguntas de uso, dudas y propuestas todavía sin concretar.
+  - name: Reportar una vulnerabilidad de seguridad
+    url: https://github.com/mrnoirhat/sirmax/security/advisories/new
+    about: No abras un issue público. Usa la divulgación privada coordinada (ver SECURITY.md).
