@@ -8,15 +8,16 @@ import org.sirmax.ui.SirmaxApplication;
  * Process entry point.
  *
  * <p>A plain (non-{@link Application}) {@code main} is the standard way to launch a modular JavaFX
- * app without fighting the module path. From Phase 3 this method builds the {@link CompositionRoot}
- * and passes it to the UI; for now it just shows the shell.
+ * app without fighting the module path. The domain graph is built by {@link
+ * CompositionRoot#bootstrapDefault()}; Phase 5 hands it to the UI (login / first-run setup). For now
+ * the shell renders on its own.
  */
 public final class Launcher {
 
     private Launcher() {}
 
     public static void main(String[] args) {
-        // TODO(Phase 3): CompositionRoot root = CompositionRoot.bootstrap(AppPaths.resolve());
+        // Phase 5: try (CompositionRoot root = CompositionRoot.bootstrapDefault()) { ... }
         Application.launch(SirmaxApplication.class, args);
     }
 }
