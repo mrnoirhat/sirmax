@@ -83,10 +83,16 @@ jobs:
       - if: matrix.language == 'java-kotlin'
         name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
       - if: matrix.language == 'java-kotlin'
         name: Build Java for analysis
         working-directory: apps/desktop
-        run: ./gradlew --no-daemon compileJava
+        # CodeQL's tracer must observe real javac runs. The project sets
+        # org.gradle.caching=true, so a warm Gradle build cache would unpack
+        # .class files without compiling and CodeQL fails with "didn't build
+        # any code" (exit 32). Force actual compilation here.
+        run: ./gradlew --no-daemon --no-build-cache --rerun-tasks compileJava
 
       - name: Analyze
         uses: github/codeql-action/analyze@v3
