@@ -7,6 +7,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+_En desarrollo en `experiment`._
+
+## [0.1.0] - 2026-08-28
+
+Primer checkpoint estable promovido a `main` a través de `testing` (`experiment → testing → main`).
+Cubre las Fases 0–3 completas y el inicio de la Fase 4. **No es la 1.0**: facturación, impresión,
+copias de seguridad y empaquetado llegan en fases posteriores (ver `ROADMAP.md`).
+
 ### Added
 - **Fase 4 (en curso) — Motor configurable de servicios.**
   - `V0003__service_engine.sql`: catálogo de servicios, definiciones y versiones (columnas tipadas +
@@ -89,4 +97,5 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
     (commit `2b24c71`). Build local reproducido: `./gradlew build`, `docs build`, landing
     `lint`/`typecheck`/`build`.
 
-[Unreleased]: https://github.com/mrnoirhat/sirmax/commits/experiment
+[Unreleased]: https://github.com/mrnoirhat/sirmax/compare/v0.1.0...experiment
+[0.1.0]: https://github.com/mrnoirhat/sirmax/releases/tag/v0.1.0
