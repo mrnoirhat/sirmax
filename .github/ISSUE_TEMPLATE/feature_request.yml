@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Propuesta de funcionalidad
+description: Sugiere una mejora o una nueva capacidad para SIRMAX.
+title: "feat: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema o necesidad
+      description: ¿Qué tarea municipal se quiere resolver? ¿Quién la realiza hoy y cómo?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+      description: Qué debería hacer SIRMAX. Piensa en el operador no técnico.
+    validations:
+      required: true
+  - type: dropdown
+    id: configurable
+    attributes:
+      label: ¿Debería ser configurable por municipio?
+      description: Preferimos configuración antes que reglas quemadas (ver CONTRIBUTING.md).
+      options:
+        - "Sí: es una regla local (tasas, requisitos, flujo, plantillas)"
+        - "No: es parte del núcleo compartido"
+        - "No lo sé"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+  - type: input
+    id: phase
+    attributes:
+      label: Fase del roadmap relacionada (si la conoces)
+      placeholder: "Fase 7 — módulos municipales"

@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Reporte de error
+description: Algo no funciona como debería en SIRMAX.
+title: "fix: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar. Antes de continuar, busca si ya existe un issue similar.
+        Para vulnerabilidades de seguridad, **no** uses este formulario: ver `SECURITY.md`.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Qué ocurre
+      description: Describe el problema y el impacto.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '...'
+        3. Ver el error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento esperado
+    validations:
+      required: true
+  - type: input
+    id: sirmax-version
+    attributes:
+      label: Versión de SIRMAX / rama / commit
+      placeholder: "0.1.0 / experiment / abc1234"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Escritorio (aplicación Windows)
+        - Facturación / pagos / caja
+        - Impresión / PDF
+        - Backup / restauración
+        - Landing
+        - Documentación
+        - CI / build
+        - Otra / no lo sé
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Sistema operativo
+      placeholder: "Windows 11 Pro 24H2"
+  - type: input
+    id: printer
+    attributes:
+      label: Impresora (si aplica)
+      placeholder: "Epson TM-T20III (80 mm) / HP LaserJet (Letter)"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs o capturas
+      description: Adjunta logs relevantes o capturas. Oculta cualquier dato personal de ciudadanos.

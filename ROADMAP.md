@@ -44,7 +44,8 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Mapa de módulos ([`docs/domain/module-map.md`](./docs/domain/module-map.md)).
 - [x] Mapa de UX ([`docs/ux/ux-map.md`](./docs/ux/ux-map.md)).
 - [x] Plan de build ([`docs/build-plan.md`](./docs/build-plan.md)).
-- [ ] CI skeleton verificado en verde en GitHub Actions.
+- [x] CI skeleton definido (`.github/workflows/{desktop,landing,docs,security}.yml`).
+- [ ] CI skeleton verificado en verde en GitHub Actions (requiere push al remoto).
 
 ## Fase 1 — Fundación del repositorio 🟡
 
@@ -55,9 +56,10 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Esqueleto Gradle multi-módulo del escritorio (`sirmax-shared/domain/application/infrastructure/ui/app`).
 - [x] Esqueleto de landing Next.js + TypeScript con navegación y CTAs obligatorios.
 - [x] Esqueleto de documentación Docusaurus.
-- [x] GitHub Actions (`desktop`, `landing`, `docs`, `security`).
-- [x] Plantillas de issues y PR.
-- [ ] Gradle wrapper comiteado (`gradle wrapper --gradle-version <x>`).
+- [x] GitHub Actions (`desktop`, `landing`, `docs`, `security`) + `dependabot.yml`.
+- [x] Plantillas de issues (bug, feature) y PR.
+- [x] `backend/`, `database/` y `scripts/` con README y migración baseline (`V0001__baseline.sql`).
+- [ ] Gradle wrapper jar comiteado (`gradle wrapper --gradle-version 8.12`).
 - [ ] `npm install` reproducible con `package-lock.json` comiteado.
 - [ ] Guía de configuración de protección de ramas aplicada en GitHub.
 - [ ] Primera ejecución verde de los cuatro workflows.

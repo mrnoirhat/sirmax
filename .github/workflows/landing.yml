@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Landing
+
+on:
+  push:
+    branches: [experiment, testing, main]
+    paths:
+      - "apps/landing/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/landing.yml"
+  pull_request:
+    paths:
+      - "apps/landing/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/landing.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: landing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint, typecheck & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --workspaces --include-workspace-root=false --workspace apps/landing
+
+      - name: Lint
+        run: npm run lint --workspace apps/landing
+
+      - name: Typecheck
+        run: npm run typecheck --workspace apps/landing
+
+      - name: Build (static export)
+        run: npm run build --workspace apps/landing
+
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-out
+          path: apps/landing/out
+          if-no-files-found: error
