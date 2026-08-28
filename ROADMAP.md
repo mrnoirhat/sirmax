@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase 4 siguiente._
+_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase 4 en curso._
 
 ---
 
@@ -16,7 +16,7 @@ _Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase
 | 1 | Fundación del repositorio | ✅ |
 | 2 | Shell de escritorio y Design System | ✅ |
 | 3 | Dominio central y base de datos | ✅ |
-| 4 | Motor configurable de servicios | ⚪ |
+| 4 | Motor configurable de servicios | 🟡 |
 | 5 | Ciudadano y experiencia de front-office | ⚪ |
 | 6 | Facturación, pagos y caja | ⚪ |
 | 7 | Módulos municipales especializados | ⚪ |
@@ -154,7 +154,9 @@ activación/desactivación.
 - [ ] Motor de requisitos: evaluación contra un trámite (checklist "faltan N requisitos").
 - [ ] Motor de flujo de trabajo tipado (ADR 0007): `WorkflowDefinition`/`Step`/transiciones,
       evaluador de expresiones restringido.
-- [ ] Motor de tasas tipado (ADR 0008): `FeeRule` + `ChargeType` + `FeeCalculator` → `Charge`.
+- [x] Motor de tasas tipado (ADR 0008): `FeeRule` (inmutable, con vigencia), `FeeRuleType`,
+      `ChargeType`, `FeeInput`, `FeeCalculator` → `Charge`/`ChargeLine`. Solo dominio; sin usar en
+      la facturación todavía (Fase 6).
 - [ ] Form schema tipado (campos dinámicos).
 - [ ] Catálogo semilla editable (plantillas dominicanas, master prompt §54).
 - [ ] UI de configuración de servicios (puede solaparse con Fase 5).

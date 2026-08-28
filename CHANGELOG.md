@@ -18,7 +18,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
     supersede la ACTIVE), `CreateServiceDraftVersion`, `SetServiceAvailability` — permiso
     `service.configure`, auditados.
   - `SqliteServiceCatalogRepository` (JSON de config vía **Jackson 2.18**, solo en infraestructura).
-  - Tests: `ServiceDefinitionVersionTest`, `ServiceEngineTest`, `SqliteServiceCatalogRepositoryTest`.
+  - Motor de tasas tipado (`domain/finance`, ADR 0008): `FeeRule` (inmutable, con vigencia),
+    `FeeRuleType`, `ChargeType`, `FeeTier`, `FeeInput`, `FeeCalculator` → `Charge` / `ChargeLine`
+    (dinero entero, nunca coma flotante). Aún sin usar en facturación (Fase 6).
+  - Tests: `ServiceDefinitionVersionTest`, `ServiceEngineTest`, `SqliteServiceCatalogRepositoryTest`,
+    `ServiceVersionValidatorTest`, `FeeCalculatorTest`.
 - **Fase 3 ✅ — Dominio central y base de datos.**
   - Runner de migraciones: `SqlScript` (splitter consciente de `BEGIN`/`END`, literales y
     comentarios), `MigrationRunner` (una transacción por migración, `schema_migrations`, rechazo de
