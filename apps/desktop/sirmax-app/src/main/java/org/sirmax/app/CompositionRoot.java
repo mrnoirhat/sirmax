@@ -10,6 +10,7 @@ import org.sirmax.application.port.PasswordHasher;
 import org.sirmax.application.port.PersonRepository;
 import org.sirmax.application.port.RoleRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
+import org.sirmax.application.port.ServiceCatalogTemplateSource;
 import org.sirmax.application.port.SettingsRepository;
 import org.sirmax.application.port.UnitOfWork;
 import org.sirmax.application.port.UserRepository;
@@ -21,10 +22,12 @@ import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
+import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.infrastructure.AppPaths;
 import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
+import org.sirmax.infrastructure.persistence.JsonServiceCatalogTemplateSource;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
 import org.sirmax.infrastructure.persistence.SqliteIdentificationRepository;
@@ -61,6 +64,7 @@ public final class CompositionRoot implements AutoCloseable {
     private final IdentificationRepository identificationRepository;
     private final SettingsRepository settingsRepository;
     private final ServiceCatalogRepository serviceCatalogRepository;
+    private final ServiceCatalogTemplateSource serviceCatalogTemplateSource;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
 
@@ -72,6 +76,7 @@ public final class CompositionRoot implements AutoCloseable {
     private final PublishServiceVersion publishServiceVersion;
     private final CreateServiceDraftVersion createServiceDraftVersion;
     private final SetServiceAvailability setServiceAvailability;
+    private final SeedServiceCatalog seedServiceCatalog;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -85,6 +90,7 @@ public final class CompositionRoot implements AutoCloseable {
         this.identificationRepository = new SqliteIdentificationRepository(database);
         this.settingsRepository = new SqliteSettingsRepository(database);
         this.serviceCatalogRepository = new SqliteServiceCatalogRepository(database);
+        this.serviceCatalogTemplateSource = new JsonServiceCatalogTemplateSource();
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -114,6 +120,14 @@ public final class CompositionRoot implements AutoCloseable {
                 new CreateServiceDraftVersion(serviceCatalogRepository, ids, clock, unitOfWork, audit);
         this.setServiceAvailability =
                 new SetServiceAvailability(serviceCatalogRepository, clock, unitOfWork, audit);
+        this.seedServiceCatalog =
+                new SeedServiceCatalog(
+                        serviceCatalogTemplateSource,
+                        serviceCatalogRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -162,8 +176,16 @@ public final class CompositionRoot implements AutoCloseable {
         return setServiceAvailability;
     }
 
+    public SeedServiceCatalog seedServiceCatalog() {
+        return seedServiceCatalog;
+    }
+
     public ServiceCatalogRepository serviceCatalogRepository() {
         return serviceCatalogRepository;
+    }
+
+    public ServiceCatalogTemplateSource serviceCatalogTemplateSource() {
+        return serviceCatalogTemplateSource;
     }
 
     public UserRepository userRepository() {

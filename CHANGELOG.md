@@ -7,7 +7,18 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
-_En desarrollo en `experiment`._
+### Added
+- **Fase 4 — Catálogo semilla editable (master prompt §54–§55).**
+  - `application.catalog`: `ServiceTemplate` / `ServiceCategoryTemplate` / `ServiceCatalogTemplates`
+    (tipados: reutilizan `RequirementDef`, `WorkflowDefinition`, `FeeRule`, `Sla`, `Validity`) y el
+    puerto `ServiceCatalogTemplateSource`.
+  - Caso de uso `SeedServiceCatalog` (permiso `service.configure`, auditado, idempotente):
+    materializa el paquete en categorías + servicios con una versión **v1 `DRAFT`** que el municipio
+    revisa (montos, requisitos, flujo) y publica. Vuelve a ejecutarse sin duplicar.
+  - `infrastructure`: `JsonServiceCatalogTemplateSource` lee el paquete de la República Dominicana
+    (`catalog/dominican-republic/service-catalog.v1.json`, 12 categorías y 93 servicios) reutilizando
+    los parsers de `ServiceJson`. Cada plantilla produce un borrador que pasa `ServiceVersionValidator`.
+  - Cableado en `CompositionRoot` (`seedServiceCatalog()`).
 
 ## [0.1.1] - 2026-08-28
 

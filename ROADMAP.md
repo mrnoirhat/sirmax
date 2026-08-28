@@ -169,7 +169,11 @@ activación/desactivación.
       `FormField` + `FieldType`), `sla`, `validity`. Solo `outputDocuments` y `authorization` siguen
       como `JsonDoc` (se tipan en Fases 7/8). `ServiceJson` mapea todo con Jackson; round-trip
       SQLite probado. `ServiceVersionValidator` usa `WorkflowValidator` y valida `feeRules`.
-- [ ] Catálogo semilla editable (plantillas dominicanas, master prompt §54).
+- [x] Catálogo semilla editable (plantillas dominicanas, master prompt §54–§55):
+      `application.catalog` (`ServiceTemplate` tipado) + puerto `ServiceCatalogTemplateSource` +
+      caso de uso `SeedServiceCatalog` (idempotente, auditado, permiso `service.configure`) +
+      `JsonServiceCatalogTemplateSource` con el paquete `dominican-republic/service-catalog.v1.json`
+      (12 categorías, 93 servicios; cada plantilla nace como `DRAFT` publicable).
 - [ ] UI de configuración de servicios (puede solaparse con Fase 5).
 
 ## Fase 5 — Ciudadano y front-office ⚪
