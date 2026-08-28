@@ -1,4 +1,4 @@
-IRMAX
+SIRMAX
 
 **Sistema Integral de Registros Municipales y Administración eXtensible.**
 
