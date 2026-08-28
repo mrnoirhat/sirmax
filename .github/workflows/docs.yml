@@ -35,10 +35,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
+          # `cache: npm` is added together with package-lock.json (Phase 1 pending item).
 
       - name: Install dependencies
-        run: npm install --workspace apps/docs
+        # package-lock.json is not committed yet (Phase 1 pending item), so use
+        # `npm install`. Switch to `npm ci` once the lockfile lands.
+        run: npm install
 
       - name: Typecheck
         run: npm run typecheck --workspace apps/docs

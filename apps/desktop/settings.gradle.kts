@@ -5,12 +5,8 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
     }
-    // Single source of truth for dependency versions.
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
-        }
-    }
+    // The version catalog `libs` is picked up automatically from
+    // gradle/libs.versions.toml (conventional location).
 }
 
 // ── Layered modules (see docs/adr/0005-modular-domain-architecture.md) ──
