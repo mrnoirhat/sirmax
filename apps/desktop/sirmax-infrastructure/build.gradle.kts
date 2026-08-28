@@ -20,3 +20,22 @@ dependencies {
     testImplementation(libs.bundles.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
+
+// The authored SQL migrations live at the repo root (database/migrations/, see
+// master prompt §3). Copy them onto this module's classpath as db/migration/*
+// plus a sorted index.txt the runner reads (reliable inside a jar).
+val migrationsSource = file("$rootDir/../../database/migrations")
+val migrationsStaging = layout.buildDirectory.dir("generated-resources/migrations")
+
+val stageMigrations by tasks.registering(Copy::class) {
+    from(migrationsSource) { include("V*__*.sql") }
+    into(migrationsStaging.map { it.dir("db/migration") })
+    doLast {
+        val dir = migrationsStaging.get().dir("db/migration").asFile
+        val names = dir.listFiles { f -> f.name.endsWith(".sql") }?.map { it.name }?.sorted().orEmpty()
+        dir.resolve("index.txt").writeText(names.joinToString("\n", postfix = "\n"))
+    }
+}
+
+sourceSets.named("main") { resources.srcDir(migrationsStaging) }
+tasks.named("processResources") { dependsOn(stageMigrations) }
