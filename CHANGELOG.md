@@ -9,6 +9,44 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 _En desarrollo en `experiment`._
 
+## [0.1.1] - 2026-08-28
+
+Checkpoint de mantenimiento: desbloquea el despliegue en Vercel (rechazaba la
+landing por una versión vulnerable de Next.js) y estabiliza el workflow de
+seguridad en CI. Incluye el avance interno de la Fase 4 (evaluador de
+expresiones, motor de requisitos y motor de flujo de trabajo tipado), todavía
+sin superficie de usuario. Sigue **sin ser la 1.0**.
+
+### Fixed
+- **Landing / Vercel:** `next` y `eslint-config-next` `15.1.6 → 15.5.24`. La 15.1.6
+  es anterior a CVE-2025-29927 (bypass de autorización en middleware, corregido en
+  15.2.3) y a avisos posteriores de 2025; Vercel rechaza el despliegue con esa
+  versión. Sin cambios de código en la landing; `lint` / `typecheck` / `build`
+  (export estático, 6 rutas) verdes. `package-lock.json` regenerado.
+- **CI (Security):** se reemplaza la acción `gitleaks/gitleaks-action` por la CLI
+  de gitleaks (el wrapper exige `GITLEAKS_LICENSE` en algunas cuentas; el binario
+  MIT no) y se corrige el paso de CodeQL — input `languages:` (plural) y
+  `build-mode` explícito por lenguaje; el singular `language:` había dejado de ser
+  válido y disparaba autodetección de todos los lenguajes.
+
+### Added
+- **Fase 4 — Motor configurable de servicios (continuación).**
+  - `domain.rules.ExpressionEvaluator` (ADR 0007): evaluador booleano restringido (`|| && !`,
+    comparadores, paréntesis, literales, identificadores del contexto; sin funciones ni I/O).
+  - Motor de requisitos: `RequirementContext`, `RequirementsChecklist` (applicable/satisfied/
+    pending por ítem; condicionales; bloqueo por etapa — "faltan N requisitos").
+  - Motor de flujo de trabajo tipado (`domain.workflow`, ADR 0007): `WorkflowDefinition`,
+    `WorkflowStep`, `Transition`, `StepType`, `TransitionKind`, `WorkflowValidator`,
+    `WorkflowEngine` (transiciones disponibles + destino; guarda de `PAYMENT_CHECKPOINT`).
+  - Form schema tipado (`FormSchema` + `FormField` + `FieldType`).
+
+### Changed
+  - `ServiceDefinitionVersion` ahora es **tipada de extremo a extremo**: `feeRules` es
+    `List<FeeRule>`, `workflow` es `WorkflowDefinition`, `formSchema` es `FormSchema` (antes
+    `JsonDoc` opacos). Solo `outputDocuments`/`authorization` siguen como `JsonDoc`. `ServiceJson`
+    (infra) los (de)serializa con Jackson; `ServiceVersionValidator` usa `WorkflowValidator`.
+    Tests de servicio y round-trip SQLite actualizados.
+
 ## [0.1.0] - 2026-08-28
 
 Primer checkpoint estable promovido a `main` a través de `testing` (`experiment → testing → main`).
@@ -97,5 +135,6 @@ copias de seguridad y empaquetado llegan en fases posteriores (ver `ROADMAP.md`)
     (commit `2b24c71`). Build local reproducido: `./gradlew build`, `docs build`, landing
     `lint`/`typecheck`/`build`.
 
-[Unreleased]: https://github.com/mrnoirhat/sirmax/compare/v0.1.0...experiment
+[Unreleased]: https://github.com/mrnoirhat/sirmax/compare/v0.1.1...experiment
+[0.1.1]: https://github.com/mrnoirhat/sirmax/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mrnoirhat/sirmax/releases/tag/v0.1.0

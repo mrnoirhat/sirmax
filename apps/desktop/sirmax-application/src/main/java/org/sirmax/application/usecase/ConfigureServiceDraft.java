@@ -8,12 +8,15 @@ import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.UnitOfWork;
 import org.sirmax.application.security.Audit;
 import org.sirmax.application.security.Session;
+import org.sirmax.domain.finance.FeeRule;
 import org.sirmax.domain.security.Permission;
+import org.sirmax.domain.service.FormSchema;
 import org.sirmax.domain.service.RequirementDef;
 import org.sirmax.domain.service.ServiceDefinitionVersion;
 import org.sirmax.domain.service.ServiceStatus;
 import org.sirmax.domain.service.Sla;
 import org.sirmax.domain.service.Validity;
+import org.sirmax.domain.workflow.WorkflowDefinition;
 import org.sirmax.shared.JsonDoc;
 import org.sirmax.shared.Result;
 
@@ -31,9 +34,9 @@ public final class ConfigureServiceDraft
             Optional<Boolean> requiresPayment,
             Optional<Sla> sla,
             Optional<Validity> validity,
-            Optional<JsonDoc> formSchema,
-            Optional<JsonDoc> workflow,
-            Optional<JsonDoc> feeRules,
+            Optional<FormSchema> formSchema,
+            Optional<WorkflowDefinition> workflow,
+            Optional<List<FeeRule>> feeRules,
             Optional<JsonDoc> outputDocuments,
             Optional<JsonDoc> authorization,
             Optional<String> numberingSequenceCode,

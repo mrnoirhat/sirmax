@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.sirmax.domain.workflow.WorkflowValidator;
 
 /**
- * Checks a {@link ServiceDefinitionVersion} is coherent enough to publish.
+ * Checks a {@link ServiceDefinitionVersion} is coherent enough to publish (docs/adr/0006).
  *
  * <p>Returns problem keys (i18n keys the UI resolves) rather than throwing, so a configuration
- * screen can show all of them at once. Deep validation of the JSON parts arrives with their typed
- * models (docs/adr/0007, 0008); this is the Phase 4 baseline.
+ * screen can show all of them at once.
  */
 public final class ServiceVersionValidator {
 
@@ -39,9 +39,14 @@ public final class ServiceVersionValidator {
         if (serviceType == ServiceType.CON_TASA && !version.requiresPayment()) {
             problems.add("service.validate.paid_service_must_require_payment");
         }
-        if (version.requiresPayment() && version.feeRules().value().equals("[]")) {
+        if (version.requiresPayment() && version.feeRules().isEmpty()) {
             problems.add("service.validate.payment_requires_fee_rules");
         }
+        if (!version.requiresPayment() && !version.feeRules().isEmpty()) {
+            problems.add("service.validate.fee_rules_without_payment");
+        }
+
+        problems.addAll(WorkflowValidator.validate(version.workflow()));
 
         return List.copyOf(problems);
     }
