@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–1 ✅; Fase 2 en curso._
+_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–2 ✅; Fase 3 siguiente._
 
 ---
 
@@ -14,7 +14,7 @@ _Última actualización: 2026-08-28 — rama `experiment`. Fases 0–1 ✅; Fase
 | ---: | --- | :---: |
 | 0 | Discovery, auditoría de repo y arquitectura | ✅ |
 | 1 | Fundación del repositorio | ✅ |
-| 2 | Shell de escritorio y Design System | 🟡 |
+| 2 | Shell de escritorio y Design System | ✅ |
 | 3 | Dominio central y base de datos | ⚪ |
 | 4 | Motor configurable de servicios | ⚪ |
 | 5 | Ciudadano y experiencia de front-office | ⚪ |
@@ -68,7 +68,7 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Los **cuatro workflows en verde** en `experiment` (Desktop, Docs, Landing, Security).
 - [ ] Guía de configuración de protección de ramas aplicada en GitHub (requiere acceso admin al repo).
 
-## Fase 2 — Shell de escritorio y Design System 🟡
+## Fase 2 — Shell de escritorio y Design System ✅
 
 Shell de aplicación, navegación, barra superior, navegación por tareas/sidebar, componentes
 reutilizables (tema, tipografía, botones, inputs, tablas, diálogos, notificaciones, estados
@@ -101,7 +101,10 @@ módulos.
       navegación/i18n sin framework.
 - [x] Auditoría visual del shell (captura de la app real: menú + barra superior + navegación por
       tareas + inicio "¿Qué necesitas hacer?"); sin advertencias de CSS.
-- [ ] Componente de tabla con paginación real (se completa con la primera lista con datos, Fase 5).
+- [x] Área de contenido con scroll (vistas altas nunca se recortan).
+
+> **Diferido a la Fase 5** (no bloquea el cierre de la Fase 2): componente de tabla con paginación
+> real — se implementa con la primera lista con datos. `DataTable` ya aporta estilo + estado vacío.
 
 ## Fase 3 — Dominio central y base de datos ⚪
 

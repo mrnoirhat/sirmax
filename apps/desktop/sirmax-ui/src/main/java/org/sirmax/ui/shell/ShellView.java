@@ -171,13 +171,21 @@ public final class ShellView extends StackPane {
         return scroll;
     }
 
-    private VBox buildContentArea() {
+    private BorderPane buildContentArea() {
         breadcrumb.getStyleClass().add(Styles.BREADCRUMB);
-        VBox.setVgrow(contentHost, Priority.ALWAYS);
 
-        VBox area = new VBox(12, breadcrumb, contentHost);
+        // The content host scrolls so tall views (dashboards, long forms) never clip.
+        ScrollPane scroll = new ScrollPane(contentHost);
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.getStyleClass().add(Styles.CONTENT);
+
+        BorderPane area = new BorderPane();
+        area.setTop(breadcrumb);
+        area.setCenter(scroll);
         area.getStyleClass().add(Styles.CONTENT);
         area.setPadding(new Insets(24, 28, 28, 28));
+        BorderPane.setMargin(breadcrumb, new Insets(0, 0, 12, 0));
         return area;
     }
 

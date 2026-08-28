@@ -8,7 +8,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
-- **Fase 2 (en curso) — Shell de escritorio y Design System.**
+- **Fase 2 ✅ — Shell de escritorio y Design System.**
   - i18n de UI (`Messages` + `messages.properties`, español base); sin texto literal en código.
   - Tema `sirmax.css` con tokens de color/tipografía/espaciado (_looked-up colors_).
   - Design System: `Styles`, `Typography`, `Buttons`, `Cards`, `Banner`, `StatefulContent`
@@ -19,8 +19,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   - Barra de menú (`Archivo`/`Ver`/`Ayuda`); atajos `Ctrl+K`, `Alt+Home`, `Ctrl+Shift+G`, `F1`,
     `Ctrl+Q`.
   - Tema claro/oscuro: `Theme` + `ThemeManager` + toggle en el menú; `-Dsirmax.theme=dark`.
+  - Área de contenido con scroll; `GlobalSearchView` con resultados por categoría (estado vacío).
   - Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest`, `ThemeManagerTest` +
-    `ShellViewSmokeTest` (arranca el toolkit JavaFX). ADR 0013 (JavaFX programático sin FXML).
+    `ShellViewSmokeTest` (arranca el toolkit JavaFX; 21 pruebas en `sirmax-ui`). ADR 0013 (JavaFX
+    programático sin FXML). Verificado en CI (Desktop + Security en verde).
 - **Fase 0/1 — Fundación del repositorio.**
   - Estructura del monorepo: `apps/desktop`, `apps/landing`, `apps/docs`, `backend`, `database`,
     `scripts`, `docs`, `.github`.
