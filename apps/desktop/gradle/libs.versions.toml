@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# SIRMAX desktop — central version catalog (see docs/adr/0004-gradle.md).
+# Versions here are the Phase 1 baseline; bump via a PR that also updates
+# THIRD_PARTY_LICENSES.md.
+
+[versions]
+javafx = "25"
+javafxPlugin = "0.1.0"
+junit = "5.11.4"
+assertj = "3.27.3"
+archunit = "1.5.0"
+sqliteJdbc = "3.49.1.0"
+jackson = "2.18.2"
+slf4j = "2.0.16"
+logback = "1.5.16"
+
+[libraries]
+# --- runtime ---
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+# --- test ---
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+
+[bundles]
+test = ["junit-jupiter", "assertj-core"]
+
+[plugins]
+javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafxPlugin" }

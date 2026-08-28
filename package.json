@@ -1,0 +1,29 @@
+{
+  "name": "sirmax-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SIRMAX — Sistema Integral de Registros Municipales y Administración eXtensible. Monorepo root (web workspaces: landing + docs). The Windows desktop application lives in apps/desktop and is built with Gradle.",
+  "license": "AGPL-3.0-or-later",
+  "homepage": "https://github.com/mrnoirhat/sirmax",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrnoirhat/sirmax.git"
+  },
+  "workspaces": [
+    "apps/landing",
+    "apps/docs"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "landing:dev": "npm run dev --workspace apps/landing",
+    "landing:build": "npm run build --workspace apps/landing",
+    "landing:lint": "npm run lint --workspace apps/landing",
+    "docs:dev": "npm run start --workspace apps/docs",
+    "docs:build": "npm run build --workspace apps/docs",
+    "desktop:build": "cd apps/desktop && ./gradlew build",
+    "desktop:run": "cd apps/desktop && ./gradlew :sirmax-app:run",
+    "web:build": "npm run landing:build && npm run docs:build"
+  }
+}

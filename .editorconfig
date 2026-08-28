@@ -1,0 +1,33 @@
+# EditorConfig — https://editorconfig.org
+# SIRMAX monorepo coding style baseline.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+[*.java]
+indent_size = 4
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999
+
+[*.{kt,kts}]
+indent_size = 4
+
+[*.{js,jsx,ts,tsx,mjs,cjs,json,json5,yml,yaml,css,scss,html}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+[*.{bat,cmd}]
+end_of_line = crlf
+
+[Makefile]
+indent_style = tab
