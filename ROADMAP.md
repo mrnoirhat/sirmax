@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-27 — rama `experiment`._
+_Última actualización: 2026-08-28 — rama `experiment` (CI en verde en `2b24c71`)._
 
 ---
 
@@ -12,8 +12,8 @@ _Última actualización: 2026-08-27 — rama `experiment`._
 
 | Fase | Título | Estado |
 | ---: | --- | :---: |
-| 0 | Discovery, auditoría de repo y arquitectura | 🟡 |
-| 1 | Fundación del repositorio | 🟡 |
+| 0 | Discovery, auditoría de repo y arquitectura | ✅ |
+| 1 | Fundación del repositorio | ✅ |
 | 2 | Shell de escritorio y Design System | ⚪ |
 | 3 | Dominio central y base de datos | ⚪ |
 | 4 | Motor configurable de servicios | ⚪ |
@@ -30,7 +30,7 @@ _Última actualización: 2026-08-27 — rama `experiment`._
 
 ---
 
-## Fase 0 — Discovery, auditoría de repo y arquitectura 🟡
+## Fase 0 — Discovery, auditoría de repo y arquitectura ✅
 
 Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 
@@ -45,9 +45,9 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Mapa de UX ([`docs/ux/ux-map.md`](./docs/ux/ux-map.md)).
 - [x] Plan de build ([`docs/build-plan.md`](./docs/build-plan.md)).
 - [x] CI skeleton definido (`.github/workflows/{desktop,landing,docs,security}.yml`).
-- [ ] CI skeleton verificado en verde en GitHub Actions (requiere push al remoto).
+- [x] CI skeleton verificado **en verde** en GitHub Actions (commit `2b24c71`, rama `experiment`).
 
-## Fase 1 — Fundación del repositorio 🟡
+## Fase 1 — Fundación del repositorio ✅
 
 - [x] Estructura de carpetas del monorepo (`apps/`, `backend/`, `database/`, `scripts/`, `docs/`, `.github/`).
 - [x] Documentos de gobernanza raíz (README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT,
@@ -64,9 +64,9 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Build de escritorio verde localmente (JDK 25 + Gradle 9.7.1): compila 7 módulos, `MoneyTest`
       y `LayerBoundaryTest` (ArchUnit) pasan.
 - [x] Toolchains instaladas en la máquina de desarrollo (JDK 25, Node 24, Gradle 9.7.1, gh).
-- [ ] `npm install` reproducible con `package-lock.json` comiteado.
-- [ ] Guía de configuración de protección de ramas aplicada en GitHub.
-- [ ] Primera ejecución verde de los cuatro workflows (Landing ✅; Desktop/Docs/Security en corrección).
+- [x] `npm ci` reproducible con `package-lock.json` comiteado; workflows con `cache: npm`.
+- [x] Los **cuatro workflows en verde** en `experiment` (Desktop, Docs, Landing, Security).
+- [ ] Guía de configuración de protección de ramas aplicada en GitHub (requiere acceso admin al repo).
 
 ## Fase 2 — Shell de escritorio y Design System ⚪
 

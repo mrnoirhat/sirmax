@@ -27,5 +27,20 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   - Esqueleto de documentación (Docusaurus) con la estructura de secciones prevista.
   - GitHub Actions: `desktop`, `landing`, `docs`, `security`; plantillas de issues y PR.
   - `database/migrations/V0001__baseline.sql` (línea base mínima del esquema).
+  - `package-lock.json` comiteado; los workflows usan `npm ci` con caché de npm.
+
+### Changed
+  - Gradle **8.12 → 9.7.1** (Gradle 8.x no arranca sobre JDK 25). El wrapper queda comiteado con
+    verificación de checksum.
+  - El cableado de dependencias se movió del bloque `subprojects {}` al `build.gradle.kts` de cada
+    módulo (el accesor `libs` no está disponible en `subprojects {}`).
+  - ArchUnit **1.3.0 → 1.5.0** (ASM de 1.3.0 no lee bytecode de Java 25).
+  - Docusaurus **3.7.0 → 3.10.2** (3.7 falla con el webpack actual y con Node ≥ 24). Se pospone el
+    tema de Mermaid a la Fase 12.
+
+### Verified
+  - Los cuatro workflows de CI (Desktop, Docs, Landing, Security) **en verde** en `experiment`
+    (commit `2b24c71`). Build local reproducido: `./gradlew build`, `docs build`, landing
+    `lint`/`typecheck`/`build`.
 
 [Unreleased]: https://github.com/mrnoirhat/sirmax/commits/experiment
