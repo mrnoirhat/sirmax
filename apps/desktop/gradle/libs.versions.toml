@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# SIRMAX desktop — central version catalog (see docs/adr/0004-gradle.md).
+# Versions here are the Phase 1 baseline; bump via a PR that also updates
+# THIRD_PARTY_LICENSES.md.
+
+[versions]
+java = "25"
+javafx = "25"
+javafxPlugin = "0.1.0"
+jlinkPlugin = "3.1.1"
+spotless = "7.0.2"
+junit = "5.11.4"
+assertj = "3.27.3"
+archunit = "1.3.0"
+mockito = "5.15.2"
+sqliteJdbc = "3.49.1.0"
+slf4j = "2.0.16"
+logback = "1.5.16"
+
+[libraries]
+# --- runtime ---
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+# --- test ---
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
+[bundles]
+test = ["junit-jupiter", "assertj-core", "mockito-core", "mockito-junit-jupiter"]
+
+[plugins]
+javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafxPlugin" }
+jlink = { id = "org.beryx.jlink", version.ref = "jlinkPlugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

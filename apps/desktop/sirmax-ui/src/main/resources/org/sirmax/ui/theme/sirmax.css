@@ -1,0 +1,83 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/*
+ * SIRMAX desktop theme — Phase 1 placeholder.
+ * The real design system (tokens, typography scale, component states) lands in Phase 2.
+ * Calm, modern, professional; never childish, bureaucratic or noisy (master prompt §12).
+ */
+
+.root {
+    -sirmax-bg: #f6f7f9;
+    -sirmax-surface: #ffffff;
+    -sirmax-text: #1f2430;
+    -sirmax-muted: #5b6472;
+    -sirmax-primary: #1f5fa6;
+    -sirmax-primary-contrast: #ffffff;
+    -sirmax-border: #d9dde3;
+
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -sirmax-bg;
+}
+
+.sirmax-topbar {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: transparent transparent -sirmax-border transparent;
+}
+
+.sirmax-brand {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -sirmax-primary;
+}
+
+.sirmax-global-search {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: -sirmax-border;
+    -fx-padding: 6 10 6 10;
+}
+
+.sirmax-tasknav {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: transparent -sirmax-border transparent transparent;
+}
+
+.sirmax-navitem {
+    -fx-background-color: transparent;
+    -fx-text-fill: -sirmax-text;
+    -fx-padding: 8 10 8 10;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.sirmax-navitem:hover {
+    -fx-background-color: derive(-sirmax-primary, 88%);
+}
+
+.sirmax-home-question {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -sirmax-text;
+}
+
+.sirmax-taskcard {
+    -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text;
+    -fx-font-size: 14px;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-padding: 14;
+    -fx-wrap-text: true;
+}
+
+.sirmax-taskcard:hover {
+    -fx-border-color: -sirmax-primary;
+}
+
+.sirmax-taskcard:focused {
+    -fx-border-color: -sirmax-primary;
+    -fx-border-width: 2;
+}
