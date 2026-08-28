@@ -16,7 +16,7 @@ subprojects {
     apply(plugin = "java-library")
 
     group = "org.sirmax"
-    version = "0.1.0"
+    version = "0.1.1"
 
     repositories {
         mavenCentral()

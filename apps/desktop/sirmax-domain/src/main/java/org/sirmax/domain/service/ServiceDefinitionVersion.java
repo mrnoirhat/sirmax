@@ -7,15 +7,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.sirmax.domain.finance.FeeRule;
+import org.sirmax.domain.workflow.WorkflowDefinition;
 import org.sirmax.shared.JsonDoc;
 
 /**
  * One immutable-once-published version of a service's configuration (docs/adr/0006).
  *
- * <p>Editable only while {@link ServiceStatus#DRAFT}. {@code requirements}, {@code sla} and {@code
- * validity} are typed; {@code formSchema} / {@code workflow} / {@code feeRules} / {@code
- * outputDocuments} / {@code authorization} are validated JSON for now and gain typed models in later
- * Phase 4 slices (docs/adr/0007, 0008).
+ * <p>Editable only while {@link ServiceStatus#DRAFT}. The configurable parts are now typed:
+ * {@link RequirementDef requirements}, {@link FormSchema}, {@link WorkflowDefinition} and {@link
+ * FeeRule fee rules}, plus {@link Sla} and {@link Validity}. Output-document definitions and
+ * authorization rules remain validated JSON until they gain typed models (Phase 7/8).
  */
 public final class ServiceDefinitionVersion {
 
@@ -28,11 +30,11 @@ public final class ServiceDefinitionVersion {
     private String notes; // nullable
 
     private final List<RequirementDef> requirements = new ArrayList<>();
+    private final List<FeeRule> feeRules = new ArrayList<>();
+    private FormSchema formSchema;
+    private WorkflowDefinition workflow;
     private Sla sla;
     private Validity validity;
-    private JsonDoc formSchema;
-    private JsonDoc workflow;
-    private JsonDoc feeRules;
     private JsonDoc outputDocuments;
     private JsonDoc authorization;
 
@@ -48,11 +50,11 @@ public final class ServiceDefinitionVersion {
             String numberingSequenceCode,
             String notes,
             List<RequirementDef> requirements,
+            List<FeeRule> feeRules,
+            FormSchema formSchema,
+            WorkflowDefinition workflow,
             Sla sla,
             Validity validity,
-            JsonDoc formSchema,
-            JsonDoc workflow,
-            JsonDoc feeRules,
             JsonDoc outputDocuments,
             JsonDoc authorization,
             Instant createdAt,
@@ -70,11 +72,13 @@ public final class ServiceDefinitionVersion {
         if (requirements != null) {
             this.requirements.addAll(requirements);
         }
+        if (feeRules != null) {
+            this.feeRules.addAll(feeRules);
+        }
+        this.formSchema = formSchema == null ? FormSchema.empty() : formSchema;
+        this.workflow = workflow == null ? WorkflowDefinition.empty() : workflow;
         this.sla = sla == null ? Sla.none() : sla;
         this.validity = validity == null ? Validity.permanent() : validity;
-        this.formSchema = formSchema == null ? JsonDoc.EMPTY_OBJECT : formSchema;
-        this.workflow = workflow == null ? JsonDoc.EMPTY_OBJECT : workflow;
-        this.feeRules = feeRules == null ? JsonDoc.EMPTY_ARRAY : feeRules;
         this.outputDocuments = outputDocuments == null ? JsonDoc.EMPTY_ARRAY : outputDocuments;
         this.authorization = authorization == null ? JsonDoc.EMPTY_OBJECT : authorization;
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
@@ -93,11 +97,11 @@ public final class ServiceDefinitionVersion {
                 null,
                 null,
                 List.of(),
+                List.of(),
+                FormSchema.empty(),
+                WorkflowDefinition.empty(),
                 Sla.none(),
                 Validity.permanent(),
-                JsonDoc.EMPTY_OBJECT,
-                JsonDoc.EMPTY_OBJECT,
-                JsonDoc.EMPTY_ARRAY,
                 JsonDoc.EMPTY_ARRAY,
                 JsonDoc.EMPTY_OBJECT,
                 now,
@@ -118,11 +122,11 @@ public final class ServiceDefinitionVersion {
                 numberingSequenceCode,
                 notes,
                 new ArrayList<>(requirements),
-                sla,
-                validity,
+                new ArrayList<>(feeRules),
                 formSchema,
                 workflow,
-                feeRules,
+                sla,
+                validity,
                 outputDocuments,
                 authorization,
                 now,
@@ -163,24 +167,24 @@ public final class ServiceDefinitionVersion {
         return Collections.unmodifiableList(requirements);
     }
 
+    public List<FeeRule> feeRules() {
+        return Collections.unmodifiableList(feeRules);
+    }
+
+    public FormSchema formSchema() {
+        return formSchema;
+    }
+
+    public WorkflowDefinition workflow() {
+        return workflow;
+    }
+
     public Sla sla() {
         return sla;
     }
 
     public Validity validity() {
         return validity;
-    }
-
-    public JsonDoc formSchema() {
-        return formSchema;
-    }
-
-    public JsonDoc workflow() {
-        return workflow;
-    }
-
-    public JsonDoc feeRules() {
-        return feeRules;
     }
 
     public JsonDoc outputDocuments() {
@@ -242,6 +246,14 @@ public final class ServiceDefinitionVersion {
         }
     }
 
+    public void setFeeRules(List<FeeRule> newFeeRules) {
+        requireDraft();
+        this.feeRules.clear();
+        if (newFeeRules != null) {
+            this.feeRules.addAll(newFeeRules);
+        }
+    }
+
     public void setRequiresPayment(boolean value) {
         requireDraft();
         this.requiresPayment = value;
@@ -267,19 +279,14 @@ public final class ServiceDefinitionVersion {
         this.validity = Objects.requireNonNull(value, "validity");
     }
 
-    public void setFormSchema(JsonDoc value) {
+    public void setFormSchema(FormSchema value) {
         requireDraft();
         this.formSchema = Objects.requireNonNull(value, "formSchema");
     }
 
-    public void setWorkflow(JsonDoc value) {
+    public void setWorkflow(WorkflowDefinition value) {
         requireDraft();
         this.workflow = Objects.requireNonNull(value, "workflow");
-    }
-
-    public void setFeeRules(JsonDoc value) {
-        requireDraft();
-        this.feeRules = Objects.requireNonNull(value, "feeRules");
     }
 
     public void setOutputDocuments(JsonDoc value) {

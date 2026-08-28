@@ -12,7 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.sirmax.application.fakes.Fakes;
 import org.sirmax.application.security.Audit;
 import org.sirmax.application.security.Session;
+import java.time.LocalDate;
 import org.sirmax.domain.common.ArchiveStatus;
+import org.sirmax.domain.finance.ChargeType;
+import org.sirmax.domain.finance.FeeRule;
 import org.sirmax.domain.security.AccessPolicy;
 import org.sirmax.domain.security.AppUser;
 import org.sirmax.domain.security.PasswordHash;
@@ -23,7 +26,6 @@ import org.sirmax.domain.service.ServiceCategory;
 import org.sirmax.domain.service.ServiceDefinitionVersion;
 import org.sirmax.domain.service.ServiceStatus;
 import org.sirmax.domain.service.ServiceType;
-import org.sirmax.shared.JsonDoc;
 import org.sirmax.shared.Result;
 
 class ServiceEngineTest {
@@ -110,7 +112,15 @@ class ServiceEngineTest {
                         Optional.empty(),
                         Optional.empty(),
                         Optional.empty(),
-                        Optional.of(JsonDoc.of("[{\"type\":\"FIXED\",\"amountMinor\":50000}]")),
+                        Optional.of(
+                                List.of(
+                                        FeeRule.fixed(
+                                                "fee1",
+                                                ChargeType.TASA,
+                                                "Certificación",
+                                                "DOP",
+                                                50_000,
+                                                LocalDate.parse("2026-01-01")))),
                         Optional.empty(),
                         Optional.empty(),
                         Optional.empty(),
