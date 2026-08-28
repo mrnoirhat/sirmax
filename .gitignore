@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────
+# SIRMAX — monorepo .gitignore
+# ─────────────────────────────────────────────────────────────
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.un~
+*.swp
+*.swo
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.sample
+
+# ── Java / Gradle (apps/desktop, backend) ──
+.gradle/
+**/build/
+!**/src/**/build/
+!database/**/build/
+!scripts/**/build/
+out/
+bin/
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+.gradletasknamecache
+# Wrapper jar is committed on purpose:
+!gradle/wrapper/gradle-wrapper.jar
+
+# jpackage / jlink output
+apps/desktop/**/jpackage/
+apps/desktop/**/image/
+*.msi
+*.exe
+!**/src/**/*.exe
+
+# ── Node / Next.js / Docusaurus (apps/landing, apps/docs) ──
+node_modules/
+.pnp
+.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.next/
+out/
+.vercel/
+.docusaurus/
+build/
+.cache-loader/
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+.turbo/
+
+# ── Environment / secrets ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!**/src/**/*.key
+secrets/
+credentials.json
+client_secret*.json
+token.json
+
+# ── SIRMAX runtime / local data (never commit operator data) ──
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+/data/
+/backups/
+*.sirmax-backup
+local-run/
+
+# ── Test / tooling reports ──
+*.hprof
+test-results/
+reports/
+.nyc_output/

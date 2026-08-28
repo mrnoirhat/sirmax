@@ -1,0 +1,176 @@
+# Roadmap de SIRMAX
+
+Estado de la construcción por fases. Este documento es la **fuente de verdad del progreso**.
+
+Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
+
+_Última actualización: 2026-08-27 — rama `experiment`._
+
+---
+
+## Resumen
+
+| Fase | Título | Estado |
+| ---: | --- | :---: |
+| 0 | Discovery, auditoría de repo y arquitectura | 🟡 |
+| 1 | Fundación del repositorio | 🟡 |
+| 2 | Shell de escritorio y Design System | ⚪ |
+| 3 | Dominio central y base de datos | ⚪ |
+| 4 | Motor configurable de servicios | ⚪ |
+| 5 | Ciudadano y experiencia de front-office | ⚪ |
+| 6 | Facturación, pagos y caja | ⚪ |
+| 7 | Módulos municipales especializados | ⚪ |
+| 8 | Documentos, PDF e impresión | ⚪ |
+| 9 | Backup, recuperación y Google Drive | ⚪ |
+| 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ⚪ |
+| 11 | Empaquetado para Windows | ⚪ |
+| 12 | Productivización de landing + docs | ⚪ |
+| 13 | Hardening | ⚪ |
+| 14 | Release 1.0 | ⚪ |
+
+---
+
+## Fase 0 — Discovery, auditoría de repo y arquitectura 🟡
+
+Objetivo: dejar una base documentada antes de escribir lógica de negocio.
+
+- [x] Auditoría del repositorio inicial (README, LICENSE, .gitignore).
+- [x] Decisiones de tecnología (ADR 0001–0012).
+- [x] Estructura del monorepo definida.
+- [x] Modelo de ramas `experiment → testing → main` creado.
+- [x] Glosario de dominio ([`docs/domain/glossary.md`](./docs/domain/glossary.md)).
+- [x] Mapa de dominio ([`docs/domain/domain-map.md`](./docs/domain/domain-map.md)).
+- [x] ERD inicial ([`docs/domain/erd.md`](./docs/domain/erd.md)).
+- [x] Mapa de módulos ([`docs/domain/module-map.md`](./docs/domain/module-map.md)).
+- [x] Mapa de UX ([`docs/ux/ux-map.md`](./docs/ux/ux-map.md)).
+- [x] Plan de build ([`docs/build-plan.md`](./docs/build-plan.md)).
+- [ ] CI skeleton verificado en verde en GitHub Actions.
+
+## Fase 1 — Fundación del repositorio 🟡
+
+- [x] Estructura de carpetas del monorepo (`apps/`, `backend/`, `database/`, `scripts/`, `docs/`, `.github/`).
+- [x] Documentos de gobernanza raíz (README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT,
+      ARCHITECTURE, DEVELOPMENT, DATABASE, BACKUP, RELEASE, ROADMAP, CHANGELOG,
+      THIRD_PARTY_LICENSES, TRADEMARK_POLICY, LICENSE).
+- [x] Esqueleto Gradle multi-módulo del escritorio (`sirmax-shared/domain/application/infrastructure/ui/app`).
+- [x] Esqueleto de landing Next.js + TypeScript con navegación y CTAs obligatorios.
+- [x] Esqueleto de documentación Docusaurus.
+- [x] GitHub Actions (`desktop`, `landing`, `docs`, `security`).
+- [x] Plantillas de issues y PR.
+- [ ] Gradle wrapper comiteado (`gradle wrapper --gradle-version <x>`).
+- [ ] `npm install` reproducible con `package-lock.json` comiteado.
+- [ ] Guía de configuración de protección de ramas aplicada en GitHub.
+- [ ] Primera ejecución verde de los cuatro workflows.
+
+## Fase 2 — Shell de escritorio y Design System ⚪
+
+Shell de aplicación, navegación, barra superior, navegación por tareas/sidebar, componentes
+reutilizables (tema, tipografía, botones, inputs, tablas, diálogos, notificaciones, estados
+loading/empty/error/success), atajos de teclado. El shell debe sentirse pulido antes de añadir
+módulos.
+
+## Fase 3 — Dominio central y base de datos ⚪
+
+Organización/municipio, departamentos, usuarios, roles, permisos, personas, organizaciones,
+direcciones, configuración, migraciones, fundación de auditoría.
+
+## Fase 4 — Motor configurable de servicios ⚪
+
+Catálogo de servicios, definiciones de servicio, requisitos, formularios dinámicos donde aplique,
+flujo de trabajo, reglas de tasas, plantillas de documentos, versionado de servicios,
+activación/desactivación.
+
+## Fase 5 — Ciudadano y front-office ⚪
+
+Búsqueda de ciudadano, ficha maestra, detección de duplicados, asistente de nuevo trámite, checklist
+de requisitos, navegación service-first, colas/worklists, detalle de caso, historial del ciudadano.
+
+## Fase 6 — Facturación, pagos y caja ⚪
+
+Cargo/liquidación, entidad factura, numeración, líneas, descuentos/cargos, métodos de pago, pago
+parcial, recibos, sesión de caja, conciliación, reembolsos/anulaciones/ajustes, auditoría de
+facturación.
+
+## Fase 7 — Módulos municipales especializados ⚪
+
+Prioridad: 1) Registro Civil / Registro de Documentos / Conservaduría · 2) Certificaciones y cartas
+oficiales · 3) Planeamiento Urbano / Construcción · 4) Propiedad/Catastro · 5) Cementerios ·
+6) Mercados y espacios comerciales · 7) Negocios/Publicidad/Permisos · 8) Espacio público/Movilidad ·
+9) Residuos/Solicitudes de servicio · 10) Casos comunitarios/sociales.
+
+## Fase 8 — Documentos, PDF e impresión ⚪
+
+Plantillas de documentos oficiales, plantilla de factura Letter, plantilla de recibo/factura
+angosta, preview, impresión Windows, perfiles de impresora, generación de PDF, marca institucional,
+QR/verificación, reimpresión auditada.
+
+## Fase 9 — Backup, recuperación y Google Drive ⚪
+
+Backups locales, historial, validación, compresión, cifrado, hash de integridad, restauración
+segura, Google OAuth, carpeta de Drive, programación automática.
+
+## Fase 10 — Seguridad, auditoría y fiabilidad ⚪
+
+Hashing de contraseñas, seguridad de sesión, permisos, integridad de auditoría, log seguro,
+validación de ficheros, manejo de secretos, chequeos de dependencias/seguridad, pruebas de
+recuperación.
+
+## Fase 11 — Empaquetado para Windows ⚪
+
+Instalador Windows, runtime empaquetado, accesos directos, instalación limpia, desinstalación,
+información de versión, verificación de artefactos de release.
+
+## Fase 12 — Productivización de landing + docs ⚪
+
+Landing lista para Vercel, SEO, capturas, CTAs de GitHub, despliegue de Docusaurus, enlaces cruzados,
+alineación release/documentación.
+
+## Fase 13 — Hardening ⚪
+
+Regresión, auditoría de UX, auditoría de rendimiento, auditoría de impresión, auditoría de
+backup/restore, auditoría de migraciones, auditoría de accesibilidad, auditoría de documentación.
+
+## Fase 14 — Release 1.0 ⚪
+
+Solo tras pasar el Release Gate de [`RELEASE.md`](./RELEASE.md).
+
+---
+
+## MVP — el bucle municipal completo (🔵 objetivo de la primera release usable)
+
+```text
+Ciudadano → Servicio → Trámite → Validación de requisitos → Tasa → Factura → Pago →
+Impresión → Documento oficial → Auditoría → Backup
+```
+
+Y al menos un proceso **gratuito/no financiero**:
+
+```text
+Ciudadano → Solicitud → Asignación → Resolución → Cierre → Auditoría
+```
+
+## Escenarios de aceptación end-to-end (🔵)
+
+- **A — Certificación:** crear ciudadano → certificado de vida y residencia → validar requisitos →
+  tasa → factura → pago → imprimir → generar certificado → auditoría.
+- **B — Construcción:** solicitante → propiedad/proyecto → documentos requeridos → revisión →
+  inspección → decisión → tasa → factura → pago → documento de permiso.
+- **C — Cementerio:** ciudadano/familia → registro de cementerio → espacio → concesión/permiso →
+  tasa → factura → pago → documentos.
+- **D — Queja:** ciudadano → solicitud de servicio → asignación → seguimiento → resolución → cierre
+  (sin factura salvo que el servicio configurado la exija).
+- **E — Documento registrado:** parte → presentación → metadatos de registro → tasa/liquidación →
+  factura → pago → registro → copia certificada.
+- **F — Recibo angosto:** servicio pagado → recibo compacto → impresora angosta configurada → salida
+  física → comportamiento de reimpresión auditado.
+- **G — Factura Letter:** servicio pagado → preview Letter → marca institucional → impresora de
+  oficina Windows → copia PDF → auditoría.
+
+## Fuera de MVP, en roadmap (⏭️)
+
+Elecciones/soporte electoral, desarrollo económico local, cultura y patrimonio, turismo, deportes y
+recreación, eventos comunitarios, bibliotecas, bienestar animal, salud pública, higiene alimentaria,
+control de plagas, ruido/molestias, arbolado urbano, protección civil, coordinación de bomberos,
+vivienda/apoyo comunitario, aparcamiento y permisos, reserva de instalaciones, subvenciones,
+gestión de activos municipales, arrendamientos y concesiones avanzados, portal ciudadano,
+notificaciones por email/SMS/WhatsApp, datos abiertos/transparencia, API/nube.
