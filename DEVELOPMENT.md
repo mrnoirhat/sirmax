@@ -38,8 +38,8 @@ cd apps/desktop
 ./gradlew build            # Windows: gradlew.bat build
 ```
 
-> El wrapper de Gradle (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) se añade en la Fase 1 con
-> `gradle wrapper --gradle-version <x>`. Hasta entonces necesitas un Gradle local para el bootstrap.
+> El wrapper de Gradle está comiteado y fija **Gradle 9.7.1** (necesario para JDK 25). No hace falta
+> instalar Gradle: `./gradlew` descarga la distribución la primera vez y valida su checksum.
 
 ## 3. Comandos habituales
 
@@ -129,4 +129,4 @@ Workflows en [`.github/workflows/`](./.github/workflows/):
 | `Unsupported class file major version` | JDK != 25 | Ajusta `JAVA_HOME` al JDK 25 |
 | JavaFX no arranca | faltan módulos nativos | usa `:sirmax-app:run` (el plugin de JavaFX resuelve las libs) |
 | `npm install` falla en `apps/docs` | Node < 20.11 | actualiza Node a LTS |
-| Gradle no encontrado en el bootstrap | wrapper aún no generado | instala Gradle local o genera el wrapper |
+| `IllegalArgumentException: 25.x` al arrancar Gradle | Gradle 8.x no soporta JDK 25 | usa el wrapper (`./gradlew`), que fija Gradle 9.7.1 |

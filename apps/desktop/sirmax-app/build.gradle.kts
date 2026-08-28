@@ -23,6 +23,10 @@ dependencies {
     implementation(project(":sirmax-domain"))
     implementation(project(":sirmax-shared"))
     runtimeOnly(libs.logback.classic)
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 application {

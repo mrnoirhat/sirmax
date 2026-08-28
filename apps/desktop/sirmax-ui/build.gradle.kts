@@ -18,4 +18,8 @@ javafx {
 dependencies {
     implementation(project(":sirmax-application"))
     implementation(project(":sirmax-shared"))
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

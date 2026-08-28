@@ -37,14 +37,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install
-        run: npm install
+          cache: npm
+      - run: npm ci
       - name: Audit (high severity, non-blocking until Phase 10)
         run: npm audit --audit-level=high || true
 
   codeql:
     name: CodeQL (${{ matrix.language }})
-    runs-on: ${{ matrix.language == 'java-kotlin' && 'windows-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       security-events: write
       contents: read

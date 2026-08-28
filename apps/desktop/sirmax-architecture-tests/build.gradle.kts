@@ -12,5 +12,9 @@ dependencies {
     testImplementation(project(":sirmax-infrastructure"))
     testImplementation(project(":sirmax-ui"))
     testImplementation(project(":sirmax-app"))
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.test)
     testImplementation(libs.archunit.junit5)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

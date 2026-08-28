@@ -2,6 +2,7 @@
 package org.sirmax.architecture;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -24,6 +25,15 @@ class LayerBoundaryTest {
                 new ClassFileImporter()
                         .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                         .importPackages("org.sirmax");
+    }
+
+    @Test
+    void productionClassesWereActuallyImported() {
+        // Guards against the rules passing vacuously if the classpath scan finds nothing.
+        assertThat(sirmax.size()).isGreaterThan(10);
+        assertThat(sirmax.stream().anyMatch(c -> c.getPackageName().startsWith("org.sirmax.domain")))
+                .as("domain classes present")
+                .isTrue();
     }
 
     @Test

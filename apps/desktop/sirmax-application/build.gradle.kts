@@ -8,4 +8,8 @@ description = "SIRMAX application layer (use cases + ports)"
 dependencies {
     api(project(":sirmax-domain"))
     api(project(":sirmax-shared"))
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

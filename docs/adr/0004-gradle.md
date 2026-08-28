@@ -13,11 +13,17 @@ multi-módulo (capas), catálogo de versiones centralizado, integración con el 
 
 ## Decisión
 
-Build con **Gradle** usando **Kotlin DSL** (`*.gradle.kts`), en `apps/desktop/`:
+Build con **Gradle 9.x** (actualmente 9.7.1) usando **Kotlin DSL** (`*.gradle.kts`), en `apps/desktop/`.
+Se requiere Gradle 9: Gradle 8.x no arranca sobre JDK 25 (su Kotlin embebido no parsea la cadena de
+versión `25.x`). Gradle corre sobre JDK 25 y compila/prueba cada módulo con el toolchain de Java
+(también 25).
 
 - `settings.gradle.kts` declara los módulos `sirmax-shared`, `sirmax-domain`, `sirmax-application`,
-  `sirmax-infrastructure`, `sirmax-ui`, `sirmax-app`.
-- `build.gradle.kts` raíz configura convenciones comunes (`java`, `toolchain 25`, JUnit 5, warnings).
+  `sirmax-infrastructure`, `sirmax-ui`, `sirmax-app`, `sirmax-architecture-tests`.
+- `build.gradle.kts` raíz configura convenciones **independientes del catálogo** (`java-library`,
+  `toolchain 25`, config de `Test`, `-Xlint`). El cableado de dependencias (que necesita el accesor
+  `libs`) vive en el `build.gradle.kts` de cada módulo, porque `libs` no está disponible dentro de un
+  bloque `subprojects {}`.
 - `gradle/libs.versions.toml` es el **catálogo de versiones** único.
 - Wrapper comiteado (`gradlew`, `gradlew.bat`, `gradle/wrapper/`).
 - Plugins clave: `org.openjfx.javafxplugin`, `application`, y `org.beryx.jlink` (o `jpackage` directo)

@@ -17,7 +17,6 @@ const config: Config = {
   projectName: "sirmax",
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
 
   i18n: {
     defaultLocale: "es",
@@ -25,9 +24,13 @@ const config: Config = {
   },
 
   markdown: {
-    mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
   },
-  themes: ["@docusaurus/theme-mermaid"],
+
+  // @docusaurus/theme-mermaid is added back in Phase 12 when the docs site gets
+  // its own diagrams (the domain diagrams live in the repo's /docs folder for now).
 
   presets: [
     [

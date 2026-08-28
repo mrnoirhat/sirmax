@@ -33,7 +33,8 @@ public sealed interface Result<T> permits Result.Ok, Result.Err {
     /** The success value, or throws {@link IllegalStateException} if this is an error. */
     T orElseThrow();
 
-    Optional<T> value();
+    /** The success value if present, otherwise empty. */
+    Optional<T> optional();
 
     <R> Result<R> map(Function<? super T, ? extends R> mapper);
 
@@ -41,6 +42,7 @@ public sealed interface Result<T> permits Result.Ok, Result.Err {
 
     T orElseGet(Supplier<? extends T> fallback);
 
+    /** A successful outcome carrying a value. */
     record Ok<T>(T value) implements Result<T> {
         public Ok {
             Objects.requireNonNull(value, "value");
@@ -57,7 +59,7 @@ public sealed interface Result<T> permits Result.Ok, Result.Err {
         }
 
         @Override
-        public Optional<T> value() {
+        public Optional<T> optional() {
             return Optional.of(value);
         }
 
@@ -100,7 +102,7 @@ public sealed interface Result<T> permits Result.Ok, Result.Err {
         }
 
         @Override
-        public Optional<T> value() {
+        public Optional<T> optional() {
             return Optional.empty();
         }
 

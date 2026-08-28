@@ -9,4 +9,8 @@ description = "SIRMAX domain model (pure Java)"
 
 dependencies {
     api(project(":sirmax-shared"))
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

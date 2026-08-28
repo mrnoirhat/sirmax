@@ -59,8 +59,11 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] GitHub Actions (`desktop`, `landing`, `docs`, `security`) + `dependabot.yml`.
 - [x] Plantillas de issues (bug, feature) y PR.
 - [x] `backend/`, `database/` y `scripts/` con README y migración baseline (`V0001__baseline.sql`).
-- [x] Gradle wrapper (scripts + jar oficial 8.12.0) comiteado.
+- [x] Gradle wrapper (Gradle 9.7.1, requerido para JDK 25) comiteado.
 - [x] Rama `experiment` publicada en el remoto.
+- [x] Build de escritorio verde localmente (JDK 25 + Gradle 9.7.1): compila 7 módulos, `MoneyTest`
+      y `LayerBoundaryTest` (ArchUnit) pasan.
+- [x] Toolchains instaladas en la máquina de desarrollo (JDK 25, Node 24, Gradle 9.7.1, gh).
 - [ ] `npm install` reproducible con `package-lock.json` comiteado.
 - [ ] Guía de configuración de protección de ramas aplicada en GitHub.
 - [ ] Primera ejecución verde de los cuatro workflows (Landing ✅; Desktop/Docs/Security en corrección).

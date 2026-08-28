@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Root build for the SIRMAX Windows desktop application.
-// Common conventions live here; module-specific config lives in each
-// sirmax-*/build.gradle.kts. See docs/adr/0004-gradle.md and
-// docs/adr/0005-modular-domain-architecture.md.
 //
-// Phase 1 keeps this intentionally minimal. Static analysis / formatting
-// (spotless + google-java-format) and -Werror are added in Phase 2 with a
-// one-time reformat commit (see ROADMAP.md).
+// Common, catalog-independent conventions live here. Dependency wiring
+// (which needs the type-safe `libs` accessor) lives in each module's own
+// build.gradle.kts, because the `libs` accessor is not available inside a
+// `subprojects {}` block. See docs/adr/0004-gradle.md.
+//
+// Gradle runs on JDK 21 (see gradle/wrapper + CI); the Java toolchain
+// compiles and tests every module with JDK 25 (docs/adr/0001-java-25.md).
 
 subprojects {
     // java-library (not plain java) so modules can expose transitive API
@@ -25,12 +26,6 @@ subprojects {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(25))
         }
-    }
-
-    dependencies {
-        "testImplementation"(platform(libs.junit.bom))
-        "testImplementation"(libs.bundles.test)
-        "testRuntimeOnly"(libs.junit.platform.launcher)
     }
 
     tasks.withType<JavaCompile>().configureEach {
