@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.sirmax.shared.JsonDoc;
+import org.sirmax.domain.finance.ChargeType;
+import org.sirmax.domain.finance.FeeRule;
 
 class ServiceDefinitionVersionTest {
 
@@ -24,7 +26,14 @@ class ServiceDefinitionVersionTest {
         assertThat(v.requirements()).isEmpty();
         assertThat(v.requiresPayment()).isFalse();
         assertThat(v.publishedAt()).isEmpty();
-        assertThat(v.feeRules()).isEqualTo(JsonDoc.EMPTY_ARRAY);
+        assertThat(v.feeRules()).isEmpty();
+        assertThat(v.workflow().isEmpty()).isTrue();
+        assertThat(v.formSchema().isEmpty()).isTrue();
+    }
+
+    private static FeeRule fixedRule() {
+        return FeeRule.fixed(
+                "r1", ChargeType.TASA, "Trámite", "DOP", 50_000, LocalDate.parse("2026-01-01"));
     }
 
     @Test
@@ -37,11 +46,12 @@ class ServiceDefinitionVersionTest {
                                 "prueba_residencia", "Prueba de residencia", RequirementStage.INTAKE)));
         v.setRequiresPayment(true);
         v.setSla(Sla.businessDays(3));
-        v.setFeeRules(JsonDoc.of("[{\"type\":\"FIXED\"}]"));
+        v.setFeeRules(List.of(fixedRule()));
 
         assertThat(v.requirements()).hasSize(2);
         assertThat(v.sla().targetDays()).isEqualTo(3);
         assertThat(v.requiresPayment()).isTrue();
+        assertThat(v.feeRules()).hasSize(1);
     }
 
     @Test

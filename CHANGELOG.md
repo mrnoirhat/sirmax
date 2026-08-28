@@ -16,7 +16,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   - Motor de flujo de trabajo tipado (`domain.workflow`, ADR 0007): `WorkflowDefinition`,
     `WorkflowStep`, `Transition`, `StepType`, `TransitionKind`, `WorkflowValidator`,
     `WorkflowEngine` (transiciones disponibles + destino; guarda de `PAYMENT_CHECKPOINT`).
-  - Tests: `ExpressionEvaluatorTest`, `RequirementsChecklistTest`, `WorkflowEngineTest`.
+  - Form schema tipado (`FormSchema` + `FormField` + `FieldType`).
+
+### Changed
+  - `ServiceDefinitionVersion` ahora es **tipada de extremo a extremo**: `feeRules` es
+    `List<FeeRule>`, `workflow` es `WorkflowDefinition`, `formSchema` es `FormSchema` (antes
+    `JsonDoc` opacos). Solo `outputDocuments`/`authorization` siguen como `JsonDoc`. `ServiceJson`
+    (infra) los (de)serializa con Jackson; `ServiceVersionValidator` usa `WorkflowValidator`.
+    Tests de servicio y round-trip SQLite actualizados.
 
 ## [0.1.0] - 2026-08-28
 

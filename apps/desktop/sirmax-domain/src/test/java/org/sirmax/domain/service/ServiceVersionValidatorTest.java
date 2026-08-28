@@ -4,13 +4,20 @@ package org.sirmax.domain.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.sirmax.shared.JsonDoc;
+import org.sirmax.domain.finance.ChargeType;
+import org.sirmax.domain.finance.FeeRule;
 
 class ServiceVersionValidatorTest {
 
     private static final Instant NOW = Instant.parse("2026-04-10T00:00:00Z");
+
+    private static FeeRule fixedRule() {
+        return FeeRule.fixed(
+                "r1", ChargeType.TASA, "Trámite", "DOP", 50_000, LocalDate.parse("2026-01-01"));
+    }
 
     private ServiceDefinitionVersion draft() {
         return ServiceDefinitionVersion.draft("v1", "s1", 1, NOW);
@@ -30,11 +37,11 @@ class ServiceVersionValidatorTest {
         assertThat(ServiceVersionValidator.validate(v, ServiceType.CON_TASA))
                 .contains("service.validate.paid_service_must_require_payment");
 
-        v.setRequiresPayment(true); // still fee_rules == "[]"
+        v.setRequiresPayment(true); // still no fee rules
         assertThat(ServiceVersionValidator.validate(v, ServiceType.CON_TASA))
                 .contains("service.validate.payment_requires_fee_rules");
 
-        v.setFeeRules(JsonDoc.of("[{\"type\":\"FIXED\"}]"));
+        v.setFeeRules(List.of(fixedRule()));
         assertThat(ServiceVersionValidator.validate(v, ServiceType.CON_TASA)).isEmpty();
     }
 

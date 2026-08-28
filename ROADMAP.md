@@ -164,8 +164,11 @@ activación/desactivación.
 - [x] Motor de tasas tipado (ADR 0008): `FeeRule` (inmutable, con vigencia), `FeeRuleType`,
       `ChargeType`, `FeeInput`, `FeeCalculator` → `Charge`/`ChargeLine`. Solo dominio; sin usar en
       la facturación todavía (Fase 6).
-- [ ] Persistir workflow/form como modelos tipados en la versión (hoy `JsonDoc` opaco).
-- [ ] Form schema tipado (campos dinámicos).
+- [x] `ServiceDefinitionVersion` tipada de extremo a extremo: `requirements` (`RequirementDef`),
+      `feeRules` (`List<FeeRule>`), `workflow` (`WorkflowDefinition`), `formSchema` (`FormSchema` +
+      `FormField` + `FieldType`), `sla`, `validity`. Solo `outputDocuments` y `authorization` siguen
+      como `JsonDoc` (se tipan en Fases 7/8). `ServiceJson` mapea todo con Jackson; round-trip
+      SQLite probado. `ServiceVersionValidator` usa `WorkflowValidator` y valida `feeRules`.
 - [ ] Catálogo semilla editable (plantillas dominicanas, master prompt §54).
 - [ ] UI de configuración de servicios (puede solaparse con Fase 5).
 
