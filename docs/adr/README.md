@@ -31,3 +31,4 @@ Estados posibles: `Propuesto`, `Aceptado`, `Rechazado`, `Obsoleto`, `Supersedido
 | [0011](./0011-monorepo.md) | Monorepo único (escritorio + landing + docs) | Aceptado |
 | [0012](./0012-three-branch-release-flow.md) | Flujo de release con tres ramas permanentes | Aceptado |
 | [0013](./0013-ui-programmatic-javafx.md) | UI: JavaFX programático (sin FXML) y navegación/i18n sin framework | Aceptado |
+| [0014](./0014-password-hashing.md) | Hashing de contraseñas: PBKDF2 ahora, Argon2id después | Aceptado |

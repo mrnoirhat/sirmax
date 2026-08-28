@@ -8,6 +8,22 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 3 ✅ — Dominio central y base de datos.**
+  - Runner de migraciones: `SqlScript` (splitter consciente de `BEGIN`/`END`, literales y
+    comentarios), `MigrationRunner` (una transacción por migración, `schema_migrations`, rechazo de
+    orden y de deriva de checksum), migraciones expuestas al classpath vía Gradle (`db/migration/` +
+    `index.txt`).
+  - `V0002__core_schema.sql`: organización/institución, departamentos, RBAC (usuarios, roles,
+    25 permisos, 4 roles de sistema), personas y organizaciones, identificaciones/direcciones/
+    contactos (dueño polimórfico), `app_setting`.
+  - Dominio puro: `identity`, `org`, `security` (incl. `AccessPolicy`, `PasswordHash`).
+  - Aplicación: puertos de repositorio, `PasswordHasher`/`IdGenerator`, `Session`/`Audit`; casos de
+    uso `ProvisionInitialAdmin`, `Authenticate`, `RegisterPerson`.
+  - Infraestructura: `SqliteDatabase` + `JdbcUnitOfWork` + adaptadores SQLite de todos los repos,
+    `SqliteAuditSink`, `Pbkdf2PasswordHasher` (ADR 0014), `UuidV7IdGenerator`, `AppPaths`,
+    `CompositionRoot`.
+  - Pruebas: 55+ nuevas (SqlScript, MigrationRunner, dominio, casos de uso con fakes, adaptadores
+    SQLite, PBKDF2, `ProvisionAndAuthenticateIT` end-to-end). CI verde.
 - **Fase 2 ✅ — Shell de escritorio y Design System.**
   - i18n de UI (`Messages` + `messages.properties`, español base); sin texto literal en código.
   - Tema `sirmax.css` con tokens de color/tipografía/espaciado (_looked-up colors_).

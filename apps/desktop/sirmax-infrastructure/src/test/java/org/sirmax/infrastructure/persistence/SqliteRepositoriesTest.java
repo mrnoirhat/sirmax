@@ -123,6 +123,28 @@ class SqliteRepositoriesTest {
     }
 
     @Test
+    void organizationPartyAndSettingsRoundTrip() {
+        var parties = new SqliteOrganizationPartyRepository(db);
+        parties.save(
+                org.sirmax.domain.identity.Organization.create(
+                        "op1",
+                        "Colmado La Esquina SRL",
+                        org.sirmax.domain.identity.OrganizationKind.BUSINESS,
+                        NOW));
+        assertThat(parties.search("esquina", 10, 0)).hasSize(1);
+        assertThat(parties.countSearch("")).isEqualTo(1);
+
+        var settings = new SqliteSettingsRepository(db);
+        settings.put(
+                "invoice.next_number",
+                "{\"prefix\":\"FACT\",\"year\":2026}",
+                org.sirmax.application.port.SettingsRepository.Classification.INTERNAL);
+        assertThat(settings.get("invoice.next_number")).contains("{\"prefix\":\"FACT\",\"year\":2026}");
+        settings.remove("invoice.next_number");
+        assertThat(settings.get("invoice.next_number")).isEmpty();
+    }
+
+    @Test
     void auditSinkWritesAndTheTableStaysAppendOnly() {
         SqliteAuditSink sink = new SqliteAuditSink(db);
         sink.record(

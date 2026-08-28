@@ -170,7 +170,7 @@ SIRMAX está en construcción por fases. El estado vive en [`ROADMAP.md`](./ROAD
 | 0 | Discovery, auditoría de repo y arquitectura | ✅ Completada |
 | 1 | Fundación del repositorio | ✅ Completada |
 | 2 | Shell de escritorio y Design System | ✅ Completada |
-| 3 | Dominio central y base de datos | ⚪ Pendiente |
+| 3 | Dominio central y base de datos | ✅ Completada |
 | … | … | ⚪ Pendiente |
 | 14 | Release 1.0 | ⚪ Pendiente |
 

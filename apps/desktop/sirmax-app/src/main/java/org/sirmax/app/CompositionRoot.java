@@ -4,10 +4,12 @@ package org.sirmax.app;
 import org.sirmax.application.port.Clock;
 import org.sirmax.application.port.IdGenerator;
 import org.sirmax.application.port.IdentificationRepository;
+import org.sirmax.application.port.OrganizationPartyRepository;
 import org.sirmax.application.port.OrganizationRepository;
 import org.sirmax.application.port.PasswordHasher;
 import org.sirmax.application.port.PersonRepository;
 import org.sirmax.application.port.RoleRepository;
+import org.sirmax.application.port.SettingsRepository;
 import org.sirmax.application.port.UnitOfWork;
 import org.sirmax.application.port.UserRepository;
 import org.sirmax.application.security.Audit;
@@ -20,9 +22,11 @@ import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
 import org.sirmax.infrastructure.persistence.SqliteIdentificationRepository;
+import org.sirmax.infrastructure.persistence.SqliteOrganizationPartyRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationRepository;
 import org.sirmax.infrastructure.persistence.SqlitePersonRepository;
 import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
+import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
 import org.sirmax.infrastructure.persistence.SqliteUserRepository;
 import org.sirmax.infrastructure.security.Pbkdf2PasswordHasher;
 import org.sirmax.infrastructure.time.SystemClock;
@@ -45,8 +49,10 @@ public final class CompositionRoot implements AutoCloseable {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final OrganizationRepository organizationRepository;
+    private final OrganizationPartyRepository organizationPartyRepository;
     private final PersonRepository personRepository;
     private final IdentificationRepository identificationRepository;
+    private final SettingsRepository settingsRepository;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
 
@@ -61,8 +67,10 @@ public final class CompositionRoot implements AutoCloseable {
         this.userRepository = new SqliteUserRepository(database);
         this.roleRepository = new SqliteRoleRepository(database);
         this.organizationRepository = new SqliteOrganizationRepository(database);
+        this.organizationPartyRepository = new SqliteOrganizationPartyRepository(database);
         this.personRepository = new SqlitePersonRepository(database);
         this.identificationRepository = new SqliteIdentificationRepository(database);
+        this.settingsRepository = new SqliteSettingsRepository(database);
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -121,8 +129,16 @@ public final class CompositionRoot implements AutoCloseable {
         return organizationRepository;
     }
 
+    public OrganizationPartyRepository organizationPartyRepository() {
+        return organizationPartyRepository;
+    }
+
     public PersonRepository personRepository() {
         return personRepository;
+    }
+
+    public SettingsRepository settingsRepository() {
+        return settingsRepository;
     }
 
     public Clock clock() {

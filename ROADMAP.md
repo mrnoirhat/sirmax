@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–2 ✅; Fase 3 siguiente._
+_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase 4 siguiente._
 
 ---
 
@@ -15,7 +15,7 @@ _Última actualización: 2026-08-28 — rama `experiment`. Fases 0–2 ✅; Fase
 | 0 | Discovery, auditoría de repo y arquitectura | ✅ |
 | 1 | Fundación del repositorio | ✅ |
 | 2 | Shell de escritorio y Design System | ✅ |
-| 3 | Dominio central y base de datos | ⚪ |
+| 3 | Dominio central y base de datos | ✅ |
 | 4 | Motor configurable de servicios | ⚪ |
 | 5 | Ciudadano y experiencia de front-office | ⚪ |
 | 6 | Facturación, pagos y caja | ⚪ |
@@ -106,10 +106,33 @@ módulos.
 > **Diferido a la Fase 5** (no bloquea el cierre de la Fase 2): componente de tabla con paginación
 > real — se implementa con la primera lista con datos. `DataTable` ya aporta estilo + estado vacío.
 
-## Fase 3 — Dominio central y base de datos ⚪
+## Fase 3 — Dominio central y base de datos ✅
 
 Organización/municipio, departamentos, usuarios, roles, permisos, personas, organizaciones,
 direcciones, configuración, migraciones, fundación de auditoría.
+
+- [x] Runner de migraciones: `SqlScript` (splitter con `BEGIN`/`END`, literales, comentarios),
+      `MigrationRunner` (transacción por migración, `schema_migrations`, rechazo de orden y de
+      deriva de checksum), `MigrationSource` classpath (`db/migration/` + `index.txt` vía Gradle).
+- [x] `V0002__core_schema.sql`: `organization_unit` + `institution_profile`, `department`,
+      `app_user`/`role`/`permission`/`user_role`/`role_permission`, `person`, `organization_party`,
+      `identification`/`postal_address`/`contact_point`, `app_setting`. Semilla: 25 permisos + 4
+      roles de sistema.
+- [x] Dominio puro (`sirmax-domain`): `identity` (Person, Organization, PersonName, Identification,
+      Address, ContactPoint + enums), `org` (OrganizationUnit, Department, InstitutionProfile),
+      `security` (Permission, Role, AppUser, PasswordHash, AccessPolicy).
+- [x] Aplicación: puertos de repositorio + `PasswordHasher`/`IdGenerator`; `Session`, `AuditContext`,
+      `Audit`; casos de uso `ProvisionInitialAdmin`, `Authenticate`, `RegisterPerson`.
+- [x] Infraestructura: `SqliteDatabase` (conexión única, WAL), `JdbcUnitOfWork`, `JdbcHelper`,
+      adaptadores SQLite de todos los repos, `SqliteAuditSink`, `Pbkdf2PasswordHasher`
+      ([ADR 0014](./docs/adr/0014-password-hashing.md)), `UuidV7IdGenerator`, `AppPaths`.
+- [x] `CompositionRoot` cablea el grafo (adaptadores + `Audit` + casos de uso).
+- [x] Pruebas: SqlScript (5), MigrationRunner (6), dominio (19), casos de uso con fakes (12),
+      adaptadores SQLite (7), PBKDF2 (4), `ProvisionAndAuthenticateIT` (2, grafo real + SQLite en
+      memoria + migraciones reales). `./gradlew build` verde; CI verde.
+- [ ] Repos de `Address`/`ContactPoint` — se implementan con el escritorio de mostrador (Fase 5).
+- [ ] Wiring del `CompositionRoot` en el arranque de la app y pantallas de login / primer arranque
+      (Fase 5).
 
 ## Fase 4 — Motor configurable de servicios ⚪
 

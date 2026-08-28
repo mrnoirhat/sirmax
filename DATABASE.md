@@ -83,3 +83,37 @@ reutiliza tras anulación.
 - Modo `WAL`, `PRAGMA synchronous = NORMAL` en operación normal.
 - Paginación en todas las listas; sin `SELECT *` sobre tablas grandes en la UI.
 - Consultas de reporte separadas y optimizadas (índices dedicados), ejecutadas en hilos de fondo.
+
+## 9. Runner de migraciones
+
+Implementado en `sirmax-infrastructure`:
+
+- `SqlScript.splitStatements` divide un `.sql` en sentencias respetando literales de cadena
+  (`''`), comentarios `--` y `/* */`, y el anidamiento `BEGIN`/`END` (cuerpos de trigger).
+- Las migraciones autoras viven en `database/migrations/` (§3). Gradle (`stageMigrations`) las
+  copia al classpath del módulo como `db/migration/*.sql` + un `index.txt` generado (fiable dentro
+  de un jar).
+- `MigrationRunner`: aplica cada migración pendiente en su propia transacción, la registra en
+  `schema_migrations`, **rechaza versiones fuera de orden** (una versión por debajo de la más alta
+  aplicada) y `validate()` **rechaza la deriva de checksum** de una migración ya aplicada.
+- `SqliteDatabase` mantiene la única conexión de larga vida y llama a `migrate()` al arrancar.
+
+## 10. Esquema del núcleo (`V0002__core_schema.sql`)
+
+| Tabla | Contenido |
+| --- | --- |
+| `organization_unit` | La institución que opera SIRMAX (ayuntamiento); país ISO alpha-2 |
+| `institution_profile` | 1:1 con `organization_unit`: marca (logo, colores, RNC, pie de factura) |
+| `department` | Unidades internas; `UNIQUE(organization_unit_id, code)` |
+| `app_user` | Cuentas de operación; `password_hash` + `password_algo`; `status` |
+| `role`, `permission` | RBAC; catálogo de 25 permisos + 4 roles de sistema sembrados |
+| `user_role`, `role_permission` | Asociaciones N:M |
+| `person` | Ciudadanos; `full_name` denormalizado para búsqueda |
+| `organization_party` | Partes no-persona (negocios, juntas de vecinos, instituciones) |
+| `identification` | Documentos identificativos; `(party_type, party_id)` polimórfico; índice `(id_type, id_number)` |
+| `postal_address`, `contact_point` | Direcciones y contactos; mismo dueño polimórfico |
+| `app_setting` | Configuración clave/valor JSON + clasificación de datos |
+| `audit_event` | Append-only (triggers bloquean UPDATE/DELETE) — creada en `V0001` |
+
+Owner polimórfico `(party_type, party_id)`: SQLite no permite FK entre tablas por valor; la
+integridad la garantiza la capa de aplicación y hay `CHECK` sobre `party_type`.
