@@ -8,13 +8,13 @@ import java.util.function.Supplier;
 import javafx.application.Platform;
 
 /** Starts the JavaFX toolkit once per test JVM and runs work on the FX application thread. */
-final class FxTestSupport {
+public final class FxTestSupport {
 
     private static boolean started;
 
     private FxTestSupport() {}
 
-    static synchronized void startToolkit() {
+    public static synchronized void startToolkit() {
         if (started) {
             return;
         }
@@ -24,7 +24,7 @@ final class FxTestSupport {
         started = true;
     }
 
-    static <T> T onFxThread(Supplier<T> work) {
+    public static <T> T onFxThread(Supplier<T> work) {
         AtomicReference<T> result = new AtomicReference<>();
         AtomicReference<RuntimeException> failure = new AtomicReference<>();
         CountDownLatch latch = new CountDownLatch(1);

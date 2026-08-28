@@ -14,31 +14,35 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.sirmax.ui.designsystem.Dialogs;
 import org.sirmax.ui.designsystem.Styles;
 import org.sirmax.ui.designsystem.ToastHost;
 import org.sirmax.ui.i18n.Messages;
 import org.sirmax.ui.nav.NavItem;
 import org.sirmax.ui.nav.Navigator;
 import org.sirmax.ui.nav.RouteKey;
+import org.sirmax.ui.theme.Theme;
+import org.sirmax.ui.theme.ThemeManager;
 import org.sirmax.ui.view.DashboardView;
 import org.sirmax.ui.view.GlobalSearchView;
 import org.sirmax.ui.view.HomeView;
 import org.sirmax.ui.view.PlaceholderView;
 import org.sirmax.ui.view.SirmaxView;
+import org.sirmax.ui.view.StyleGuideView;
 
 /**
- * The application shell: top bar (brand + global search + user), task-first navigation, a content
- * host driven by the {@link Navigator}, and a toast overlay.
+ * The application shell: menu bar, top bar (brand + global search + user), task-first navigation, a
+ * content host driven by the {@link Navigator}, and a toast overlay.
  *
  * <p>The shell is a {@link StackPane}: the framed {@link BorderPane} plus a mouse-transparent
- * {@link ToastHost} on top.
+ * {@link ToastHost} on top. It is the scene root, so it also owns the {@link ThemeManager}.
  */
 public final class ShellView extends StackPane {
 
     private final Navigator navigator;
+    private final ThemeManager themeManager;
     private final Map<RouteKey, SirmaxView> views = new EnumMap<>(RouteKey.class);
     private final Map<RouteKey, Button> navButtons = new EnumMap<>(RouteKey.class);
     private final StackPane contentHost = new StackPane();
@@ -48,13 +52,22 @@ public final class ShellView extends StackPane {
     private final GlobalSearchView searchView = new GlobalSearchView();
 
     public ShellView(Navigator navigator) {
+        this(navigator, Theme.LIGHT);
+    }
+
+    public ShellView(Navigator navigator, Theme initialTheme) {
         this.navigator = navigator;
         getStyleClass().add(Styles.SHELL);
+        this.themeManager = new ThemeManager(this, initialTheme);
 
         registerViews();
 
+        AppMenuBar menuBar =
+                new AppMenuBar(
+                        navigator, themeManager, this::showShortcutsHelp, this::showStyleGuide);
+
         BorderPane frame = new BorderPane();
-        frame.setTop(buildTopBar());
+        frame.setTop(new VBox(menuBar, buildTopBar()));
         frame.setLeft(buildTaskNav());
         frame.setCenter(buildContentArea());
 
@@ -69,6 +82,10 @@ public final class ShellView extends StackPane {
         return toasts;
     }
 
+    public ThemeManager themeManager() {
+        return themeManager;
+    }
+
     /** Move keyboard focus to the global search field (Ctrl+K). */
     public void focusSearch() {
         search.requestFocus();
@@ -79,12 +96,21 @@ public final class ShellView extends StackPane {
         navigator.navigate(RouteKey.HOME);
     }
 
+    public void showStyleGuide() {
+        navigator.navigate(RouteKey.STYLEGUIDE);
+    }
+
+    public void showShortcutsHelp() {
+        Dialogs.info(getScene() == null ? null : getScene().getWindow(), "shortcuts.title", "shortcuts.help");
+    }
+
     // ---- construction ----------------------------------------------------
 
     private void registerViews() {
         put(new HomeView(navigator));
         put(new DashboardView());
         put(searchView);
+        put(new StyleGuideView(toasts));
         put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
         put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
         put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
@@ -167,20 +193,18 @@ public final class ShellView extends StackPane {
         Parent node = view.node();
 
         contentHost.getChildren().setAll(node);
-        breadcrumb.setText(
-                Messages.get("app.brand") + "  ›  " + Messages.get(view.titleKey()));
+        breadcrumb.setText(Messages.get("app.brand") + "  ›  " + Messages.get(view.titleKey()));
 
         navButtons.forEach(
                 (key, button) -> {
-                    boolean selected = key == route;
                     button.getStyleClass().remove(Styles.SELECTED);
-                    if (selected) {
+                    if (key == route) {
                         button.getStyleClass().add(Styles.SELECTED);
                     }
                 });
     }
 
-    /** Exposed for tests: the registered routes and their view titles. */
+    /** Exposed for tests: the registered routes and their view title keys. */
     public Map<RouteKey, String> routeTitles() {
         Map<RouteKey, String> out = new LinkedHashMap<>();
         views.forEach((k, v) -> out.put(k, v.titleKey()));

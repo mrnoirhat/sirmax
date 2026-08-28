@@ -9,6 +9,7 @@ import org.sirmax.ui.nav.RouteKey;
 import org.sirmax.ui.nav.ShellNavigator;
 import org.sirmax.ui.shell.KeyboardShortcuts;
 import org.sirmax.ui.shell.ShellView;
+import org.sirmax.ui.theme.Theme;
 
 /**
  * The JavaFX {@link Application} for the SIRMAX desktop client.
@@ -23,7 +24,7 @@ public final class SirmaxApplication extends Application {
     @Override
     public void start(Stage stage) {
         ShellNavigator navigator = new ShellNavigator(RouteKey.HOME);
-        ShellView shell = new ShellView(navigator);
+        ShellView shell = new ShellView(navigator, initialTheme());
 
         Scene scene = new Scene(shell, 1200, 780);
         var stylesheet = SirmaxApplication.class.getResource("/org/sirmax/ui/theme/sirmax.css");
@@ -37,5 +38,12 @@ public final class SirmaxApplication extends Application {
         stage.setMinHeight(640);
         stage.setScene(scene);
         stage.show();
+    }
+
+    /** Optional {@code -Dsirmax.theme=dark} for demos/screenshots; defaults to light. */
+    private static Theme initialTheme() {
+        return "dark".equalsIgnoreCase(System.getProperty("sirmax.theme", "light").trim())
+                ? Theme.DARK
+                : Theme.LIGHT;
     }
 }

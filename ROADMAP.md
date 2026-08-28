@@ -86,14 +86,22 @@ módulos.
       secciones y resaltado, área de contenido, breadcrumb, overlay de toasts.
 - [x] Vistas: `DashboardView` (tiles de cola), `GlobalSearchView` (shell de resultados
       categorizados), `PlaceholderView` (rutas de fases posteriores, claramente etiquetadas).
-- [x] Atajos de teclado: `Ctrl+K` (búsqueda), `Alt+Home` (inicio), `F1` (ayuda de atajos).
-- [x] Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest` (JUnit) + `ShellViewSmokeTest`
-      (arranca el toolkit JavaFX y valida shell/vistas/scene/navegación). 16 pruebas en `sirmax-ui`.
+- [x] Barra de menú `Archivo` / `Ver` / `Ayuda` (`AppMenuBar`), con acceso de ratón a todo lo que
+      tiene atajo.
+- [x] Atajos de teclado: `Ctrl+K` (búsqueda), `Alt+Home` (inicio), `Ctrl+Shift+G` (guía de estilos),
+      `F1` (ayuda de atajos), `Ctrl+Q` (salir).
+- [x] Tema claro/oscuro: `Theme`, `ThemeManager` (aplica `sirmax-dark` a la raíz), toggle en el menú
+      `Ver`; tokens oscuros en `sirmax.css`. `-Dsirmax.theme=dark` para demos.
+- [x] `StyleGuideView` — galería visual del Design System (herramienta de desarrollo; no aparece en
+      la navegación), accesible por `Ctrl+Shift+G` / menú Ayuda.
+- [x] Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest`, `ThemeManagerTest` +
+      `ShellViewSmokeTest` (arranca el toolkit JavaFX; valida shell/vistas/scene/navegación/tema).
+      21 pruebas en `sirmax-ui`.
 - [x] [ADR 0013](./docs/adr/0013-ui-programmatic-javafx.md): JavaFX programático (sin FXML),
       navegación/i18n sin framework.
+- [x] Auditoría visual del shell (captura de la app real: menú + barra superior + navegación por
+      tareas + inicio "¿Qué necesitas hacer?"); sin advertencias de CSS.
 - [ ] Componente de tabla con paginación real (se completa con la primera lista con datos, Fase 5).
-- [ ] Modo oscuro (opcional; tokens ya preparados).
-- [ ] Auditoría visual del shell en la app real (captura) antes de cerrar la fase.
 
 ## Fase 3 — Dominio central y base de datos ⚪
 

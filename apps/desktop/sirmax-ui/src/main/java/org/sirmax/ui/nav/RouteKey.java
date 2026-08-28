@@ -19,5 +19,8 @@ public enum RouteKey {
     DEPARTMENTS,
     SETTINGS,
     REPORTS,
-    SEARCH
+    /** Reached via the top-bar search box, not the task navigation. */
+    SEARCH,
+    /** Design System gallery — a developer tool, reached via Ctrl+Shift+G / the Help menu. */
+    STYLEGUIDE
 }

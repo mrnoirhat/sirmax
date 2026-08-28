@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.sirmax.ui.nav.RouteKey;
 import org.sirmax.ui.nav.ShellNavigator;
 import org.sirmax.ui.shell.ShellView;
+import org.sirmax.ui.theme.Theme;
 
 /**
  * Smoke test: the shell and every registered view build without error on the JavaFX thread, the
@@ -41,6 +42,32 @@ class ShellViewSmokeTest {
                             ShellView shell = new ShellView(nav);
                             nav.navigate(RouteKey.BILLING);
                             return nav.current() == RouteKey.BILLING && shell.getChildren().size() == 2;
+                        });
+        assertThat(ok).isTrue();
+    }
+
+    @Test
+    void styleGuideIsReachableButNotInTheTaskNavigation() {
+        Boolean ok =
+                FxTestSupport.onFxThread(
+                        () -> {
+                            ShellNavigator nav = new ShellNavigator(RouteKey.HOME);
+                            ShellView shell = new ShellView(nav);
+                            boolean registered = shell.routeTitles().containsKey(RouteKey.STYLEGUIDE);
+                            shell.showStyleGuide();
+                            return registered && nav.current() == RouteKey.STYLEGUIDE;
+                        });
+        assertThat(ok).isTrue();
+    }
+
+    @Test
+    void themeToggleAddsTheDarkStyleClassToTheShell() {
+        Boolean ok =
+                FxTestSupport.onFxThread(
+                        () -> {
+                            ShellView shell = new ShellView(new ShellNavigator(RouteKey.HOME));
+                            shell.themeManager().set(Theme.DARK);
+                            return shell.getStyleClass().contains("sirmax-dark");
                         });
         assertThat(ok).isTrue();
     }

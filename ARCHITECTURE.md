@@ -68,10 +68,11 @@ org.sirmax.ui.i18n         Messages (ResourceBundle; español base) — nada de 
 org.sirmax.ui.designsystem Styles, Typography, Buttons, Cards, Banner, StatefulContent,
                            ToastHost, Dialogs, FormField, DataTable  +  theme/sirmax.css
 org.sirmax.ui.nav          RouteKey, NavItem, Navigator (sin JavaFX), ShellNavigator
+org.sirmax.ui.theme        Theme, ThemeManager (claro/oscuro; aplica `sirmax-dark` a la raíz)
 org.sirmax.ui.view         SirmaxView, HomeView (service-first), DashboardView,
-                           GlobalSearchView, PlaceholderView
-org.sirmax.ui.shell        ShellView (top bar + task nav + content host + toasts),
-                           KeyboardShortcuts (Ctrl+K, Alt+Home, F1)
+                           GlobalSearchView, PlaceholderView, StyleGuideView (galería, dev)
+org.sirmax.ui.shell        ShellView (menú + top bar + task nav + content host + toasts),
+                           AppMenuBar (Archivo/Ver/Ayuda), KeyboardShortcuts (Ctrl+K)
 org.sirmax.ui              SirmaxApplication (Scene + tema + atajos)
 ```
 

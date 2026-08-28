@@ -3,7 +3,7 @@
  * SIRMAX Design System — JavaFX theme.
  *
  * One stylesheet, loaded once by SirmaxApplication. Sections:
- *   1. Design tokens (looked-up colors + metrics on .root)
+ *   1. Design tokens (looked-up colors on .root; dark overrides on .sirmax-dark)
  *   2. Typography
  *   3. Base controls (Button, TextField, Label, ScrollPane, Tooltip…)
  *   4. Shell (top bar, task navigation, content host)
@@ -51,16 +51,40 @@
     /* Focus ring */
     -sirmax-focus:         #2f7bce;
 
-    /* Metrics */
-    -sirmax-radius:        8px;
-    -sirmax-radius-lg:     12px;
-    -sirmax-gap:           12px;
-
+    /* Only <paint> values can be looked-up tokens in JavaFX CSS; radii/padding
+       are literals in the rules below. */
     -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
     -fx-font-size: 13px;
     -fx-background-color: -sirmax-bg;
     -fx-focus-color: -sirmax-focus;
     -fx-faint-focus-color: transparent;
+}
+
+/* Dark theme — redefine only the tokens; every rule below is theme-agnostic.
+ * Applied by adding the "sirmax-dark" style class to the scene root. */
+.sirmax-dark {
+    -sirmax-bg:            #12151b;
+    -sirmax-surface:       #1b2029;
+    -sirmax-surface-2:     #232a34;
+    -sirmax-border:        #2b323c;
+    -sirmax-border-strong: #3a424e;
+    -sirmax-text:          #eef1f5;
+    -sirmax-text-soft:     #c7cdd7;
+    -sirmax-text-muted:    #97a0ac;
+    -sirmax-text-on-accent:#0c1116;
+    -sirmax-primary:       #5aa2e0;
+    -sirmax-primary-hover: #6caee6;
+    -sirmax-primary-press: #4c93d2;
+    -sirmax-primary-soft:  derive(#5aa2e0, -62%);
+    -sirmax-success:       #57b979;
+    -sirmax-success-soft:  derive(#57b979, -66%);
+    -sirmax-warning:       #d0a24a;
+    -sirmax-warning-soft:  derive(#d0a24a, -66%);
+    -sirmax-danger:        #e0676d;
+    -sirmax-danger-soft:   derive(#e0676d, -66%);
+    -sirmax-info:          #5aa2e0;
+    -sirmax-info-soft:     derive(#5aa2e0, -66%);
+    -sirmax-focus:         #7db8ea;
 }
 
 /* ============================================================
@@ -91,8 +115,8 @@
 .text-field, .text-area, .password-field, .combo-box, .date-picker, .spinner {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: -sirmax-border-strong;
-    -fx-border-radius: -sirmax-radius;
-    -fx-background-radius: -sirmax-radius;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 7 10 7 10;
     -fx-prompt-text-fill: -sirmax-text-muted;
 }
@@ -106,8 +130,8 @@
     -fx-background-color: -sirmax-surface;
     -fx-text-fill: -sirmax-text;
     -fx-border-color: -sirmax-border-strong;
-    -fx-border-radius: -sirmax-radius;
-    -fx-background-radius: -sirmax-radius;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 8 14 8 14;
     -fx-cursor: hand;
 }
@@ -152,8 +176,8 @@
 
 .sirmax-global-search {
     -fx-min-width: 320px;
-    -fx-background-radius: -sirmax-radius;
-    -fx-border-radius: -sirmax-radius;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
 }
 
 .sirmax-tasknav {
@@ -175,7 +199,7 @@
     -fx-border-color: transparent;
     -fx-alignment: center-left;
     -fx-padding: 8 10 8 10;
-    -fx-background-radius: -sirmax-radius;
+    -fx-background-radius: 8;
     -fx-cursor: hand;
 }
 .sirmax-navitem:hover { -fx-background-color: -sirmax-surface-2; }
@@ -195,8 +219,8 @@
 .sirmax-card {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: -sirmax-border;
-    -fx-border-radius: -sirmax-radius-lg;
-    -fx-background-radius: -sirmax-radius-lg;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-padding: 16;
 }
 
@@ -205,8 +229,8 @@
     -fx-text-fill: -sirmax-text;
     -fx-font-size: 14px;
     -fx-border-color: -sirmax-border;
-    -fx-border-radius: -sirmax-radius-lg;
-    -fx-background-radius: -sirmax-radius-lg;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-alignment: center-left;
     -fx-padding: 16;
     -fx-wrap-text: true;
@@ -218,8 +242,8 @@
 
 /* Banners + toasts — icon/label carries meaning; tint is secondary */
 .sirmax-banner {
-    -fx-border-radius: -sirmax-radius;
-    -fx-background-radius: -sirmax-radius;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 10 14 10 14;
     -fx-border-width: 1;
 }
@@ -232,8 +256,8 @@
 .sirmax-toast {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: -sirmax-border-strong;
-    -fx-border-radius: -sirmax-radius;
-    -fx-background-radius: -sirmax-radius;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 12 16 12 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 16, 0.1, 0, 4);
 }
@@ -248,8 +272,8 @@
 .sirmax-table {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: -sirmax-border;
-    -fx-border-radius: -sirmax-radius;
-    -fx-background-radius: -sirmax-radius;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
 }
 .sirmax-table .table-row-cell { -fx-background-color: -sirmax-surface; -fx-border-color: transparent transparent -sirmax-border transparent; }
 .sirmax-table .table-row-cell:selected { -fx-background-color: -sirmax-primary-soft; }

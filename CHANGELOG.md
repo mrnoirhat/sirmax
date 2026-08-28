@@ -14,11 +14,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   - Design System: `Styles`, `Typography`, `Buttons`, `Cards`, `Banner`, `StatefulContent`
     (loading/empty/error/success), `ToastHost`, `Dialogs`, `FormField`, `DataTable`.
   - Navegación service-first: `RouteKey`, `NavItem`, `Navigator`/`ShellNavigator` (sin JavaFX),
-    `ShellView` (barra superior + navegación por tareas + área de contenido + toasts),
-    `HomeView` / `DashboardView` / `GlobalSearchView` / `PlaceholderView`.
-  - Atajos de teclado: `Ctrl+K`, `Alt+Home`, `F1`.
-  - Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest` + `ShellViewSmokeTest` (arranca el
-    toolkit JavaFX). ADR 0013 (JavaFX programático sin FXML).
+    `ShellView` (menú + barra superior + navegación por tareas + área de contenido + toasts),
+    `HomeView` / `DashboardView` / `GlobalSearchView` / `PlaceholderView` / `StyleGuideView`.
+  - Barra de menú (`Archivo`/`Ver`/`Ayuda`); atajos `Ctrl+K`, `Alt+Home`, `Ctrl+Shift+G`, `F1`,
+    `Ctrl+Q`.
+  - Tema claro/oscuro: `Theme` + `ThemeManager` + toggle en el menú; `-Dsirmax.theme=dark`.
+  - Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest`, `ThemeManagerTest` +
+    `ShellViewSmokeTest` (arranca el toolkit JavaFX). ADR 0013 (JavaFX programático sin FXML).
 - **Fase 0/1 — Fundación del repositorio.**
   - Estructura del monorepo: `apps/desktop`, `apps/landing`, `apps/docs`, `backend`, `database`,
     `scripts`, `docs`, `.github`.
