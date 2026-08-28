@@ -1,112 +1,189 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package org.sirmax.ui.shell;
 
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.sirmax.ui.designsystem.Styles;
+import org.sirmax.ui.designsystem.ToastHost;
+import org.sirmax.ui.i18n.Messages;
+import org.sirmax.ui.nav.NavItem;
+import org.sirmax.ui.nav.Navigator;
+import org.sirmax.ui.nav.RouteKey;
+import org.sirmax.ui.view.DashboardView;
+import org.sirmax.ui.view.GlobalSearchView;
+import org.sirmax.ui.view.HomeView;
+import org.sirmax.ui.view.PlaceholderView;
+import org.sirmax.ui.view.SirmaxView;
 
 /**
- * The application shell: top bar, task navigation and the task-first home screen.
+ * The application shell: top bar (brand + global search + user), task-first navigation, a content
+ * host driven by the {@link Navigator}, and a toast overlay.
  *
- * <p>This is a Phase 1 placeholder that establishes the layout the design system (Phase 2) will
- * refine. Every string here is provisional and will move to i18n bundles.
+ * <p>The shell is a {@link StackPane}: the framed {@link BorderPane} plus a mouse-transparent
+ * {@link ToastHost} on top.
  */
-public final class ShellView extends BorderPane {
+public final class ShellView extends StackPane {
 
-    public ShellView() {
-        getStyleClass().add("sirmax-shell");
-        setTop(buildTopBar());
-        setLeft(buildTaskNav());
-        setCenter(buildHome());
+    private final Navigator navigator;
+    private final Map<RouteKey, SirmaxView> views = new EnumMap<>(RouteKey.class);
+    private final Map<RouteKey, Button> navButtons = new EnumMap<>(RouteKey.class);
+    private final StackPane contentHost = new StackPane();
+    private final Label breadcrumb = new Label();
+    private final TextField search = new TextField();
+    private final ToastHost toasts = new ToastHost();
+    private final GlobalSearchView searchView = new GlobalSearchView();
+
+    public ShellView(Navigator navigator) {
+        this.navigator = navigator;
+        getStyleClass().add(Styles.SHELL);
+
+        registerViews();
+
+        BorderPane frame = new BorderPane();
+        frame.setTop(buildTopBar());
+        frame.setLeft(buildTaskNav());
+        frame.setCenter(buildContentArea());
+
+        getChildren().addAll(frame, toasts);
+
+        navigator.addListener(this::showRoute);
+        showRoute(navigator.current());
+    }
+
+    /** Toast/notification surface, for views and the composition root. */
+    public ToastHost notifications() {
+        return toasts;
+    }
+
+    /** Move keyboard focus to the global search field (Ctrl+K). */
+    public void focusSearch() {
+        search.requestFocus();
+        search.selectAll();
+    }
+
+    public void goHome() {
+        navigator.navigate(RouteKey.HOME);
+    }
+
+    // ---- construction ----------------------------------------------------
+
+    private void registerViews() {
+        put(new HomeView(navigator));
+        put(new DashboardView());
+        put(searchView);
+        put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
+        put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
+        put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
+        put(new PlaceholderView(RouteKey.DOCUMENTS, "nav.documents"));
+        put(new PlaceholderView(RouteKey.CITIZENS, "nav.citizens"));
+        put(new PlaceholderView(RouteKey.DEPARTMENTS, "nav.departments"));
+        put(new PlaceholderView(RouteKey.SETTINGS, "nav.settings"));
+        put(new PlaceholderView(RouteKey.REPORTS, "nav.reports"));
+    }
+
+    private void put(SirmaxView view) {
+        views.put(view.route(), view);
     }
 
     private HBox buildTopBar() {
-        Label brand = new Label("SIRMAX");
-        brand.getStyleClass().add("sirmax-brand");
+        Label brand = new Label(Messages.get("app.brand"));
+        brand.getStyleClass().add(Styles.BRAND);
 
-        TextField search = new TextField();
-        search.setPromptText("Búsqueda global  (Ctrl+K)");
-        search.getStyleClass().add("sirmax-global-search");
+        search.setPromptText(Messages.get("shell.search.prompt"));
+        search.getStyleClass().add(Styles.GLOBAL_SEARCH);
+        search.setOnAction(e -> submitSearch());
         HBox.setHgrow(search, Priority.ALWAYS);
 
-        Label user = new Label("Usuaria · Caja");
+        Label user = new Label(Messages.get("shell.user.placeholder"));
+        user.getStyleClass().add(Styles.MUTED);
 
         HBox bar = new HBox(16, brand, search, user);
         bar.setAlignment(Pos.CENTER_LEFT);
-        bar.setPadding(new Insets(10, 16, 10, 16));
-        bar.getStyleClass().add("sirmax-topbar");
+        bar.getStyleClass().add(Styles.TOPBAR);
         return bar;
     }
 
-    private VBox buildTaskNav() {
-        VBox nav =
-                new VBox(
-                        4,
-                        navItem("Inicio"),
-                        navItem("Trámites"),
-                        navItem("Facturación"),
-                        navItem("Caja"),
-                        navItem("Documentos"),
-                        navItem("Ciudadanos"),
-                        separator(),
-                        navItem("Departamentos"),
-                        navItem("Configuración"),
-                        navItem("Reportes"));
-        nav.setPadding(new Insets(16, 12, 16, 12));
-        nav.setPrefWidth(220);
-        nav.getStyleClass().add("sirmax-tasknav");
-        return nav;
+    private ScrollPane buildTaskNav() {
+        VBox nav = new VBox(2);
+        nav.getStyleClass().add(Styles.TASKNAV);
+
+        NavItem.Section currentSection = null;
+        for (NavItem item : NavItem.defaults()) {
+            if (item.section() != currentSection) {
+                currentSection = item.section();
+                Label header = new Label(Messages.get(currentSection.labelKey()));
+                header.getStyleClass().add(Styles.NAV_SECTION);
+                nav.getChildren().add(header);
+            }
+            Button b = new Button(Messages.get(item.labelKey()));
+            b.getStyleClass().add(Styles.NAV_ITEM);
+            b.setMaxWidth(Double.MAX_VALUE);
+            b.setAlignment(Pos.CENTER_LEFT);
+            b.setOnAction(e -> navigator.navigate(item.key()));
+            navButtons.put(item.key(), b);
+            nav.getChildren().add(b);
+        }
+
+        ScrollPane scroll = new ScrollPane(nav);
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.getStyleClass().add(Styles.TASKNAV);
+        return scroll;
     }
 
-    private VBox buildHome() {
-        Label question = new Label("¿Qué necesitas hacer?");
-        question.getStyleClass().add("sirmax-home-question");
+    private VBox buildContentArea() {
+        breadcrumb.getStyleClass().add(Styles.BREADCRUMB);
+        VBox.setVgrow(contentHost, Priority.ALWAYS);
 
-        FlowPane tasks =
-                new FlowPane(
-                        16,
-                        16,
-                        taskCard("Registrar un trámite"),
-                        taskCard("Emitir una certificación"),
-                        taskCard("Registrar un pago"),
-                        taskCard("Registrar un documento"),
-                        taskCard("Registrar una solicitud/queja"),
-                        taskCard("Gestionar un contrato"));
-        tasks.setPrefWrapLength(720);
-
-        VBox home = new VBox(24, question, tasks);
-        home.setPadding(new Insets(40));
-        home.setAlignment(Pos.TOP_LEFT);
-        home.getStyleClass().add("sirmax-home");
-        return home;
+        VBox area = new VBox(12, breadcrumb, contentHost);
+        area.getStyleClass().add(Styles.CONTENT);
+        area.setPadding(new Insets(24, 28, 28, 28));
+        return area;
     }
 
-    private static Button navItem(String text) {
-        Button b = new Button(text);
-        b.setMaxWidth(Double.MAX_VALUE);
-        b.setAlignment(Pos.CENTER_LEFT);
-        b.getStyleClass().add("sirmax-navitem");
-        return b;
+    // ---- navigation ----------------------------------------------------
+
+    private void submitSearch() {
+        searchView.query(search.getText());
+        navigator.navigate(RouteKey.SEARCH);
     }
 
-    private static Button taskCard(String text) {
-        Button b = new Button(text);
-        b.setPrefSize(230, 96);
-        b.getStyleClass().add("sirmax-taskcard");
-        return b;
+    private void showRoute(RouteKey route) {
+        SirmaxView view = views.getOrDefault(route, views.get(RouteKey.HOME));
+        Parent node = view.node();
+
+        contentHost.getChildren().setAll(node);
+        breadcrumb.setText(
+                Messages.get("app.brand") + "  ›  " + Messages.get(view.titleKey()));
+
+        navButtons.forEach(
+                (key, button) -> {
+                    boolean selected = key == route;
+                    button.getStyleClass().remove(Styles.SELECTED);
+                    if (selected) {
+                        button.getStyleClass().add(Styles.SELECTED);
+                    }
+                });
     }
 
-    private static Region separator() {
-        Region r = new Region();
-        r.setPrefHeight(12);
-        return r;
+    /** Exposed for tests: the registered routes and their view titles. */
+    public Map<RouteKey, String> routeTitles() {
+        Map<RouteKey, String> out = new LinkedHashMap<>();
+        views.forEach((k, v) -> out.put(k, v.titleKey()));
+        return out;
     }
 }

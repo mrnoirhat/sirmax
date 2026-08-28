@@ -30,3 +30,4 @@ Estados posibles: `Propuesto`, `Aceptado`, `Rechazado`, `Obsoleto`, `Supersedido
 | [0010](./0010-agplv3-or-later.md) | Licencia AGPL-3.0-or-later para el código | Aceptado |
 | [0011](./0011-monorepo.md) | Monorepo único (escritorio + landing + docs) | Aceptado |
 | [0012](./0012-three-branch-release-flow.md) | Flujo de release con tres ramas permanentes | Aceptado |
+| [0013](./0013-ui-programmatic-javafx.md) | UI: JavaFX programático (sin FXML) y navegación/i18n sin framework | Aceptado |

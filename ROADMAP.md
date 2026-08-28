@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-28 — rama `experiment` (CI en verde en `2b24c71`)._
+_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–1 ✅; Fase 2 en curso._
 
 ---
 
@@ -14,7 +14,7 @@ _Última actualización: 2026-08-28 — rama `experiment` (CI en verde en `2b24c
 | ---: | --- | :---: |
 | 0 | Discovery, auditoría de repo y arquitectura | ✅ |
 | 1 | Fundación del repositorio | ✅ |
-| 2 | Shell de escritorio y Design System | ⚪ |
+| 2 | Shell de escritorio y Design System | 🟡 |
 | 3 | Dominio central y base de datos | ⚪ |
 | 4 | Motor configurable de servicios | ⚪ |
 | 5 | Ciudadano y experiencia de front-office | ⚪ |
@@ -68,12 +68,32 @@ Objetivo: dejar una base documentada antes de escribir lógica de negocio.
 - [x] Los **cuatro workflows en verde** en `experiment` (Desktop, Docs, Landing, Security).
 - [ ] Guía de configuración de protección de ramas aplicada en GitHub (requiere acceso admin al repo).
 
-## Fase 2 — Shell de escritorio y Design System ⚪
+## Fase 2 — Shell de escritorio y Design System 🟡
 
 Shell de aplicación, navegación, barra superior, navegación por tareas/sidebar, componentes
 reutilizables (tema, tipografía, botones, inputs, tablas, diálogos, notificaciones, estados
 loading/empty/error/success), atajos de teclado. El shell debe sentirse pulido antes de añadir
 módulos.
+
+- [x] i18n de UI: `Messages` + `messages.properties` (español base). Sin texto literal en código.
+- [x] Tema `sirmax.css` con tokens (_looked-up colors_ `-sirmax-*`), tipografía, radios, espaciado.
+- [x] Design System: `Styles`, `Typography`, `Buttons` (primary/secondary/danger/ghost), `Cards`,
+      `Banner`, `StatefulContent` (loading/empty/error/success), `ToastHost`, `Dialogs`, `FormField`,
+      `DataTable`.
+- [x] Navegación service-first: `RouteKey`, `NavItem`, `Navigator`/`ShellNavigator` (Java plano,
+      testeable) + `HomeView` "¿Qué necesitas hacer?".
+- [x] `ShellView`: barra superior (marca + búsqueda global + usuaria), navegación por tareas con
+      secciones y resaltado, área de contenido, breadcrumb, overlay de toasts.
+- [x] Vistas: `DashboardView` (tiles de cola), `GlobalSearchView` (shell de resultados
+      categorizados), `PlaceholderView` (rutas de fases posteriores, claramente etiquetadas).
+- [x] Atajos de teclado: `Ctrl+K` (búsqueda), `Alt+Home` (inicio), `F1` (ayuda de atajos).
+- [x] Pruebas: `ShellNavigatorTest`, `NavItemTest`, `MessagesTest` (JUnit) + `ShellViewSmokeTest`
+      (arranca el toolkit JavaFX y valida shell/vistas/scene/navegación). 16 pruebas en `sirmax-ui`.
+- [x] [ADR 0013](./docs/adr/0013-ui-programmatic-javafx.md): JavaFX programático (sin FXML),
+      navegación/i18n sin framework.
+- [ ] Componente de tabla con paginación real (se completa con la primera lista con datos, Fase 5).
+- [ ] Modo oscuro (opcional; tokens ya preparados).
+- [ ] Auditoría visual del shell en la app real (captura) antes de cerrar la fase.
 
 ## Fase 3 — Dominio central y base de datos ⚪
 

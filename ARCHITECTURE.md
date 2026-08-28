@@ -56,8 +56,32 @@ app ──▶ (todos)
 **Prohibido:** `domain → javafx`, `domain → jdbc`, `ui → jdbc`, `application → javafx`,
 `domain → infrastructure`.
 
-Estas reglas se verifican con una prueba de arquitectura (p. ej. ArchUnit) en `sirmax-app` o en un
-módulo `architecture-tests` dedicado.
+Estas reglas se verifican con una prueba de arquitectura (ArchUnit) en el módulo
+`sirmax-architecture-tests`.
+
+### 3.1 Capa de UI (`sirmax-ui`, Fase 2)
+
+JavaFX **programático, sin FXML** (ver [ADR 0013](./docs/adr/0013-ui-programmatic-javafx.md)).
+
+```text
+org.sirmax.ui.i18n         Messages (ResourceBundle; español base) — nada de texto literal
+org.sirmax.ui.designsystem Styles, Typography, Buttons, Cards, Banner, StatefulContent,
+                           ToastHost, Dialogs, FormField, DataTable  +  theme/sirmax.css
+org.sirmax.ui.nav          RouteKey, NavItem, Navigator (sin JavaFX), ShellNavigator
+org.sirmax.ui.view         SirmaxView, HomeView (service-first), DashboardView,
+                           GlobalSearchView, PlaceholderView
+org.sirmax.ui.shell        ShellView (top bar + task nav + content host + toasts),
+                           KeyboardShortcuts (Ctrl+K, Alt+Home, F1)
+org.sirmax.ui              SirmaxApplication (Scene + tema + atajos)
+```
+
+- **Navegación** orientada a tareas (§35): la pantalla de inicio pregunta "¿Qué necesitas hacer?".
+  `Navigator`/`ShellNavigator` son Java plano y testeables sin toolkit.
+- **Estados** loading / empty / error / success como componente reutilizable (`StatefulContent`); el
+  error muestra mensaje amable + reintento y esconde el detalle técnico.
+- **Tema** con _looked-up colors_ (`-sirmax-*`); el color nunca es el único indicador semántico.
+- **Pruebas:** lógica con JUnit normal; `ShellViewSmokeTest` arranca el toolkit (`Platform.startup`)
+  y valida el shell en el hilo de JavaFX (runner Windows de CI).
 
 ## 4. Módulos transversales (conceptuales)
 
