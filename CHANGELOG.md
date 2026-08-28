@@ -7,7 +7,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
-_En desarrollo en `experiment`._
+### Added
+- **Fase 4 — Motor configurable de servicios (continuación).**
+  - `domain.rules.ExpressionEvaluator` (ADR 0007): evaluador booleano restringido (`|| && !`,
+    comparadores, paréntesis, literales, identificadores del contexto; sin funciones ni I/O).
+  - Motor de requisitos: `RequirementContext`, `RequirementsChecklist` (applicable/satisfied/
+    pending por ítem; condicionales; bloqueo por etapa — "faltan N requisitos").
+  - Motor de flujo de trabajo tipado (`domain.workflow`, ADR 0007): `WorkflowDefinition`,
+    `WorkflowStep`, `Transition`, `StepType`, `TransitionKind`, `WorkflowValidator`,
+    `WorkflowEngine` (transiciones disponibles + destino; guarda de `PAYMENT_CHECKPOINT`).
+  - Tests: `ExpressionEvaluatorTest`, `RequirementsChecklistTest`, `WorkflowEngineTest`.
 
 ## [0.1.0] - 2026-08-28
 

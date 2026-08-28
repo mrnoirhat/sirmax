@@ -151,12 +151,20 @@ activación/desactivación.
       `CreateServiceDraftVersion` (clona la ACTIVE), `SetServiceAvailability`.
 - [x] `ServiceCatalogRepository` + `SqliteServiceCatalogRepository` (JSON vía Jackson en infra;
       el dominio no depende de Jackson). Cableado en `CompositionRoot`.
-- [ ] Motor de requisitos: evaluación contra un trámite (checklist "faltan N requisitos").
-- [ ] Motor de flujo de trabajo tipado (ADR 0007): `WorkflowDefinition`/`Step`/transiciones,
-      evaluador de expresiones restringido.
+- [x] Evaluador de expresiones restringido (`domain.rules.ExpressionEvaluator`, ADR 0007):
+      `|| && !`, comparadores, paréntesis, literales, identificadores del contexto; sin llamadas a
+      función ni I/O. Compartido por requisitos y flujo.
+- [x] Motor de requisitos: `RequirementsChecklist.evaluate(requisitos, RequirementContext)` →
+      applicable/satisfied/pending por ítem; un requisito condicional solo aplica si su expresión
+      se cumple; un obligatorio pendiente bloquea su etapa y las siguientes ("faltan N requisitos").
+- [x] Motor de flujo de trabajo tipado (ADR 0007): `WorkflowDefinition`/`WorkflowStep`/`Transition`
+      con vocabulario cerrado (`StepType`, `TransitionKind`), `WorkflowValidator` (estructura,
+      alcanzabilidad), `WorkflowEngine` (transiciones disponibles + destino; `PAYMENT_CHECKPOINT`
+      bloquea `ADVANCE` hasta pago). Estado de ejecución → Fase 5.
 - [x] Motor de tasas tipado (ADR 0008): `FeeRule` (inmutable, con vigencia), `FeeRuleType`,
       `ChargeType`, `FeeInput`, `FeeCalculator` → `Charge`/`ChargeLine`. Solo dominio; sin usar en
       la facturación todavía (Fase 6).
+- [ ] Persistir workflow/form como modelos tipados en la versión (hoy `JsonDoc` opaco).
 - [ ] Form schema tipado (campos dinámicos).
 - [ ] Catálogo semilla editable (plantillas dominicanas, master prompt §54).
 - [ ] UI de configuración de servicios (puede solaparse con Fase 5).
