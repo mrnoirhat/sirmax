@@ -40,7 +40,7 @@ jobs:
           java-version: "25"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build, test and static analysis
         run: ./gradlew --no-daemon build
@@ -74,7 +74,7 @@ jobs:
           java-version: "25"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # WiX is not on the GitHub runner and the MSI needs it. The app image does
       # not, so this proves the part that can be proved on every push: a trimmed
