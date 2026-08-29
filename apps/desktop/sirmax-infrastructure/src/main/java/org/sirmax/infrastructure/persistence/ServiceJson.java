@@ -121,7 +121,9 @@ final class ServiceJson {
             for (JsonNode n : root) {
                 Map<String, Long> byKey = new LinkedHashMap<>();
                 if (n.has("byKey")) {
-                    n.get("byKey").fields().forEachRemaining(e -> byKey.put(e.getKey(), e.getValue().asLong()));
+                    n.get("byKey")
+                            .properties()
+                            .forEach(e -> byKey.put(e.getKey(), e.getValue().asLong()));
                 }
                 List<FeeTier> tiers = new ArrayList<>();
                 if (n.has("tiers")) {

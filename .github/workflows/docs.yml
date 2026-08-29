@@ -31,10 +31,10 @@ jobs:
     name: Build Docusaurus
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -60,7 +60,7 @@ jobs:
         run: npm run build --workspace apps/docs
 
       - name: Upload site
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs-build
           path: apps/docs/build
@@ -80,7 +80,7 @@ jobs:
       # people stop reading.
       - name: Package for GitHub Pages
         if: github.ref == 'refs/heads/main' && vars.PUBLISH_DOCS == 'true'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: apps/docs/build
 
@@ -95,4 +95,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
