@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–9 ✅; Fase 10 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–10 ✅; Fase 11 en curso._
 
 ---
 
@@ -22,7 +22,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–9 ✅; Fase
 | 7 | Módulos municipales especializados | ✅ |
 | 8 | Documentos, PDF e impresión | ✅ |
 | 9 | Backup, recuperación y Google Drive | ✅ |
-| 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ⚪ |
+| 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ✅ |
 | 11 | Empaquetado para Windows | ⚪ |
 | 12 | Productivización de landing + docs | ⚪ |
 | 13 | Hardening | ⚪ |
@@ -317,11 +317,34 @@ segura, Google OAuth, carpeta de Drive, programación automática.
       frase, frase incorrecta que falla sin tocar la base, archivo manipulado rechazado, y la
       restauración que **reinscribe su propia procedencia** en la base recuperada.
 
-## Fase 10 — Seguridad, auditoría y fiabilidad ⚪
+## Fase 10 — Seguridad, auditoría y fiabilidad ✅
 
 Hashing de contraseñas, seguridad de sesión, permisos, integridad de auditoría, log seguro,
 validación de ficheros, manejo de secretos, chequeos de dependencias/seguridad, pruebas de
 recuperación.
+
+- [x] **Integridad de auditoría (§40)**: `AuditChain` encadena cada entrada con la anterior por
+      SHA-256. Los triggers de V0001 ya rechazan UPDATE/DELETE, pero un trigger lo puede eliminar
+      quien tenga el fichero; la cadena no impide la manipulación — la hace **detectable**.
+      `VerifyAuditIntegrity` recorre la cadena y señala la primera entrada afectada, distinguiendo
+      una entrada editada (rompe su propio hash) de una borrada (rompe el enlace de la siguiente).
+- [x] **Bloqueo de cuenta (§43)**: `login_attempt` registra todo intento con su motivo — guardar
+      también los aciertos es lo que distingue «se equivoca al teclear» de «alguien probó nueve
+      usuarios a las 3am». El bloqueo vive en la cuenta, así sobrevive a un reinicio, y **expira
+      solo**: un municipio con un único administrador de vacaciones también tiene que abrir.
+      Un usuario inexistente y una contraseña errónea responden idéntico.
+- [x] **`SecurityPolicy`**: longitud mínima, umbral de bloqueo, bloqueo por inactividad, vida
+      máxima de sesión y tamaño máximo de adjunto. Valores por defecto deliberadamente suaves —
+      una seguridad que la oficina desactiva no es seguridad.
+- [x] **Validación de ficheros (§43)**: `AttachmentValidator` decide por **magic bytes**, no por
+      extensión; un `.exe` renombrado a `.pdf` se rechaza. La lista blanca es lo que un mostrador
+      recibe de verdad (PDF, JPG, PNG, TIFF) y excluye todo formato con motor de scripting,
+      documentos de Office incluidos. Todo rechazo da el mismo mensaje: decir *qué* comprobación
+      falló es reconocimiento gratis.
+- [x] Ya cubierto en fases previas: PBKDF2 (ADR 0014), RBAC, cifrado de copias y `SecretStore`
+      (Fase 9), `gitleaks` + CodeQL + `npm audit` en CI (Fase 0).
+- [x] `SecurityHardeningIT` elimina los triggers y edita el registro para comprobar que la
+      alteración **se ve igual**.
 
 ## Fase 11 — Empaquetado para Windows ⚪
 

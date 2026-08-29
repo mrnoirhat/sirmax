@@ -24,6 +24,11 @@ public final class AppUser {
     private Instant updatedAt;
     private Instant lastLoginAt; // nullable
 
+    // Lockout state (master prompt §43). Kept on the account rather than in memory so a lock
+    // survives a restart — otherwise closing SIRMAX would be the way around it.
+    private int failedAttempts;
+    private Instant lockedUntil; // nullable
+
     public AppUser(
             String id,
             String username,
@@ -34,6 +39,34 @@ public final class AppUser {
             Instant createdAt,
             Instant updatedAt,
             Instant lastLoginAt) {
+        this(
+                id,
+                username,
+                displayName,
+                passwordHash,
+                status,
+                departmentId,
+                createdAt,
+                updatedAt,
+                lastLoginAt,
+                0,
+                null);
+    }
+
+    public AppUser(
+            String id,
+            String username,
+            String displayName,
+            PasswordHash passwordHash,
+            AppUserStatus status,
+            String departmentId,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant lastLoginAt,
+            int failedAttempts,
+            Instant lockedUntil) {
+        this.failedAttempts = Math.max(0, failedAttempts);
+        this.lockedUntil = lockedUntil;
         this.id = requireText(id, "id");
         this.username = requireText(username, "username");
         this.displayName = requireText(displayName, "displayName");
@@ -97,6 +130,44 @@ public final class AppUser {
         return updatedAt;
     }
 
+    public int failedAttempts() {
+        return failedAttempts;
+    }
+
+    public Optional<Instant> lockedUntil() {
+        return Optional.ofNullable(lockedUntil);
+    }
+
+    /** {@code true} while a lockout is still in force at {@code now}. */
+    public boolean isLockedAt(Instant now) {
+        return lockedUntil != null && now.isBefore(lockedUntil);
+    }
+
+    /**
+     * Record a failed sign-in, locking the account once the policy's threshold is reached.
+     *
+     * @return {@code true} when this attempt is the one that locked it
+     */
+    public boolean recordFailedSignIn(SecurityPolicy policy, Instant now) {
+        failedAttempts++;
+        updatedAt = now;
+        if (failedAttempts >= policy.maxFailedAttempts()) {
+            lockedUntil = now.plus(policy.lockout());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Clear the lockout — on a successful sign-in, or when an administrator unlocks the account.
+     * A lock that expires on its own also runs through here on the next successful attempt.
+     */
+    public void clearLockout(Instant now) {
+        failedAttempts = 0;
+        lockedUntil = null;
+        updatedAt = now;
+    }
+
     public Optional<Instant> lastLoginAt() {
         return Optional.ofNullable(lastLoginAt);
     }
@@ -126,6 +197,7 @@ public final class AppUser {
     }
 
     public void recordSignIn(Instant now) {
+        clearLockout(now);
         this.lastLoginAt = Objects.requireNonNull(now, "now");
     }
 

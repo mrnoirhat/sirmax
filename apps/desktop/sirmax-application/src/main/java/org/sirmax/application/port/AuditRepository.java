@@ -4,6 +4,7 @@ package org.sirmax.application.port;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.sirmax.domain.audit.AuditChain;
 import org.sirmax.domain.audit.AuditEvent;
 
 /**
@@ -31,4 +32,13 @@ public interface AuditRepository {
     List<AuditEvent> forEntity(String entityType, String entityId);
 
     long count();
+
+    /**
+     * The whole trail as chain entries, oldest first — what {@link AuditChain#verify} walks.
+     *
+     * <p>Returns entries rather than events because verification needs the stored hashes alongside
+     * the content: recomputing from the content alone would only prove the content hashes to
+     * itself.
+     */
+    List<AuditChain.Entry> chainEntries(int limit, int offset);
 }

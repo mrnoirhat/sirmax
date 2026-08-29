@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.sirmax.application.port.AuditRepository;
+import org.sirmax.domain.audit.AuditChain;
 import org.sirmax.domain.audit.AuditEvent;
 
 /** Read-only access to the append-only {@code audit_event} table. */
@@ -84,8 +85,27 @@ public final class SqliteAuditRepository implements AuditRepository {
     }
 
     @Override
+    public List<AuditChain.Entry> chainEntries(int limit, int offset) {
+        // rowid order, not when_at: the chain is built in insertion order, and two entries can
+        // share a timestamp. Verifying them in a different order would report a false break.
+        return JdbcHelper.queryList(
+                db.connection(),
+                "SELECT * FROM audit_event ORDER BY rowid LIMIT ? OFFSET ?",
+                SqliteAuditRepository::mapEntry,
+                limit,
+                offset);
+    }
+
+    @Override
     public long count() {
         return JdbcHelper.queryLong(db.connection(), "SELECT count(*) FROM audit_event");
+    }
+
+    private static AuditChain.Entry mapEntry(ResultSet rs) throws SQLException {
+        return new AuditChain.Entry(
+                map(rs),
+                Optional.ofNullable(str(rs, "prev_hash")),
+                Optional.ofNullable(str(rs, "entry_hash")));
     }
 
     private static AuditEvent map(ResultSet rs) throws SQLException {

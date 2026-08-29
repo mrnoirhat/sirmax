@@ -10,6 +10,7 @@ import org.sirmax.application.port.DocumentPrinter;
 import org.sirmax.application.port.DocumentRepository;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RegistryRepository;
+import org.sirmax.application.port.SecurityPolicyRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.UserRepository;
 import org.sirmax.application.usecase.AddProcedureNote;
@@ -36,6 +37,7 @@ import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.StartProcedure;
 import org.sirmax.application.usecase.TransferAgreement;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
+import org.sirmax.application.usecase.VerifyAuditIntegrity;
 import org.sirmax.application.usecase.VoidInvoice;
 
 /**
@@ -137,4 +139,9 @@ public interface AppServices {
 
     /** So the settings screen can say whether an account is connected, and to which folder. */
     CloudBackupTarget cloudBackups();
+
+    // ── security ──
+    VerifyAuditIntegrity verifyAuditIntegrity();
+
+    SecurityPolicyRepository securityPolicy();
 }

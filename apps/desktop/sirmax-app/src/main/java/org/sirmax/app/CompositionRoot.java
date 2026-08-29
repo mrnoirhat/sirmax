@@ -21,6 +21,7 @@ import org.sirmax.application.port.PersonRepository;
 import org.sirmax.application.port.ProcedureFinance;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RegistryRepository;
+import org.sirmax.application.port.SecurityPolicyRepository;
 import org.sirmax.application.port.RoleRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.ServiceCatalogTemplateSource;
@@ -55,6 +56,7 @@ import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.application.usecase.StartProcedure;
+import org.sirmax.application.usecase.VerifyAuditIntegrity;
 import org.sirmax.application.usecase.TransferAgreement;
 import org.sirmax.application.usecase.VoidInvoice;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
@@ -80,6 +82,7 @@ import org.sirmax.infrastructure.persistence.SqlitePersonRepository;
 import org.sirmax.infrastructure.persistence.SqliteProcedureRepository;
 import org.sirmax.infrastructure.persistence.SqliteRegistryRepository;
 import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
+import org.sirmax.infrastructure.persistence.SqliteSecurityPolicyRepository;
 import org.sirmax.infrastructure.persistence.SqliteServiceCatalogRepository;
 import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
 import org.sirmax.infrastructure.persistence.SqliteUserRepository;
@@ -117,6 +120,7 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final NumberingRepository numberingRepository;
     private final BillingRepository billingRepository;
     private final AuditRepository auditRepository;
+    private final SecurityPolicyRepository securityPolicyRepository;
     private final AssetRepository assetRepository;
     private final RegistryRepository registryRepository;
     private final DocumentRepository documentRepository;
@@ -159,6 +163,7 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final CreateBackup createBackup;
     private final RestoreBackup restoreBackup;
     private final ManageBackupPolicy manageBackupPolicy;
+    private final VerifyAuditIntegrity verifyAuditIntegrity;
 
     private final AppPaths paths;
 
@@ -184,6 +189,7 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         // table — no billing state is duplicated onto the case.
         this.procedureFinance = billing;
         this.auditRepository = new SqliteAuditRepository(database);
+        this.securityPolicyRepository = new SqliteSecurityPolicyRepository(database);
         this.assetRepository = new SqliteAssetRepository(database);
         this.registryRepository = new SqliteRegistryRepository(database);
         this.documentRepository = new SqliteDocumentRepository(database);
@@ -197,7 +203,14 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
         this.authenticate =
-                new Authenticate(userRepository, roleRepository, passwordHasher, ids, clock, audit);
+                new Authenticate(
+                        userRepository,
+                        roleRepository,
+                        passwordHasher,
+                        ids,
+                        clock,
+                        audit,
+                        securityPolicyRepository);
         this.provisionInitialAdmin =
                 new ProvisionInitialAdmin(
                         userRepository,
@@ -350,6 +363,7 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.manageBackupPolicy =
                 new ManageBackupPolicy(
                         backupRepository, backupEngine, cloudBackupTarget, createBackup, clock, audit);
+        this.verifyAuditIntegrity = new VerifyAuditIntegrity(auditRepository);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -477,6 +491,16 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     @Override
     public BillingRepository billing() {
         return billingRepository;
+    }
+
+    @Override
+    public VerifyAuditIntegrity verifyAuditIntegrity() {
+        return verifyAuditIntegrity;
+    }
+
+    @Override
+    public SecurityPolicyRepository securityPolicy() {
+        return securityPolicyRepository;
     }
 
     @Override

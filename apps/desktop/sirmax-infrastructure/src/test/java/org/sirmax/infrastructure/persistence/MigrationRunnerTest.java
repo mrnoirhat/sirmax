@@ -38,7 +38,7 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2, 3, 4, 5, 6, 7, 8);
+        assertThat(applied).contains(1, 2, 3, 4, 5, 6, 7, 8, 9);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
                 .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
@@ -58,6 +58,9 @@ class MigrationRunnerTest {
         assertThat(intQuery("SELECT count(*) FROM backup_record")).isZero();
         // V0008 seeds exactly one backup policy row
         assertThat(intQuery("SELECT count(*) FROM backup_schedule")).isEqualTo(1);
+        assertThat(intQuery("SELECT count(*) FROM login_attempt")).isZero();
+        // V0009 seeds exactly one security policy row
+        assertThat(intQuery("SELECT count(*) FROM security_policy")).isEqualTo(1);
         assertThat(intQuery("SELECT count(*) FROM invoice")).isZero();
         assertThat(intQuery("SELECT count(*) FROM payment")).isZero();
         assertThat(intQuery("SELECT count(*) FROM cash_session")).isZero();

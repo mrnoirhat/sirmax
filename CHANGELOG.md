@@ -8,6 +8,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 10 ✅ — Seguridad, auditoría y fiabilidad.**
+  - `AuditChain`: cada entrada de auditoría se encadena con la anterior por SHA-256, así una
+    alteración o un borrado son detectables aunque se eliminen los triggers. `VerifyAuditIntegrity`.
+  - Bloqueo de cuenta con expiración automática y registro de intentos (`login_attempt`);
+    usuario inexistente y contraseña errónea responden idéntico.
+  - `SecurityPolicy` (longitud mínima, umbral de bloqueo, inactividad, tamaño de adjunto) y
+    `AttachmentValidator` por magic bytes — un ejecutable renombrado a `.pdf` se rechaza.
+  - `V0009__security_hardening.sql`, `SqliteSecurityPolicyRepository`; `SqliteAuditSink` ahora
+    escribe la cadena.
 - **Fase 9 ✅ — Backup, recuperación y Google Drive.**
   - `SqliteBackupEngine`: `VACUUM INTO` → gzip → AES-256-GCM → SHA-256. Un archivo alterado falla
     al descifrar en vez de restaurar basura; la frase de paso nunca se guarda.

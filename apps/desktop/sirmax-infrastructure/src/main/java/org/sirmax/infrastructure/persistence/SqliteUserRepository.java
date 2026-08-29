@@ -30,12 +30,14 @@ public final class SqliteUserRepository implements UserRepository {
                 db.connection(),
                 "INSERT INTO app_user"
                     + " (id, username, display_name, password_hash, password_algo, status,"
-                    + "  department_id, created_at, updated_at, last_login_at)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    + "  department_id, created_at, updated_at, last_login_at, failed_attempts,"
+                    + "  locked_until)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                     + " ON CONFLICT(id) DO UPDATE SET display_name=excluded.display_name,"
                     + " password_hash=excluded.password_hash, password_algo=excluded.password_algo,"
                     + " status=excluded.status, department_id=excluded.department_id,"
-                    + " updated_at=excluded.updated_at, last_login_at=excluded.last_login_at",
+                    + " updated_at=excluded.updated_at, last_login_at=excluded.last_login_at,"
+                    + " failed_attempts=excluded.failed_attempts, locked_until=excluded.locked_until",
                 u.id(),
                 u.username(),
                 u.displayName(),
@@ -45,7 +47,9 @@ public final class SqliteUserRepository implements UserRepository {
                 u.departmentId().orElse(null),
                 u.createdAt(),
                 u.updatedAt(),
-                u.lastLoginAt().map(Instant::toString).orElse(null));
+                u.lastLoginAt().map(Instant::toString).orElse(null),
+                u.failedAttempts(),
+                u.lockedUntil().map(Instant::toString).orElse(null));
     }
 
     @Override
@@ -103,6 +107,7 @@ public final class SqliteUserRepository implements UserRepository {
 
     private static AppUser mapUser(ResultSet rs) throws SQLException {
         String lastLogin = str(rs, "last_login_at");
+        String lockedUntil = str(rs, "locked_until");
         return new AppUser(
                 rs.getString("id"),
                 rs.getString("username"),
@@ -112,6 +117,8 @@ public final class SqliteUserRepository implements UserRepository {
                 str(rs, "department_id"),
                 instant(rs, "created_at"),
                 instant(rs, "updated_at"),
-                lastLogin == null ? null : Instant.parse(lastLogin));
+                lastLogin == null ? null : Instant.parse(lastLogin),
+                rs.getInt("failed_attempts"),
+                lockedUntil == null ? null : Instant.parse(lockedUntil));
     }
 }
