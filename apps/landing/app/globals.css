@@ -339,3 +339,15 @@ details.faq p {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
+
+/* Secondary call to action: present, but visibly not the recommended path. */
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

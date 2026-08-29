@@ -199,7 +199,7 @@ public final class SqliteBackupRepository implements BackupRepository {
         try {
             JsonNode root = M.readTree(json);
             Map<String, Long> counts = new LinkedHashMap<>();
-            root.fields().forEachRemaining(e -> counts.put(e.getKey(), e.getValue().asLong()));
+            root.properties().forEach(e -> counts.put(e.getKey(), e.getValue().asLong()));
             return Map.copyOf(counts);
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
             throw new SirmaxException("Could not read the backup fingerprint", e);

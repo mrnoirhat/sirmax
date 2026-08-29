@@ -7,11 +7,14 @@
 _La gestión municipal, simplificada._
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](./LICENSE)
-[![Desktop CI](https://github.com/mrnoirhat/sirmax/actions/workflows/desktop.yml/badge.svg?branch=testing)](https://github.com/mrnoirhat/sirmax/actions/workflows/desktop.yml)
-[![Landing CI](https://github.com/mrnoirhat/sirmax/actions/workflows/landing.yml/badge.svg?branch=testing)](https://github.com/mrnoirhat/sirmax/actions/workflows/landing.yml)
-[![Docs CI](https://github.com/mrnoirhat/sirmax/actions/workflows/docs.yml/badge.svg?branch=testing)](https://github.com/mrnoirhat/sirmax/actions/workflows/docs.yml)
+[![Desktop CI](https://github.com/mrnoirhat/sirmax/actions/workflows/desktop.yml/badge.svg?branch=main)](https://github.com/mrnoirhat/sirmax/actions/workflows/desktop.yml)
+[![Landing CI](https://github.com/mrnoirhat/sirmax/actions/workflows/landing.yml/badge.svg?branch=main)](https://github.com/mrnoirhat/sirmax/actions/workflows/landing.yml)
+[![Docs CI](https://github.com/mrnoirhat/sirmax/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/mrnoirhat/sirmax/actions/workflows/docs.yml)
+[![Última versión](https://img.shields.io/github/v/release/mrnoirhat/sirmax?label=descargar&color=2563eb)](https://github.com/mrnoirhat/sirmax/releases/latest)
 
-**[Sitio web](#) · [Documentación](#) · [GitHub](https://github.com/mrnoirhat/sirmax) · [Descargas](https://github.com/mrnoirhat/sirmax/releases) · [Issues](https://github.com/mrnoirhat/sirmax/issues) · [Contribuir](./CONTRIBUTING.md) · [Roadmap](./ROADMAP.md)**
+**[Sitio web](https://sirmax.vercel.app) · [Documentación](https://sirmax-docs.vercel.app) · [Descargar para Windows](https://github.com/mrnoirhat/sirmax/releases/latest) · [Issues](https://github.com/mrnoirhat/sirmax/issues) · [Contribuir](./CONTRIBUTING.md) · [Roadmap](./ROADMAP.md)**
+
+_La documentación también está en [GitHub Pages](https://mrnoirhat.github.io/sirmax)._
 
 </div>
 
