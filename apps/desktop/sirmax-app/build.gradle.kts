@@ -208,6 +208,22 @@ val packageWindows by tasks.registering(Exec::class) {
 }
 
 /**
+ * Zips the app image, so the portable download is one file rather than a folder
+ * a browser cannot deliver.
+ */
+val packageZip by tasks.registering(Zip::class) {
+    group = "distribution"
+    description = "Packs the self-contained SIRMAX folder into a single downloadable archive"
+    dependsOn(packageAppImage)
+
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows }
+
+    from(appImageDir)
+    archiveFileName.set("SIRMAX-$appVersion-windows.zip")
+    destinationDirectory.set(installerDir)
+}
+
+/**
  * Checks the produced artifacts are real ones (§67).
  *
  * The size floor is not arbitrary: the bundled runtime alone is tens of
@@ -217,7 +233,7 @@ val packageWindows by tasks.registering(Exec::class) {
 val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the packaged artifacts look like real, runnable artifacts"
-    dependsOn(packageAppImage, packageWindows)
+    dependsOn(packageAppImage, packageZip, packageWindows)
 
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows }
 
@@ -234,6 +250,13 @@ val verifyReleaseArtifacts by tasks.registering {
             "The app image is only ${size / 1024 / 1024} MB — the runtime image is missing"
         }
         logger.lifecycle("App image: $image (${size / 1024 / 1024} MB)")
+
+        val zip = File(installerDir.get().asFile, "SIRMAX-$appVersion-windows.zip")
+        check(zip.isFile) { "The portable archive was not produced at $zip" }
+        check(zip.length() > 20L * 1024 * 1024) {
+            "${zip.name} is only ${zip.length() / 1024} KB — the runtime image is missing"
+        }
+        logger.lifecycle("Portable: ${zip.name} (${zip.length() / 1024 / 1024} MB)")
 
         installerDir.get().asFile.listFiles { f -> f.name.endsWith(".msi") }?.forEach { msi ->
             check(msi.length() > 20L * 1024 * 1024) {

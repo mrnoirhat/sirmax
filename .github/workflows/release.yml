@@ -1,0 +1,110 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Release
+
+# Fires on a version tag. Building the release from the tag rather than from a
+# developer's machine is what makes the artifact reproducible: whatever is
+# downloaded corresponds exactly to the commit the tag names.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and publish (e.g. v1.0.0)"
+        required: true
+
+permissions:
+  contents: write # creating the release and uploading its assets
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false # never cancel a half-published release
+
+jobs:
+  build:
+    name: Build Windows artifacts
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: apps/desktop
+        shell: bash # so ./gradlew (not .bat) resolves on the Windows runner
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # The runner image ships WiX 3.14 but does not put it on PATH, and
+      # jpackage looks for candle/light there. Without this the MSI is silently
+      # skipped and the release goes out with only the portable archive.
+      - name: Put WiX on PATH
+        shell: pwsh
+        run: |
+          $wix = Get-ChildItem 'C:\Program Files (x86)\WiX Toolset*' -Directory |
+                 Sort-Object Name -Descending | Select-Object -First 1
+          if (-not $wix) { throw 'WiX is not installed on this runner image' }
+          "$($wix.FullName)\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          Write-Host "WiX: $($wix.FullName)"
+
+      - name: Verify before packaging
+        run: ./gradlew --no-daemon build
+
+      # verifyReleaseArtifacts fails if the bundled runtime did not make it in,
+      # so a release cannot ship an artifact that installs and then will not start.
+      - name: Package and verify
+        run: ./gradlew --no-daemon verifyReleaseArtifacts
+
+      - name: Checksums
+        shell: pwsh
+        working-directory: apps/desktop/sirmax-app/build/installer
+        run: |
+          Get-ChildItem -File | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($_.Name)"
+          } | Set-Content -Path SHA256SUMS.txt -Encoding utf8
+          Get-Content SHA256SUMS.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sirmax-release-artifacts
+          path: apps/desktop/sirmax-app/build/installer/
+          if-no-files-found: error
+
+  publish:
+    name: Publish the GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sirmax-release-artifacts
+          path: artifacts
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: SIRMAX ${{ inputs.tag || github.ref_name }}
+          # The tag's own annotation is the release notes: written once, at the
+          # moment of tagging, rather than restated here where it could drift.
+          generate_release_notes: false
+          body_path: .github/release-body.md
+          files: |
+            artifacts/*.msi
+            artifacts/*.zip
+            artifacts/SHA256SUMS.txt
+          fail_on_unmatched_files: true

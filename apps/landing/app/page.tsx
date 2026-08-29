@@ -344,13 +344,50 @@ export default function HomePage() {
           id="descargar"
           eyebrow="Descargar"
           title="SIRMAX para Windows"
-          lead="Los instaladores se publican en las releases de GitHub a partir de la Fase 11. El
-            instalador incluye el runtime: no necesitas instalar Java."
+          lead="Incluye su propio runtime de Java: el PC del ayuntamiento no necesita instalar Java,
+            Node ni Python. Los enlaces apuntan siempre a la versión más reciente."
         >
-          <p className="hero-actions">
-            <a className="btn btn-primary" href={site.releases} target="_blank" rel="noreferrer">
-              Ver releases en GitHub
+          <div className="grid">
+            <article className="card">
+              <h3>Instalador (.msi)</h3>
+              <p>
+                Lo habitual. Crea entrada en el menú Inicio, acceso directo opcional e instala por
+                usuario. Al actualizar conserva los datos; al desinstalar, también.
+              </p>
+              <p className="hero-actions">
+                <a
+                  className="btn btn-primary"
+                  href={`${site.download}/download/SIRMAX-${site.version}.msi`}
+                >
+                  Descargar el instalador
+                </a>
+              </p>
+            </article>
+            <article className="card">
+              <h3>Carpeta portable (.zip)</h3>
+              <p>
+                Sin instalar nada: se descomprime y se ejecuta <code>SIRMAX.exe</code>. Útil para
+                evaluarlo, o para ejecutarlo desde una carpeta compartida.
+              </p>
+              <p className="hero-actions">
+                <a
+                  className="btn btn-secondary"
+                  href={`${site.download}/download/SIRMAX-${site.version}-windows.zip`}
+                >
+                  Descargar el portable
+                </a>
+              </p>
+            </article>
+          </div>
+          <p className="section-lead" style={{ marginTop: "1.25rem" }}>
+            Los datos se guardan en <code>%LOCALAPPDATA%\SIRMAX</code>, nunca dentro del directorio
+            de instalación — ver{" "}
+            <a href={site.repo + "/blob/main/docs/PACKAGING.md"}>cómo se empaqueta</a>. Todas las
+            versiones y sus notas están en{" "}
+            <a href={site.releases} target="_blank" rel="noreferrer">
+              las releases de GitHub
             </a>
+            .
           </p>
         </Section>
 
