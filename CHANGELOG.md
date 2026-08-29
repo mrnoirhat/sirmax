@@ -8,6 +8,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 13 ✅ — Hardening.** Auditorías ejecutables de rendimiento (`PerformanceAuditIT`, con
+  20 000 ciudadanos y 20 000 trámites, leyendo el plan de ejecución), migraciones
+  (`MigrationAuditTest`) y accesibilidad/UX (`AccessibilityAuditTest`). Informe en
+  [`docs/HARDENING.md`](docs/HARDENING.md), incluida la lista de lo que **no** cubre.
+  `V0010__foreign_key_indexes.sql` indexa las claves foráneas que la aplicación recorre.
 - **Fase 12 ✅ — Landing y documentación a producción.**
   - Guía de usuario real (trámites, ciudadanos, facturación, caja, impresión, documentos, registro,
     copias, restauración, seguridad) en lugar de plantillas.

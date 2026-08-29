@@ -38,7 +38,7 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        assertThat(applied).contains(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
                 .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);

@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–12 ✅; Fase 13 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–13 ✅; Fase 14 (release 1.0) pendiente._
 
 ---
 
@@ -25,7 +25,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–12 ✅; Fas
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ✅ |
 | 11 | Empaquetado para Windows | ✅ |
 | 12 | Productivización de landing + docs | ✅ |
-| 13 | Hardening | ⚪ |
+| 13 | Hardening | ✅ |
 | 14 | Release 1.0 | ⚪ |
 
 ---
@@ -401,10 +401,34 @@ alineación release/documentación.
   ahora **con la hoja de estilos real** — sin ella el test medía un layout que la aplicación nunca
   renderiza, que es justo cómo una tarjeta mal colocada sobrevive a un test en verde.
 
-## Fase 13 — Hardening ⚪
+## Fase 13 — Hardening ✅
 
 Regresión, auditoría de UX, auditoría de rendimiento, auditoría de impresión, auditoría de
 backup/restore, auditoría de migraciones, auditoría de accesibilidad, auditoría de documentación.
+
+Informe completo en [`docs/HARDENING.md`](./docs/HARDENING.md). Cada auditoría es **ejecutable**:
+vive como prueba, no como una casilla en un documento que envejece sin que nadie lo note.
+
+- [x] **Regresión**: 319 pruebas en 57 clases; `./gradlew build` verde.
+- [x] **Rendimiento** (`PerformanceAuditIT`): 20 000 ciudadanos y 20 000 trámites. Búsqueda, cola,
+      historial y conteo por debajo de 400 ms; búsqueda por número por debajo de 50 ms. Lee además
+      el **plan de ejecución**, porque un tiempo que pasa por caché no dice nada.
+- [x] **Migraciones** (`MigrationAuditTest`): idempotencia, integridad, FK activadas, clave primaria
+      en toda tabla, ningún importe en coma flotante, disparadores de auditoría presentes.
+- [x] **Accesibilidad y UX** (`AccessibilityAuditTest`): todo control alcanzable por teclado, ninguna
+      clave sin traducir, y **ningún mensaje que filtre detalle técnico** al operador.
+- [x] **Impresión**, **copias/restauración** y **seguridad**: cubiertas por las pruebas de sus fases,
+      incluida la que elimina los disparadores para comprobar que la manipulación sigue viéndose.
+- [x] **Documentación**: `onBrokenLinks: "throw"` rompe el CI ante un enlace interno roto.
+
+### Hallazgos corregidos en esta fase
+
+- **30 claves foráneas sin índice.** SQLite indexa las primarias pero nunca las foráneas.
+  `V0010__foreign_key_indexes.sql` indexa las doce que la aplicación recorre; las demás son columnas
+  de autoría cuya exención queda **registrada en el propio test**, así que una FK nueva sin índice
+  ni exención rompe la auditoría.
+- La regla de moneda era demasiado estricta: `invoice_line` hereda la moneda de su factura a
+  propósito — duplicarla solo crearía dónde discrepar.
 
 ## Fase 14 — Release 1.0 ⚪
 
