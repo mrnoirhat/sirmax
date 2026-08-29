@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package org.sirmax.app;
 
+import org.sirmax.application.port.AssetRepository;
 import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.Clock;
@@ -13,6 +14,7 @@ import org.sirmax.application.port.PasswordHasher;
 import org.sirmax.application.port.PersonRepository;
 import org.sirmax.application.port.ProcedureFinance;
 import org.sirmax.application.port.ProcedureRepository;
+import org.sirmax.application.port.RegistryRepository;
 import org.sirmax.application.port.RoleRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.ServiceCatalogTemplateSource;
@@ -24,14 +26,17 @@ import org.sirmax.application.usecase.AddProcedureNote;
 import org.sirmax.application.usecase.AdvanceProcedure;
 import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
+import org.sirmax.application.usecase.ConductInspection;
 import org.sirmax.application.usecase.ConfigureServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.FindDuplicatePeople;
+import org.sirmax.application.usecase.GrantAgreement;
 import org.sirmax.application.usecase.IssueInvoice;
 import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
 import org.sirmax.application.usecase.RefundPayment;
+import org.sirmax.application.usecase.RegisterDocument;
 import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
@@ -39,6 +44,7 @@ import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.application.usecase.StartProcedure;
+import org.sirmax.application.usecase.TransferAgreement;
 import org.sirmax.application.usecase.VoidInvoice;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
 import org.sirmax.infrastructure.AppPaths;
@@ -46,6 +52,7 @@ import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
 import org.sirmax.infrastructure.persistence.SqliteBillingRepository;
 import org.sirmax.infrastructure.persistence.JsonServiceCatalogTemplateSource;
+import org.sirmax.infrastructure.persistence.SqliteAssetRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
@@ -55,6 +62,7 @@ import org.sirmax.infrastructure.persistence.SqliteNumberingRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationRepository;
 import org.sirmax.infrastructure.persistence.SqlitePersonRepository;
 import org.sirmax.infrastructure.persistence.SqliteProcedureRepository;
+import org.sirmax.infrastructure.persistence.SqliteRegistryRepository;
 import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
 import org.sirmax.infrastructure.persistence.SqliteServiceCatalogRepository;
 import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
@@ -91,6 +99,8 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final NumberingRepository numberingRepository;
     private final BillingRepository billingRepository;
     private final AuditRepository auditRepository;
+    private final AssetRepository assetRepository;
+    private final RegistryRepository registryRepository;
     private final ProcedureFinance procedureFinance;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
@@ -116,6 +126,10 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final VoidInvoice voidInvoice;
     private final RefundPayment refundPayment;
     private final ManageCashSession manageCashSession;
+    private final GrantAgreement grantAgreement;
+    private final TransferAgreement transferAgreement;
+    private final RegisterDocument registerDocument;
+    private final ConductInspection conductInspection;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -138,6 +152,8 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         // table — no billing state is duplicated onto the case.
         this.procedureFinance = billing;
         this.auditRepository = new SqliteAuditRepository(database);
+        this.assetRepository = new SqliteAssetRepository(database);
+        this.registryRepository = new SqliteRegistryRepository(database);
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -234,6 +250,31 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.manageCashSession =
                 new ManageCashSession(
                         billingRepository, numberingRepository, ids, clock, unitOfWork, audit);
+
+        this.grantAgreement =
+                new GrantAgreement(
+                        assetRepository, numberingRepository, ids, clock, unitOfWork, audit);
+        this.transferAgreement =
+                new TransferAgreement(
+                        assetRepository, numberingRepository, ids, clock, unitOfWork, audit);
+        this.registerDocument =
+                new RegisterDocument(
+                        registryRepository,
+                        procedureRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.conductInspection =
+                new ConductInspection(
+                        registryRepository,
+                        procedureRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -359,6 +400,36 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     @Override
     public AuditRepository auditTrail() {
         return auditRepository;
+    }
+
+    @Override
+    public GrantAgreement grantAgreement() {
+        return grantAgreement;
+    }
+
+    @Override
+    public TransferAgreement transferAgreement() {
+        return transferAgreement;
+    }
+
+    @Override
+    public RegisterDocument registerDocument() {
+        return registerDocument;
+    }
+
+    @Override
+    public ConductInspection conductInspection() {
+        return conductInspection;
+    }
+
+    @Override
+    public AssetRepository assets() {
+        return assetRepository;
+    }
+
+    @Override
+    public RegistryRepository registry() {
+        return registryRepository;
     }
 
     public ProcedureRepository procedureRepository() {

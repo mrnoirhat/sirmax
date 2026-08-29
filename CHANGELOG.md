@@ -8,6 +8,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 7 ✅ — Módulos municipales especializados.**
+  - Tres modelos compartidos en lugar de diez arquitecturas: `MunicipalAsset` (+ `AssetHolder` como
+    historia de tenencia), `Agreement` (arrendamiento/concesión/casilla/permiso con un solo ciclo de
+    vida y traspaso encadenado) e `Inspection`.
+  - `RegisteredDocument`: la Conservaduría, distinta de un adjunto — libro/folio, partes y
+    anotaciones marginales; una entrada registrada se congela. `Decision` (§28).
+  - `V0006__municipal_modules.sql`, `SqliteAssetRepository`, `SqliteRegistryRepository`;
+    `GrantAgreement`, `TransferAgreement`, `RegisterDocument`, `ConductInspection`.
 - **Fase 6 ✅ — Facturación, pagos y caja.**
   - `V0005__billing.sql`: facturas, líneas, pagos, devoluciones y sesiones de caja; dinero como
     unidades menores enteras + ISO-4217, nunca coma flotante.

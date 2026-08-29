@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–6 ✅; Fase 7 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–7 ✅; Fase 8 en curso._
 
 ---
 
@@ -19,7 +19,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–6 ✅; Fase
 | 4 | Motor configurable de servicios | ✅ |
 | 5 | Ciudadano y experiencia de front-office | ✅ |
 | 6 | Facturación, pagos y caja | ✅ |
-| 7 | Módulos municipales especializados | ⚪ |
+| 7 | Módulos municipales especializados | ✅ |
 | 8 | Documentos, PDF e impresión | ⚪ |
 | 9 | Backup, recuperación y Google Drive | ⚪ |
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ⚪ |
@@ -235,12 +235,36 @@ facturación.
       cuadre de caja.
 - [ ] Impresión de factura/recibo — Fase 8.
 
-## Fase 7 — Módulos municipales especializados ⚪
+## Fase 7 — Módulos municipales especializados ✅
 
 Prioridad: 1) Registro Civil / Registro de Documentos / Conservaduría · 2) Certificaciones y cartas
 oficiales · 3) Planeamiento Urbano / Construcción · 4) Propiedad/Catastro · 5) Cementerios ·
 6) Mercados y espacios comerciales · 7) Negocios/Publicidad/Permisos · 8) Espacio público/Movilidad ·
 9) Residuos/Solicitudes de servicio · 10) Casos comunitarios/sociales.
+
+La regla que da forma a esta fase es «no codificar cada servicio como una arquitectura aparte»
+(§15). Tres modelos compartidos cubren los diez módulos:
+
+- [x] `MunicipalAsset` (§25, §6, §7): parcela, nicho, casilla, kiosco, espacio público. La
+      contención es una autorreferencia (cementerio → sección → nicho, mercado → casilla), así que
+      un tipo nuevo de bien es configuración, no una migración. `AssetHolder` guarda **historia**
+      de tenencia, no un titular mutable.
+- [x] `Agreement` (§26): arrendamiento, concesión, asignación de casilla y permiso de espacio
+      público con un único ciclo de vida. Un **traspaso** crea un contrato nuevo que apunta al
+      anterior — la cadena es justamente lo que dirime una disputa.
+- [x] `Inspection` (§29): la visita reutilizable por cualquier servicio, con checklist tri-estado
+      (no evaluado ≠ incumple).
+- [x] `RegisteredDocument` (§4) — la Conservaduría, explícitamente **distinta** de un adjunto: tiene
+      libro/folio, partes nombradas y anotaciones marginales append-only. Una entrada registrada se
+      congela; se corrige anotando, nunca editando.
+- [x] `Decision` (§28): cada acto de aprobación con su autor, rol y motivo, separado del desenlace
+      grueso del trámite porque un caso reúne varias decisiones de varios roles.
+- [x] `V0006__municipal_modules.sql`, `SqliteAssetRepository`, `SqliteRegistryRepository`,
+      `RegistryJson`; casos de uso `GrantAgreement`, `TransferAgreement`, `RegisterDocument`
+      (presentar ≠ registrar: permisos distintos), `ConductInspection`.
+- [x] `MunicipalModulesIT`: casilla, nicho y parcela pasan por **el mismo código**; si alguno
+      necesitara un caso especial, el test no podría compartir el helper.
+- [ ] UI de los módulos — se monta sobre las vistas de trámite en la Fase 12.
 
 ## Fase 8 — Documentos, PDF e impresión ⚪
 

@@ -38,7 +38,7 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2, 3, 4, 5);
+        assertThat(applied).contains(1, 2, 3, 4, 5, 6);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
                 .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
@@ -47,8 +47,12 @@ class MigrationRunnerTest {
         assertThat(intQuery("SELECT count(*) FROM service_definition_version")).isZero();
         assertThat(intQuery("SELECT count(*) FROM procedure")).isZero();
         assertThat(intQuery("SELECT count(*) FROM procedure_requirement")).isZero();
-        // V0004 seeds the case sequence, V0005 the four billing ones
-        assertThat(intQuery("SELECT count(*) FROM numbering_sequence")).isEqualTo(5);
+        // V0004 seeds the case sequence, V0005 four billing ones, V0006 three module ones
+        assertThat(intQuery("SELECT count(*) FROM numbering_sequence")).isEqualTo(8);
+        assertThat(intQuery("SELECT count(*) FROM municipal_asset")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM agreement")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM registered_document")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM inspection")).isZero();
         assertThat(intQuery("SELECT count(*) FROM invoice")).isZero();
         assertThat(intQuery("SELECT count(*) FROM payment")).isZero();
         assertThat(intQuery("SELECT count(*) FROM cash_session")).isZero();
