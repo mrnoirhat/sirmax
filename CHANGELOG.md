@@ -8,6 +8,12 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 11 ✅ — Empaquetado para Windows.**
+  - `jlinkRuntime` (runtime recortado), `packageAppImage` (carpeta autocontenida, siempre
+    disponible) y `packageWindows` (MSI; se salta con un mensaje si falta WiX).
+  - `verifyReleaseArtifacts` falla si el runtime no quedó dentro del artefacto.
+  - Datos en `%LOCALAPPDATA%\SIRMAX`: actualizar conserva, desinstalar deja.
+  - Job `package` en CI y [`docs/PACKAGING.md`](docs/PACKAGING.md).
 - **Fase 10 ✅ — Seguridad, auditoría y fiabilidad.**
   - `AuditChain`: cada entrada de auditoría se encadena con la anterior por SHA-256, así una
     alteración o un borrado son detectables aunque se eliminen los triggers. `VerifyAuditIntegrity`.

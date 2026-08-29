@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–10 ✅; Fase 11 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–11 ✅; Fase 12 en curso._
 
 ---
 
@@ -23,7 +23,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–10 ✅; Fas
 | 8 | Documentos, PDF e impresión | ✅ |
 | 9 | Backup, recuperación y Google Drive | ✅ |
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ✅ |
-| 11 | Empaquetado para Windows | ⚪ |
+| 11 | Empaquetado para Windows | ✅ |
 | 12 | Productivización de landing + docs | ⚪ |
 | 13 | Hardening | ⚪ |
 | 14 | Release 1.0 | ⚪ |
@@ -346,10 +346,29 @@ recuperación.
 - [x] `SecurityHardeningIT` elimina los triggers y edita el registro para comprobar que la
       alteración **se ve igual**.
 
-## Fase 11 — Empaquetado para Windows ⚪
+## Fase 11 — Empaquetado para Windows ✅
 
 Instalador Windows, runtime empaquetado, accesos directos, instalación limpia, desinstalación,
 información de versión, verificación de artefactos de release.
+
+Ver [`docs/PACKAGING.md`](./docs/PACKAGING.md).
+
+- [x] `jlinkRuntime`: runtime recortado (~51 MB) con los módulos que la aplicación usa de verdad.
+- [x] `packageAppImage`: carpeta autocontenida con `SIRMAX.exe`. Es el artefacto que **siempre**
+      existe — no necesita más que el JDK, así que se construye y verifica en cualquier máquina y
+      en CI, y sirve para evaluar SIRMAX desde una carpeta compartida o un USB.
+- [x] `packageWindows`: MSI con menú Inicio, acceso directo **opcional**, instalación por usuario y
+      `--win-upgrade-uuid` constante (una versión nueva actualiza, no se instala al lado). Requiere
+      WiX 3.x; si falta, la tarea se **salta con un mensaje** en vez de romper la compilación de
+      quien solo está desarrollando.
+- [x] `verifyReleaseArtifacts`: falla si el runtime no quedó incluido. Un artefacto que instala
+      bien y luego no arranca es peor que uno que no se construye.
+- [x] Los datos viven en `%LOCALAPPDATA%\SIRMAX`, **nunca** en el directorio de instalación: una
+      actualización lo reemplaza entero. Actualizar conserva los datos; desinstalar los deja.
+- [x] Job `package` en el workflow Desktop, con la imagen como artefacto descargable.
+- [x] **Verificado en Windows 11 sin Java en el `PATH`**: la imagen arrancó, aplicó las nueve
+      migraciones y abrió la ventana.
+- [ ] MSI firmado — requiere un certificado del ayuntamiento; se documenta en la Fase 14.
 
 ## Fase 12 — Productivización de landing + docs ⚪
 
