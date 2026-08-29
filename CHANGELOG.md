@@ -7,6 +7,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-29
+
 ### Added
 - **Fase 13 ✅ — Hardening.** Auditorías ejecutables de rendimiento (`PerformanceAuditIT`, con
   20 000 ciudadanos y 20 000 trámites, leyendo el plan de ejecución), migraciones

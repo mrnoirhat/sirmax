@@ -26,7 +26,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–13 ✅; Fas
 | 11 | Empaquetado para Windows | ✅ |
 | 12 | Productivización de landing + docs | ✅ |
 | 13 | Hardening | ✅ |
-| 14 | Release 1.0 | ⚪ |
+| 14 | Release 1.0 | 🟡 |
 
 ---
 
@@ -430,9 +430,20 @@ vive como prueba, no como una casilla en un documento que envejece sin que nadie
 - La regla de moneda era demasiado estricta: `invoice_line` hereda la moneda de su factura a
   propósito — duplicarla solo crearía dónde discrepar.
 
-## Fase 14 — Release 1.0 ⚪
+## Fase 14 — Release 1.0 🟡
 
 Solo tras pasar el Release Gate de [`RELEASE.md`](./RELEASE.md).
+
+Verificación completa en [`docs/RELEASE-GATE-1.0.md`](./docs/RELEASE-GATE-1.0.md): **18 de 21
+checks en verde**, tres marcados ⚠️ porque no se pueden probar honestamente en CI —
+impresión sobre hardware físico (dos) y el flujo de Google Drive, que necesita credenciales del
+municipio. Fabricarlas para que un test pasara sería justo la funcionalidad falsa que §1.2 prohíbe.
+
+- [x] Release Gate verificado check por check, con la evidencia enlazada.
+- [x] `CHANGELOG.md` finalizado; versión `1.0.0`.
+- [ ] Promoción `experiment → testing → main` con merges `--no-ff`.
+- [ ] Tag `v1.0.0` sobre `main`.
+- [ ] Verificación con impresora física antes de la primera instalación real.
 
 ---
 
