@@ -16,6 +16,8 @@ _La gestión municipal, simplificada._
 
 _La documentación también está en [GitHub Pages](https://mrnoirhat.github.io/sirmax)._
 
+_Administrando el repositorio: [configuración de GitHub](./docs/GITHUB-SETUP.md)._
+
 </div>
 
 ---
