@@ -57,6 +57,16 @@ jobs:
           path: apps/docs/build
           if-no-files-found: error
 
+      # Turns Pages on for the repository if nobody has yet. Without this the
+      # deploy job fails with "Get Pages site failed" on a repository that has
+      # never published, which is every repository the first time — a red build
+      # caused by a setting rather than by the code.
+      - name: Configure GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       # The Pages artifact is only produced from main: documentation and the
       # released application have to say the same thing (§67), and experiment
       # says whatever is being tried out this week.
