@@ -63,3 +63,22 @@ compilar, así que la lista se revisa cuando cambia el classpath.
 
 La imagen empaquetada se ejecutó en Windows 11 sin `JAVA_HOME` ni Java en el
 `PATH`: arrancó, aplicó las nueve migraciones y abrió la ventana de JavaFX.
+
+---
+
+## Publicar la documentación
+
+El sitio de Docusaurus se despliega a GitHub Pages desde `main`, pero **hace
+falta un paso manual una sola vez**: habilitar Pages es una acción de
+administración del repositorio y el `GITHUB_TOKEN` de Actions no puede hacerla.
+
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions**
+2. **Settings → Secrets and variables → Actions → Variables**: crear
+   `PUBLISH_DOCS = true`
+
+Hasta entonces la documentación se sigue construyendo, comprobando de tipos y
+validando enlaces en cada push — el workflow simplemente no intenta publicar.
+
+Se hizo así a propósito: un build de release en rojo porque nadie ha visitado una
+página de ajustes diría que el código está roto cuando no lo está, y un rojo que
+no significa nada es un rojo que la gente deja de mirar.
