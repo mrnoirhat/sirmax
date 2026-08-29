@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-test-reports
           path: apps/desktop/**/build/reports/
@@ -84,7 +84,7 @@ jobs:
         run: ./gradlew --no-daemon verifyReleaseArtifacts
 
       - name: Upload the app image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sirmax-app-image
           path: apps/desktop/sirmax-app/build/app-image/
