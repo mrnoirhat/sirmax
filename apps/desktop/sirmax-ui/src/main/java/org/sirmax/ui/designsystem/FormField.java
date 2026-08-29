@@ -20,11 +20,24 @@ public final class FormField extends VBox {
         this(labelKey, control, null);
     }
 
+    /**
+     * A field whose label is <em>data</em>, not program text — a dynamic form field or a service
+     * requirement named by the administrator. Those labels are never i18n keys, because SIRMAX does
+     * not ship translations for text a municipality wrote itself.
+     */
+    public static FormField withLiteralLabel(String label, Node control) {
+        return new FormField(label, control, null, true);
+    }
+
     public FormField(String labelKey, Node control, String hintKey) {
+        this(labelKey, control, hintKey, false);
+    }
+
+    private FormField(String labelText, Node control, String hintKey, boolean literalLabel) {
         super(4);
         getStyleClass().add(Styles.FIELD);
 
-        Label label = new Label(Messages.get(labelKey));
+        Label label = new Label(literalLabel ? labelText : Messages.get(labelText));
         label.getStyleClass().add(Styles.FIELD_LABEL);
         label.setLabelFor(control);
         getChildren().addAll(label, control);

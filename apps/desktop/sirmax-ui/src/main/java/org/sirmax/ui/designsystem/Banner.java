@@ -31,24 +31,66 @@ public final class Banner extends HBox {
         }
     }
 
+    private final Label icon = new Label();
+    private final Label title = new Label();
+    private final Label body = new Label();
+    private Severity severity;
+
     public Banner(Severity severity, String titleKey, String messageKey) {
+        this();
+        show(severity, titleKey, messageKey);
+    }
+
+    /**
+     * An empty banner whose content is set later with {@link #show}. Views that surface a validation
+     * result — "faltan 2 requisitos", "posible duplicado" — reuse one banner instead of rebuilding
+     * the node and losing its place in the layout.
+     */
+    public Banner() {
         super(10);
         setAlignment(Pos.TOP_LEFT);
-        getStyleClass().addAll(Styles.BANNER, severity.styleClass);
+        getStyleClass().add(Styles.BANNER);
 
-        Label icon = new Label(severity.glyph);
-
-        Label title = new Label(Messages.get(titleKey));
         title.getStyleClass().add(Styles.BANNER_TITLE);
+        body.setWrapText(true);
+        body.setVisible(false);
+        body.setManaged(false);
 
-        VBox text = new VBox(2, title);
-        if (messageKey != null) {
-            Label body = new Label(Messages.get(messageKey));
-            body.setWrapText(true);
-            text.getChildren().add(body);
-        }
+        VBox text = new VBox(2, title, body);
         HBox.setHgrow(text, Priority.ALWAYS);
-
         getChildren().addAll(icon, text);
+
+        setVisible(false);
+        setManaged(false);
+    }
+
+    /** Replace the content and make the banner visible. {@code messageKey} may be null. */
+    public void show(Severity newSeverity, String titleKey, String messageKey, Object... args) {
+        if (severity != null) {
+            getStyleClass().remove(severity.styleClass);
+        }
+        severity = newSeverity;
+        getStyleClass().add(severity.styleClass);
+
+        icon.setText(severity.glyph);
+        title.setText(Messages.get(titleKey, args));
+
+        boolean hasBody = messageKey != null;
+        body.setText(hasBody ? Messages.get(messageKey) : "");
+        body.setVisible(hasBody);
+        body.setManaged(hasBody);
+
+        setVisible(true);
+        setManaged(true);
+    }
+
+    public void hide() {
+        setVisible(false);
+        setManaged(false);
+    }
+
+    /** Exposed for tests: the text currently displayed, or empty when hidden. */
+    public String currentTitle() {
+        return isVisible() ? title.getText() : "";
     }
 }

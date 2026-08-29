@@ -8,6 +8,18 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 5 ✅ — Ciudadano y front-office.**
+  - `V0004__procedure.sql`: trámites, checklist materializado, valores de formulario, línea de
+    tiempo, adjuntos, `numbering_sequence` y `person.search_name` (clave plegada).
+  - Dominio `procedure` (`Procedure`, `ProcedureChecklist`, `ProcedureEvent`, `DueDates`) y
+    `numbering` (`NumberingSequence`). `shared.text.Normalization` (plegado + similitud).
+  - Casos de uso `StartProcedure`, `UpdateProcedureRequirement`, `SaveProcedureForm`,
+    `AdvanceProcedure`, `AssignProcedure`, `AddProcedureNote`, `FindDuplicatePeople`.
+  - Adaptadores `SqliteProcedureRepository` / `SqliteNumberingRepository`.
+  - UI real: login/primer arranque, worklist con colas guardadas, asistente de nuevo trámite con
+    detección de duplicados, detalle de trámite (checklist + formulario + acciones del flujo +
+    historial) y escritorio de ciudadano. `AppServices` desacopla la UI de la infraestructura.
+  - 35 pruebas nuevas, incluida `FrontOfficeUiIT` (JavaFX sobre el grafo real).
 - **Fase 4 — Catálogo semilla editable (master prompt §54–§55).**
   - `application.catalog`: `ServiceTemplate` / `ServiceCategoryTemplate` / `ServiceCatalogTemplates`
     (tipados: reutilizan `RequirementDef`, `WorkflowDefinition`, `FeeRule`, `Sla`, `Validity`) y el

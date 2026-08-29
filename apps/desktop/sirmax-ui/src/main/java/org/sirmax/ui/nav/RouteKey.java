@@ -12,6 +12,10 @@ public enum RouteKey {
     HOME,
     DASHBOARD,
     PROCEDURES,
+    /** The new-case wizard; reached from Home or the worklist, not from the sidebar. */
+    PROCEDURE_NEW,
+    /** One case, opened with its id as the route argument. */
+    PROCEDURE_DETAIL,
     BILLING,
     CASH,
     DOCUMENTS,

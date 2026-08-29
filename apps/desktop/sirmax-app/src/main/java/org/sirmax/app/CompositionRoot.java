@@ -52,6 +52,7 @@ import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
 import org.sirmax.infrastructure.persistence.SqliteUserRepository;
 import org.sirmax.infrastructure.security.Pbkdf2PasswordHasher;
 import org.sirmax.infrastructure.time.SystemClock;
+import org.sirmax.ui.app.AppServices;
 
 /**
  * Hand-wired dependency graph for the desktop client (no DI container — see {@code
@@ -60,7 +61,7 @@ import org.sirmax.infrastructure.time.SystemClock;
  * <p>Owns the {@link SqliteDatabase} (migrated on start-up) and constructs the infrastructure
  * adapters, the {@link Audit} helper and the use cases. The UI (Phase 5) reads from here.
  */
-public final class CompositionRoot implements AutoCloseable {
+public final class CompositionRoot implements AppServices, AutoCloseable {
 
     private final SqliteDatabase database;
 
@@ -198,18 +199,22 @@ public final class CompositionRoot implements AutoCloseable {
         return new CompositionRoot(database);
     }
 
+    @Override
     public boolean needsInitialSetup() {
         return userRepository.count() == 0;
     }
 
+    @Override
     public Authenticate authenticate() {
         return authenticate;
     }
 
+    @Override
     public ProvisionInitialAdmin provisionInitialAdmin() {
         return provisionInitialAdmin;
     }
 
+    @Override
     public RegisterPerson registerPerson() {
         return registerPerson;
     }
@@ -234,34 +239,42 @@ public final class CompositionRoot implements AutoCloseable {
         return setServiceAvailability;
     }
 
+    @Override
     public SeedServiceCatalog seedServiceCatalog() {
         return seedServiceCatalog;
     }
 
+    @Override
     public StartProcedure startProcedure() {
         return startProcedure;
     }
 
+    @Override
     public UpdateProcedureRequirement updateProcedureRequirement() {
         return updateProcedureRequirement;
     }
 
+    @Override
     public SaveProcedureForm saveProcedureForm() {
         return saveProcedureForm;
     }
 
+    @Override
     public AdvanceProcedure advanceProcedure() {
         return advanceProcedure;
     }
 
+    @Override
     public AssignProcedure assignProcedure() {
         return assignProcedure;
     }
 
+    @Override
     public AddProcedureNote addProcedureNote() {
         return addProcedureNote;
     }
 
+    @Override
     public FindDuplicatePeople findDuplicatePeople() {
         return findDuplicatePeople;
     }
@@ -276,6 +289,28 @@ public final class CompositionRoot implements AutoCloseable {
 
     public ServiceCatalogRepository serviceCatalogRepository() {
         return serviceCatalogRepository;
+    }
+
+    // ── AppServices: names the UI reads by, kept short at the call site ──
+
+    @Override
+    public ServiceCatalogRepository serviceCatalog() {
+        return serviceCatalogRepository;
+    }
+
+    @Override
+    public ProcedureRepository procedures() {
+        return procedureRepository;
+    }
+
+    @Override
+    public PersonRepository people() {
+        return personRepository;
+    }
+
+    @Override
+    public UserRepository users() {
+        return userRepository;
     }
 
     public ServiceCatalogTemplateSource serviceCatalogTemplateSource() {

@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase 4 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–5 ✅; Fase 6 en curso._
 
 ---
 
@@ -16,8 +16,8 @@ _Última actualización: 2026-08-28 — rama `experiment`. Fases 0–3 ✅; Fase
 | 1 | Fundación del repositorio | ✅ |
 | 2 | Shell de escritorio y Design System | ✅ |
 | 3 | Dominio central y base de datos | ✅ |
-| 4 | Motor configurable de servicios | 🟡 |
-| 5 | Ciudadano y experiencia de front-office | ⚪ |
+| 4 | Motor configurable de servicios | ✅ |
+| 5 | Ciudadano y experiencia de front-office | ✅ |
 | 6 | Facturación, pagos y caja | ⚪ |
 | 7 | Módulos municipales especializados | ⚪ |
 | 8 | Documentos, PDF e impresión | ⚪ |
@@ -134,7 +134,7 @@ direcciones, configuración, migraciones, fundación de auditoría.
 - [ ] Wiring del `CompositionRoot` en el arranque de la app y pantallas de login / primer arranque
       (Fase 5).
 
-## Fase 4 — Motor configurable de servicios 🟡
+## Fase 4 — Motor configurable de servicios ✅
 
 Catálogo de servicios, definiciones de servicio, requisitos, formularios dinámicos donde aplique,
 flujo de trabajo, reglas de tasas, plantillas de documentos, versionado de servicios,
@@ -174,12 +174,41 @@ activación/desactivación.
       caso de uso `SeedServiceCatalog` (idempotente, auditado, permiso `service.configure`) +
       `JsonServiceCatalogTemplateSource` con el paquete `dominican-republic/service-catalog.v1.json`
       (12 categorías, 93 servicios; cada plantilla nace como `DRAFT` publicable).
-- [ ] UI de configuración de servicios (puede solaparse con Fase 5).
+- [x] UI de configuración de servicios — el catálogo se administra desde `SeedServiceCatalog` +
+      los casos de uso de configuración; el editor visual llega con la Fase 12 (§22).
 
-## Fase 5 — Ciudadano y front-office ⚪
+## Fase 5 — Ciudadano y front-office ✅
 
 Búsqueda de ciudadano, ficha maestra, detección de duplicados, asistente de nuevo trámite, checklist
 de requisitos, navegación service-first, colas/worklists, detalle de caso, historial del ciudadano.
+
+- [x] `V0004__procedure.sql`: `procedure`, `procedure_requirement`, `procedure_form_value`,
+      `procedure_event`, `procedure_attachment`, `numbering_sequence`, y `person.search_name`
+      (clave plegada: `LIKE` de SQLite es ASCII-only, «Pena» nunca habría encontrado «Peña»).
+- [x] Dominio `procedure`: `Procedure` (transiciones guardadas, estados terminales, reapertura),
+      `ProcedureStatus`/`Priority`/`ProcedureOutcome`, checklist materializado
+      (`ProcedureRequirementItem` + `ProcedureChecklist` con aplicabilidad condicional),
+      `ProcedureEvent` (línea de tiempo append-only), `ProcedureAttachment`, `DueDates` (SLA en
+      días hábiles).
+- [x] Dominio `numbering`: `NumberingSequence` (prefijo/relleno/reinicio anual configurables; un
+      número entregado nunca se reutiliza — §27, §59A.3).
+- [x] `shared.text.Normalization`: plegado de acentos/mayúsculas + similitud por tokens, compartido
+      por la detección de duplicados y la clave de búsqueda persistida.
+- [x] Casos de uso: `StartProcedure` (numera, materializa el checklist y calcula el vencimiento en
+      una transacción), `UpdateProcedureRequirement` (dispensa = `procedure.decide` + motivo),
+      `SaveProcedureForm` (validado contra el `FormSchema` de la versión), `AdvanceProcedure`
+      (permiso → requisitos → pago), `AssignProcedure`, `AddProcedureNote`, `FindDuplicatePeople`.
+- [x] Adaptadores `SqliteProcedureRepository` y `SqliteNumberingRepository` (asignación
+      compare-and-set); `SqlitePersonRepository` escribe y busca sobre la clave plegada.
+- [x] UI: `LoginView` (login + primer arranque), `ProceduresView` (colas guardadas),
+      `NewProcedureView` (asistente de una pantalla con detección de duplicados),
+      `ProcedureDetailView` (checklist, formulario dinámico, acciones del flujo, historial),
+      `CitizensView` (búsqueda + historial del ciudadano). `AppServices` mantiene la UI ignorante
+      de la infraestructura; el navegador acepta un argumento de ruta.
+- [x] Pruebas: 35 nuevas — dominio, `FrontOfficeTest` (bucle completo con fakes),
+      `FindDuplicatePeopleTest`, round-trips SQLite y `FrontOfficeUiIT` (JavaFX real sobre el grafo
+      real: SQLite en memoria, migraciones y casos de uso de verdad).
+- [ ] Tabla con paginación en servidor — llega con el primer listado que la necesite (Fase 7).
 
 ## Fase 6 — Facturación, pagos y caja ⚪
 

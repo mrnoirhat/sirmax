@@ -39,6 +39,10 @@ public final class ToastHost extends VBox {
         show(Styles.SUCCESS, messageKey, args);
     }
 
+    public void warning(String messageKey, Object... args) {
+        show(Styles.WARNING, messageKey, args);
+    }
+
     public void error(String messageKey, Object... args) {
         show(Styles.DANGER, messageKey, args);
     }
