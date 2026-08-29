@@ -18,12 +18,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.sirmax.application.usecase.IssueDocument;
+import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.VoidInvoice;
 import org.sirmax.domain.finance.Invoice;
 import org.sirmax.domain.finance.InvoiceStatus;
 import org.sirmax.domain.finance.Payment;
+import org.sirmax.domain.document.DocumentKind;
+import org.sirmax.domain.document.IssuedDocument;
+import org.sirmax.domain.document.PaperFormat;
 import org.sirmax.domain.finance.PaymentMethod;
 import org.sirmax.domain.security.Permission;
 import org.sirmax.shared.Money;
@@ -186,6 +191,16 @@ public final class BillingView implements SirmaxView {
         if (session.can(Permission.PAYMENT_REFUND)) {
             actions.getChildren().add(Buttons.secondary("billing.refund", this::refund));
         }
+        if (session.can(Permission.INVOICE_ISSUE)) {
+            actions.getChildren()
+                    .addAll(
+                            Buttons.secondary(
+                                    "billing.print_receipt",
+                                    () -> issueAndPrint(DocumentKind.RECEIPT, PaperFormat.NARROW_80)),
+                            Buttons.secondary(
+                                    "billing.print_invoice",
+                                    () -> issueAndPrint(DocumentKind.INVOICE, PaperFormat.LETTER)));
+        }
         if (session.can(Permission.INVOICE_VOID)) {
             actions.getChildren().add(Buttons.danger("billing.void", this::voidInvoice));
         }
@@ -311,6 +326,62 @@ public final class BillingView implements SirmaxView {
         }
         toasts.success("billing.receipt", receipt.payment().code());
         refresh();
+    }
+
+    /**
+     * Issue the document and print it in one press (§59A.7, §59D). The operator thinks "imprimir
+     * recibo", not "issue a document, then send it to a printer".
+     */
+    private void issueAndPrint(DocumentKind kind, PaperFormat format) {
+        Invoice invoice = selected();
+        if (invoice == null) {
+            return;
+        }
+        Result<IssuedDocument> issued =
+                services.issueDocument()
+                        .execute(
+                                new IssueDocument.Command(
+                                        session.require(),
+                                        invoice.id(),
+                                        kind,
+                                        format,
+                                        Optional.empty(),
+                                        "desktop.billing"));
+        if (issued instanceof Result.Err<IssuedDocument> err) {
+            toasts.error(err.messageKey());
+            return;
+        }
+
+        Result<PrintDocument.Outcome> printed =
+                services.printDocument()
+                        .execute(
+                                new PrintDocument.Command(
+                                        session.require(),
+                                        issued.orElseThrow().id(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        workstation(),
+                                        "desktop.billing"));
+        if (printed instanceof Result.Err<PrintDocument.Outcome> err) {
+            // The document exists and keeps its number; only the paper failed. Say exactly that,
+            // so the operator does not press Imprimir again expecting a fresh document.
+            toasts.error(err.messageKey());
+            return;
+        }
+        if (printed.orElseThrow().sentToPrinter()) {
+            toasts.success("billing.printed", issued.orElseThrow().documentNumber());
+        } else {
+            toasts.info("billing.print_cancelled", issued.orElseThrow().documentNumber());
+        }
+    }
+
+    /** Printer profiles can be per-machine, so the view has to say which machine it is (§59D). */
+    private static String workstation() {
+        try {
+            return java.net.InetAddress.getLocalHost().getHostName();
+        } catch (java.net.UnknownHostException e) {
+            return "";
+        }
     }
 
     private void refund() {

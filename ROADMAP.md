@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–7 ✅; Fase 8 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–8 ✅; Fase 9 en curso._
 
 ---
 
@@ -20,7 +20,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–7 ✅; Fase
 | 5 | Ciudadano y experiencia de front-office | ✅ |
 | 6 | Facturación, pagos y caja | ✅ |
 | 7 | Módulos municipales especializados | ✅ |
-| 8 | Documentos, PDF e impresión | ⚪ |
+| 8 | Documentos, PDF e impresión | ✅ |
 | 9 | Backup, recuperación y Google Drive | ⚪ |
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ⚪ |
 | 11 | Empaquetado para Windows | ⚪ |
@@ -266,11 +266,33 @@ La regla que da forma a esta fase es «no codificar cada servicio como una arqui
       necesitara un caso especial, el test no podría compartir el helper.
 - [ ] UI de los módulos — se monta sobre las vistas de trámite en la Fase 12.
 
-## Fase 8 — Documentos, PDF e impresión ⚪
+## Fase 8 — Documentos, PDF e impresión ✅
 
 Plantillas de documentos oficiales, plantilla de factura Letter, plantilla de recibo/factura
 angosta, preview, impresión Windows, perfiles de impresora, generación de PDF, marca institucional,
 QR/verificación, reimpresión auditada.
+
+La idea que sostiene toda la fase es §59F: **un cambio de logo o dirección no puede reescribir una
+factura ya emitida**. Por eso un documento emitido lleva su propio `DocumentSnapshot` congelado y el
+renderizador no lee nada más.
+
+- [x] `V0007__documents.sql`: `issued_document` (con `snapshot_json` y código de verificación
+      único), `document_print` (historial de cada impresión, incluida la primera),
+      `document_template` y `printer_profile`.
+- [x] Dominio `document`: `DocumentSnapshot` (institución + ciudadano + líneas + totales + pago,
+      todo en `Money`), `IssuedDocument` (emitir ≠ imprimir; reimprimir nunca renumera),
+      `VerificationCode` (alfabeto sin `O/0`, `I/1`, `S/5` — se dictan por teléfono),
+      `PaperFormat`, `PrinterProfile`.
+- [x] `PdfDocumentRenderer` con **PDFBox**: plantilla Letter §59B.2 (membrete, identidad, bloque de
+      ciudadano, tabla, totales, bloque de pago, pie con QR) y plantilla angosta §59B.1
+      (`NarrowReceiptLayout`, monoespaciado, sin filetes ni color, papel continuo). `QrCodes` con
+      ZXing; el QR solo lleva el código, nunca datos del ciudadano (§48).
+- [x] `JavaPrintServiceDocumentPrinter`: cola de Windows, tamaño real (sin «ajustar a la página»),
+      perfiles silenciosos para la impresora de caja.
+- [x] Casos de uso `IssueDocument` (toma el snapshot) y `PrintDocument` (reimpresión con permiso
+      `invoice.reprint`, sello COPIA, historial y auditoría; un diálogo cancelado no registra nada).
+- [x] `DocumentPrintingIT`: PDF real en ambos formatos, la garantía §59F con un rebranding de por
+      medio, reimpresión sin renumerar ni duplicar el pago, y el rastro de auditoría.
 
 ## Fase 9 — Backup, recuperación y Google Drive ⚪
 

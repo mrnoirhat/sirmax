@@ -4,6 +4,8 @@ package org.sirmax.ui.app;
 import org.sirmax.application.port.AssetRepository;
 import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
+import org.sirmax.application.port.DocumentPrinter;
+import org.sirmax.application.port.DocumentRepository;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RegistryRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
@@ -15,8 +17,10 @@ import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.ConductInspection;
 import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.GrantAgreement;
+import org.sirmax.application.usecase.IssueDocument;
 import org.sirmax.application.usecase.IssueInvoice;
 import org.sirmax.application.usecase.ManageCashSession;
+import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
 import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterPayment;
@@ -106,4 +110,14 @@ public interface AppServices {
     AssetRepository assets();
 
     RegistryRepository registry();
+
+    // ── documents, PDF and printing ──
+    IssueDocument issueDocument();
+
+    PrintDocument printDocument();
+
+    DocumentRepository documents();
+
+    /** Only the printer-profile screen needs this, to list the workstation's Windows queues. */
+    DocumentPrinter printer();
 }

@@ -8,6 +8,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 8 ✅ — Documentos, PDF e impresión.**
+  - `DocumentSnapshot`: una factura emitida guarda la marca institucional, el ciudadano, las líneas
+    y los totales congelados. Un rebranding en 2029 no reescribe un documento de 2026 (§59F).
+  - `PdfDocumentRenderer` (PDFBox): plantilla Letter y plantilla de recibo angosto real, no capturas.
+    `VerificationCode` + QR (ZXing) sin datos privados.
+  - `JavaPrintServiceDocumentPrinter` (cola de Windows, tamaño real, perfiles silenciosos),
+    `IssueDocument`, `PrintDocument` (reimpresión auditada que nunca renumera).
+  - `V0007__documents.sql`, `SqliteDocumentRepository`, `DocumentJson`.
 - **Fase 7 ✅ — Módulos municipales especializados.**
   - Tres modelos compartidos en lugar de diez arquitecturas: `MunicipalAsset` (+ `AssetHolder` como
     historia de tenencia), `Agreement` (arrendamiento/concesión/casilla/permiso con un solo ciclo de

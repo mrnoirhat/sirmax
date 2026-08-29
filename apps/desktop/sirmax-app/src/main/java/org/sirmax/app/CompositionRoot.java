@@ -5,6 +5,9 @@ import org.sirmax.application.port.AssetRepository;
 import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.Clock;
+import org.sirmax.application.port.DocumentPrinter;
+import org.sirmax.application.port.DocumentRenderer;
+import org.sirmax.application.port.DocumentRepository;
 import org.sirmax.application.port.IdGenerator;
 import org.sirmax.application.port.IdentificationRepository;
 import org.sirmax.application.port.NumberingRepository;
@@ -32,8 +35,10 @@ import org.sirmax.application.usecase.CreateServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.GrantAgreement;
+import org.sirmax.application.usecase.IssueDocument;
 import org.sirmax.application.usecase.IssueInvoice;
 import org.sirmax.application.usecase.ManageCashSession;
+import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
 import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterDocument;
@@ -56,6 +61,7 @@ import org.sirmax.infrastructure.persistence.SqliteAssetRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
+import org.sirmax.infrastructure.persistence.SqliteDocumentRepository;
 import org.sirmax.infrastructure.persistence.SqliteIdentificationRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationPartyRepository;
 import org.sirmax.infrastructure.persistence.SqliteNumberingRepository;
@@ -67,6 +73,8 @@ import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
 import org.sirmax.infrastructure.persistence.SqliteServiceCatalogRepository;
 import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
 import org.sirmax.infrastructure.persistence.SqliteUserRepository;
+import org.sirmax.infrastructure.print.JavaPrintServiceDocumentPrinter;
+import org.sirmax.infrastructure.print.PdfDocumentRenderer;
 import org.sirmax.infrastructure.security.Pbkdf2PasswordHasher;
 import org.sirmax.infrastructure.time.SystemClock;
 import org.sirmax.ui.app.AppServices;
@@ -101,6 +109,9 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final AuditRepository auditRepository;
     private final AssetRepository assetRepository;
     private final RegistryRepository registryRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentRenderer documentRenderer;
+    private final DocumentPrinter documentPrinter;
     private final ProcedureFinance procedureFinance;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
@@ -130,6 +141,8 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final TransferAgreement transferAgreement;
     private final RegisterDocument registerDocument;
     private final ConductInspection conductInspection;
+    private final IssueDocument issueDocument;
+    private final PrintDocument printDocument;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -154,6 +167,9 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.auditRepository = new SqliteAuditRepository(database);
         this.assetRepository = new SqliteAssetRepository(database);
         this.registryRepository = new SqliteRegistryRepository(database);
+        this.documentRepository = new SqliteDocumentRepository(database);
+        this.documentRenderer = new PdfDocumentRenderer();
+        this.documentPrinter = new JavaPrintServiceDocumentPrinter();
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -271,6 +287,27 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
                         registryRepository,
                         procedureRepository,
                         numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+
+        this.issueDocument =
+                new IssueDocument(
+                        documentRepository,
+                        billingRepository,
+                        procedureRepository,
+                        organizationRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.printDocument =
+                new PrintDocument(
+                        documentRepository,
+                        documentRenderer,
+                        documentPrinter,
                         ids,
                         clock,
                         unitOfWork,
@@ -423,6 +460,26 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     }
 
     @Override
+    public IssueDocument issueDocument() {
+        return issueDocument;
+    }
+
+    @Override
+    public PrintDocument printDocument() {
+        return printDocument;
+    }
+
+    @Override
+    public DocumentRepository documents() {
+        return documentRepository;
+    }
+
+    @Override
+    public DocumentPrinter printer() {
+        return documentPrinter;
+    }
+
+    @Override
     public AssetRepository assets() {
         return assetRepository;
     }
@@ -496,6 +553,14 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
 
     public Clock clock() {
         return clock;
+    }
+
+    /**
+     * The audit helper. Exposed so a test can rebuild one use case around a double — printing is
+     * the one adapter CI cannot exercise, since a headless runner has no printers.
+     */
+    public Audit auditFor() {
+        return audit;
     }
 
     public IdGenerator ids() {
