@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–13 ✅; Fase 14 (release 1.0) pendiente._
+_Última actualización: 2026-08-29 — **v1.0.0 publicada en `main`**. Las quince fases (0–14) completas._
 
 ---
 
@@ -26,7 +26,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–13 ✅; Fas
 | 11 | Empaquetado para Windows | ✅ |
 | 12 | Productivización de landing + docs | ✅ |
 | 13 | Hardening | ✅ |
-| 14 | Release 1.0 | 🟡 |
+| 14 | Release 1.0 | ✅ |
 
 ---
 
@@ -430,7 +430,7 @@ vive como prueba, no como una casilla en un documento que envejece sin que nadie
 - La regla de moneda era demasiado estricta: `invoice_line` hereda la moneda de su factura a
   propósito — duplicarla solo crearía dónde discrepar.
 
-## Fase 14 — Release 1.0 🟡
+## Fase 14 — Release 1.0 ✅
 
 Solo tras pasar el Release Gate de [`RELEASE.md`](./RELEASE.md).
 
@@ -441,9 +441,13 @@ municipio. Fabricarlas para que un test pasara sería justo la funcionalidad fal
 
 - [x] Release Gate verificado check por check, con la evidencia enlazada.
 - [x] `CHANGELOG.md` finalizado; versión `1.0.0`.
-- [ ] Promoción `experiment → testing → main` con merges `--no-ff`.
-- [ ] Tag `v1.0.0` sobre `main`.
-- [ ] Verificación con impresora física antes de la primera instalación real.
+- [x] Promoción `experiment → testing → main` con merges `--no-ff` y los cuatro workflows en verde
+      en cada paso.
+- [x] Tag `v1.0.0` sobre `main`.
+- [ ] **Verificación con impresora física antes de la primera instalación real.** Es lo único que
+      queda del Release Gate y no se puede hacer sin el hardware del ayuntamiento.
+- [ ] Firma del MSI — requiere un certificado del municipio.
+- [ ] Protección de ramas en GitHub — requiere acceso de administración al repositorio.
 
 ---
 
