@@ -7,7 +7,101 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
-_En desarrollo en `experiment`._
+## [1.0.0] - 2026-08-29
+
+### Added
+- **Fase 13 ✅ — Hardening.** Auditorías ejecutables de rendimiento (`PerformanceAuditIT`, con
+  20 000 ciudadanos y 20 000 trámites, leyendo el plan de ejecución), migraciones
+  (`MigrationAuditTest`) y accesibilidad/UX (`AccessibilityAuditTest`). Informe en
+  [`docs/HARDENING.md`](docs/HARDENING.md), incluida la lista de lo que **no** cubre.
+  `V0010__foreign_key_indexes.sql` indexa las claves foráneas que la aplicación recorre.
+- **Fase 12 ✅ — Landing y documentación a producción.**
+  - Guía de usuario real (trámites, ciudadanos, facturación, caja, impresión, documentos, registro,
+    copias, restauración, seguridad) en lugar de plantillas.
+  - `ScreenshotGenerator`: capturas fieles desde `Scene.snapshot()`, no del escritorio.
+  - Docusaurus se despliega a GitHub Pages desde `main`; `url`/`baseUrl` y el enlace landing → docs
+    corregidos a rutas que existen.
+
+### Fixed
+- La ventana por defecto no cabía en pantallas de 1280×720 y dejaba el botón de primer arranque
+  fuera de pantalla. Ahora se ajusta al tamaño real de la pantalla y se centra.
+- La tarjeta de acceso se estiraba a todo el alto de la ventana.
+- `LoginViewLayoutTest` mide el layout con la hoja de estilos real.
+
+### Added
+- **Fase 11 ✅ — Empaquetado para Windows.**
+  - `jlinkRuntime` (runtime recortado), `packageAppImage` (carpeta autocontenida, siempre
+    disponible) y `packageWindows` (MSI; se salta con un mensaje si falta WiX).
+  - `verifyReleaseArtifacts` falla si el runtime no quedó dentro del artefacto.
+  - Datos en `%LOCALAPPDATA%\SIRMAX`: actualizar conserva, desinstalar deja.
+  - Job `package` en CI y [`docs/PACKAGING.md`](docs/PACKAGING.md).
+- **Fase 10 ✅ — Seguridad, auditoría y fiabilidad.**
+  - `AuditChain`: cada entrada de auditoría se encadena con la anterior por SHA-256, así una
+    alteración o un borrado son detectables aunque se eliminen los triggers. `VerifyAuditIntegrity`.
+  - Bloqueo de cuenta con expiración automática y registro de intentos (`login_attempt`);
+    usuario inexistente y contraseña errónea responden idéntico.
+  - `SecurityPolicy` (longitud mínima, umbral de bloqueo, inactividad, tamaño de adjunto) y
+    `AttachmentValidator` por magic bytes — un ejecutable renombrado a `.pdf` se rechaza.
+  - `V0009__security_hardening.sql`, `SqliteSecurityPolicyRepository`; `SqliteAuditSink` ahora
+    escribe la cadena.
+- **Fase 9 ✅ — Backup, recuperación y Google Drive.**
+  - `SqliteBackupEngine`: `VACUUM INTO` → gzip → AES-256-GCM → SHA-256. Un archivo alterado falla
+    al descifrar en vez de restaurar basura; la frase de paso nunca se guarda.
+  - `RestoreBackup` sigue la secuencia §42 al pie de la letra y reinscribe su procedencia en la base
+    recuperada, para que la copia de emergencia siga siendo localizable.
+  - `GoogleDriveBackupTarget` (REST + `HttpClient`) y `SecretStore` cifrado en reposo. La subida
+    fuera de sede está **apagada** por defecto (§41).
+  - `V0008__backup.sql`, `SqliteBackupRepository`, `CreateBackup`, `ManageBackupPolicy`.
+  - `SqliteDatabase.reopen()`: una restauración cambia el fichero bajo la aplicación.
+- **Fase 8 ✅ — Documentos, PDF e impresión.**
+  - `DocumentSnapshot`: una factura emitida guarda la marca institucional, el ciudadano, las líneas
+    y los totales congelados. Un rebranding en 2029 no reescribe un documento de 2026 (§59F).
+  - `PdfDocumentRenderer` (PDFBox): plantilla Letter y plantilla de recibo angosto real, no capturas.
+    `VerificationCode` + QR (ZXing) sin datos privados.
+  - `JavaPrintServiceDocumentPrinter` (cola de Windows, tamaño real, perfiles silenciosos),
+    `IssueDocument`, `PrintDocument` (reimpresión auditada que nunca renumera).
+  - `V0007__documents.sql`, `SqliteDocumentRepository`, `DocumentJson`.
+- **Fase 7 ✅ — Módulos municipales especializados.**
+  - Tres modelos compartidos en lugar de diez arquitecturas: `MunicipalAsset` (+ `AssetHolder` como
+    historia de tenencia), `Agreement` (arrendamiento/concesión/casilla/permiso con un solo ciclo de
+    vida y traspaso encadenado) e `Inspection`.
+  - `RegisteredDocument`: la Conservaduría, distinta de un adjunto — libro/folio, partes y
+    anotaciones marginales; una entrada registrada se congela. `Decision` (§28).
+  - `V0006__municipal_modules.sql`, `SqliteAssetRepository`, `SqliteRegistryRepository`;
+    `GrantAgreement`, `TransferAgreement`, `RegisterDocument`, `ConductInspection`.
+- **Fase 6 ✅ — Facturación, pagos y caja.**
+  - `V0005__billing.sql`: facturas, líneas, pagos, devoluciones y sesiones de caja; dinero como
+    unidades menores enteras + ISO-4217, nunca coma flotante.
+  - Dominio `Invoice` / `InvoiceLine` / `Payment` / `Refund` / `CashSession`: la historia financiera
+    de una factura emitida no cambia en silencio; el sobrepago es **cambio**, no ingreso; la
+    diferencia de caja se registra en lugar de corregirse.
+  - Casos de uso `IssueInvoice`, `RegisterPayment`, `VoidInvoice`, `RefundPayment`,
+    `ManageCashSession`.
+  - `SqliteBillingRepository` (que además implementa `ProcedureFinance`) y `SqliteAuditRepository`.
+  - UI `BillingView` y `CashView`; `MunicipalLoopIT` cubre el bucle municipal completo.
+- **Fase 5 ✅ — Ciudadano y front-office.**
+  - `V0004__procedure.sql`: trámites, checklist materializado, valores de formulario, línea de
+    tiempo, adjuntos, `numbering_sequence` y `person.search_name` (clave plegada).
+  - Dominio `procedure` (`Procedure`, `ProcedureChecklist`, `ProcedureEvent`, `DueDates`) y
+    `numbering` (`NumberingSequence`). `shared.text.Normalization` (plegado + similitud).
+  - Casos de uso `StartProcedure`, `UpdateProcedureRequirement`, `SaveProcedureForm`,
+    `AdvanceProcedure`, `AssignProcedure`, `AddProcedureNote`, `FindDuplicatePeople`.
+  - Adaptadores `SqliteProcedureRepository` / `SqliteNumberingRepository`.
+  - UI real: login/primer arranque, worklist con colas guardadas, asistente de nuevo trámite con
+    detección de duplicados, detalle de trámite (checklist + formulario + acciones del flujo +
+    historial) y escritorio de ciudadano. `AppServices` desacopla la UI de la infraestructura.
+  - 35 pruebas nuevas, incluida `FrontOfficeUiIT` (JavaFX sobre el grafo real).
+- **Fase 4 — Catálogo semilla editable (master prompt §54–§55).**
+  - `application.catalog`: `ServiceTemplate` / `ServiceCategoryTemplate` / `ServiceCatalogTemplates`
+    (tipados: reutilizan `RequirementDef`, `WorkflowDefinition`, `FeeRule`, `Sla`, `Validity`) y el
+    puerto `ServiceCatalogTemplateSource`.
+  - Caso de uso `SeedServiceCatalog` (permiso `service.configure`, auditado, idempotente):
+    materializa el paquete en categorías + servicios con una versión **v1 `DRAFT`** que el municipio
+    revisa (montos, requisitos, flujo) y publica. Vuelve a ejecutarse sin duplicar.
+  - `infrastructure`: `JsonServiceCatalogTemplateSource` lee el paquete de la República Dominicana
+    (`catalog/dominican-republic/service-catalog.v1.json`, 12 categorías y 93 servicios) reutilizando
+    los parsers de `ServiceJson`. Cada plantilla produce un borrador que pasa `ServiceVersionValidator`.
+  - Cableado en `CompositionRoot` (`seedServiceCatalog()`).
 
 ## [0.1.1] - 2026-08-28
 

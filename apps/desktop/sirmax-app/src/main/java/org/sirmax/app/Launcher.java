@@ -8,16 +8,21 @@ import org.sirmax.ui.SirmaxApplication;
  * Process entry point.
  *
  * <p>A plain (non-{@link Application}) {@code main} is the standard way to launch a modular JavaFX
- * app without fighting the module path. The domain graph is built by {@link
- * CompositionRoot#bootstrapDefault()}; Phase 5 hands it to the UI (login / first-run setup). For now
- * the shell renders on its own.
+ * app without fighting the module path. It opens the local database, applies pending migrations and
+ * hands the wired graph to the UI, which shows the login (or first-run setup) screen.
+ *
+ * <p>The composition root is closed on JVM shutdown rather than after {@code launch} returns, so the
+ * SQLite connection is released even if the window is closed while work is in flight.
  */
 public final class Launcher {
 
     private Launcher() {}
 
     public static void main(String[] args) {
-        // Phase 5: try (CompositionRoot root = CompositionRoot.bootstrapDefault()) { ... }
+        CompositionRoot root = CompositionRoot.bootstrapDefault();
+        Runtime.getRuntime().addShutdownHook(new Thread(root::close, "sirmax-shutdown"));
+
+        SirmaxApplication.services(root);
         Application.launch(SirmaxApplication.class, args);
     }
 }

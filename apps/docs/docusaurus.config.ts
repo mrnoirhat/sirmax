@@ -10,8 +10,11 @@ const config: Config = {
   tagline: "La gestión municipal, simplificada.",
   // favicon: "img/favicon.ico", // added with the real asset in Phase 12
 
-  url: "https://docs.sirmax.org",
-  baseUrl: "/",
+  // GitHub Pages for mrnoirhat/sirmax. A custom domain (docs.sirmax.org) can be
+  // pointed here later by adding a CNAME; until someone actually owns it, naming
+  // it here would only produce asset URLs that 404.
+  url: "https://mrnoirhat.github.io",
+  baseUrl: "/sirmax/",
 
   organizationName: "mrnoirhat",
   projectName: "sirmax",

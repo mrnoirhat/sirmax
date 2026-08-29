@@ -314,3 +314,28 @@ details.faq p {
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
 }
+
+/* ── Product screenshots ─────────────────────────────────────────────────── */
+/* Real renders of the application, generated from the JavaFX scenes themselves
+   (see ScreenshotGenerator). A mock-up on a landing page for municipal software
+   is a promise; a render is evidence. */
+.shot {
+  margin: 2rem 0 0;
+}
+
+.shot img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  /* The application's own background is very light, so a plain border alone
+     leaves the screenshot floating; a soft shadow gives it an edge. */
+  box-shadow: 0 8px 24px rgb(15 23 42 / 8%);
+}
+
+.shot figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}

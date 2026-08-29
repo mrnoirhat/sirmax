@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: docs-${{ github.ref }}
@@ -54,3 +56,25 @@ jobs:
           name: docs-build
           path: apps/docs/build
           if-no-files-found: error
+
+      # The Pages artifact is only produced from main: documentation and the
+      # released application have to say the same thing (§67), and experiment
+      # says whatever is being tried out this week.
+      - name: Package for GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

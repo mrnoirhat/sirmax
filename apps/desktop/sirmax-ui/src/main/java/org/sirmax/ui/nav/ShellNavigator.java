@@ -20,6 +20,7 @@ public final class ShellNavigator implements Navigator {
     private final Deque<RouteKey> back = new ArrayDeque<>();
     private final List<Consumer<RouteKey>> listeners = new ArrayList<>();
     private RouteKey current;
+    private String argument;
 
     public ShellNavigator(RouteKey initial) {
         this.current = Objects.requireNonNull(initial, "initial");
@@ -32,8 +33,15 @@ public final class ShellNavigator implements Navigator {
 
     @Override
     public void navigate(RouteKey target) {
+        navigate(target, null);
+    }
+
+    @Override
+    public void navigate(RouteKey target, String newArgument) {
         Objects.requireNonNull(target, "target");
-        if (target == current) {
+        // Re-navigating to the same route with a *different* argument is a real move: it is how the
+        // operator jumps from one case to another without going through the list.
+        if (target == current && Objects.equals(argument, newArgument)) {
             return;
         }
         back.push(current);
@@ -41,7 +49,13 @@ public final class ShellNavigator implements Navigator {
             back.removeLast();
         }
         current = target;
+        argument = newArgument;
         notifyListeners();
+    }
+
+    @Override
+    public java.util.Optional<String> argument() {
+        return java.util.Optional.ofNullable(argument);
     }
 
     @Override
@@ -55,6 +69,7 @@ public final class ShellNavigator implements Navigator {
             return;
         }
         current = back.pop();
+        argument = null;
         notifyListeners();
     }
 

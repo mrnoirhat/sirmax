@@ -38,13 +38,34 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2, 3);
+        assertThat(applied).contains(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
                 .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
         // V0003 tables exist and are queryable
         assertThat(intQuery("SELECT count(*) FROM service_category")).isZero();
         assertThat(intQuery("SELECT count(*) FROM service_definition_version")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM procedure")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM procedure_requirement")).isZero();
+        // numbering sequences seeded across V0004 (1), V0005 (4), V0006 (3), V0007 (1), V0008 (1)
+        assertThat(intQuery("SELECT count(*) FROM numbering_sequence")).isEqualTo(10);
+        assertThat(intQuery("SELECT count(*) FROM municipal_asset")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM agreement")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM registered_document")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM inspection")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM issued_document")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM printer_profile")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM backup_record")).isZero();
+        // V0008 seeds exactly one backup policy row
+        assertThat(intQuery("SELECT count(*) FROM backup_schedule")).isEqualTo(1);
+        assertThat(intQuery("SELECT count(*) FROM login_attempt")).isZero();
+        // V0009 seeds exactly one security policy row
+        assertThat(intQuery("SELECT count(*) FROM security_policy")).isEqualTo(1);
+        assertThat(intQuery("SELECT count(*) FROM invoice")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM payment")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM cash_session")).isZero();
+        // V0004 also adds the folded search key used by citizen search
+        assertThat(intQuery("SELECT count(*) FROM person WHERE search_name IS NOT NULL")).isZero();
         assertThat(intQuery("SELECT count(*) FROM role WHERE is_system = 1")).isEqualTo(4);
         assertThat(
                         intQuery(

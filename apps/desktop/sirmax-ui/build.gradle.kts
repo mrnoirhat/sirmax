@@ -12,7 +12,9 @@ description = "SIRMAX JavaFX UI (shell + design system)"
 
 javafx {
     version = libs.versions.javafx.get()
-    modules = listOf("javafx.controls", "javafx.fxml")
+    // javafx.swing is test-only: the screenshot generator converts a scene snapshot
+    // to a PNG through SwingFXUtils. It is not used by the application itself.
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 dependencies {

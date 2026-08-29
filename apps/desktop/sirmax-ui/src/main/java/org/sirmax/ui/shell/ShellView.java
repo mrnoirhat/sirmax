@@ -16,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.sirmax.ui.app.AppServices;
+import org.sirmax.ui.app.UiSession;
 import org.sirmax.ui.designsystem.Dialogs;
 import org.sirmax.ui.designsystem.Styles;
 import org.sirmax.ui.designsystem.ToastHost;
@@ -25,10 +27,16 @@ import org.sirmax.ui.nav.Navigator;
 import org.sirmax.ui.nav.RouteKey;
 import org.sirmax.ui.theme.Theme;
 import org.sirmax.ui.theme.ThemeManager;
+import org.sirmax.ui.view.BillingView;
+import org.sirmax.ui.view.CashView;
+import org.sirmax.ui.view.CitizensView;
 import org.sirmax.ui.view.DashboardView;
 import org.sirmax.ui.view.GlobalSearchView;
 import org.sirmax.ui.view.HomeView;
+import org.sirmax.ui.view.NewProcedureView;
 import org.sirmax.ui.view.PlaceholderView;
+import org.sirmax.ui.view.ProcedureDetailView;
+import org.sirmax.ui.view.ProceduresView;
 import org.sirmax.ui.view.SirmaxView;
 import org.sirmax.ui.view.StyleGuideView;
 
@@ -50,13 +58,23 @@ public final class ShellView extends StackPane {
     private final TextField search = new TextField();
     private final ToastHost toasts = new ToastHost();
     private final GlobalSearchView searchView = new GlobalSearchView();
+    private final AppServices services;
+    private final UiSession session;
 
+    /** A shell with no backing services: the Design System demo used by tests and the style guide. */
     public ShellView(Navigator navigator) {
-        this(navigator, Theme.LIGHT);
+        this(navigator, Theme.LIGHT, null, new UiSession());
     }
 
     public ShellView(Navigator navigator, Theme initialTheme) {
+        this(navigator, initialTheme, null, new UiSession());
+    }
+
+    public ShellView(
+            Navigator navigator, Theme initialTheme, AppServices services, UiSession session) {
         this.navigator = navigator;
+        this.services = services;
+        this.session = session;
         getStyleClass().add(Styles.SHELL);
         this.themeManager = new ThemeManager(this, initialTheme);
 
@@ -111,11 +129,25 @@ public final class ShellView extends StackPane {
         put(new DashboardView());
         put(searchView);
         put(new StyleGuideView(toasts));
-        put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
-        put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
-        put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
+
+        // Feature views need the application graph. Without it (the Design System demo shell) the
+        // routes fall back to their labelled placeholders rather than half-working screens.
+        if (services != null) {
+            put(new ProceduresView(services, session, navigator));
+            put(new NewProcedureView(services, session, navigator, toasts));
+            put(new ProcedureDetailView(services, session, navigator, toasts));
+            put(new CitizensView(services, session, navigator));
+            put(new BillingView(services, session, navigator, toasts));
+            put(new CashView(services, session, toasts));
+        } else {
+            put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
+            put(new PlaceholderView(RouteKey.PROCEDURE_NEW, "procedures.new"));
+            put(new PlaceholderView(RouteKey.PROCEDURE_DETAIL, "procedure.detail.title"));
+            put(new PlaceholderView(RouteKey.CITIZENS, "nav.citizens"));
+            put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
+            put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
+        }
         put(new PlaceholderView(RouteKey.DOCUMENTS, "nav.documents"));
-        put(new PlaceholderView(RouteKey.CITIZENS, "nav.citizens"));
         put(new PlaceholderView(RouteKey.DEPARTMENTS, "nav.departments"));
         put(new PlaceholderView(RouteKey.SETTINGS, "nav.settings"));
         put(new PlaceholderView(RouteKey.REPORTS, "nav.reports"));
@@ -134,7 +166,11 @@ public final class ShellView extends StackPane {
         search.setOnAction(e -> submitSearch());
         HBox.setHgrow(search, Priority.ALWAYS);
 
-        Label user = new Label(Messages.get("shell.user.placeholder"));
+        Label user =
+                new Label(
+                        session.isSignedIn()
+                                ? session.displayName()
+                                : Messages.get("shell.user.placeholder"));
         user.getStyleClass().add(Styles.MUTED);
 
         HBox bar = new HBox(16, brand, search, user);
