@@ -4,10 +4,13 @@ package org.sirmax.app;
 import org.sirmax.application.port.Clock;
 import org.sirmax.application.port.IdGenerator;
 import org.sirmax.application.port.IdentificationRepository;
+import org.sirmax.application.port.NumberingRepository;
 import org.sirmax.application.port.OrganizationPartyRepository;
 import org.sirmax.application.port.OrganizationRepository;
 import org.sirmax.application.port.PasswordHasher;
 import org.sirmax.application.port.PersonRepository;
+import org.sirmax.application.port.ProcedureFinance;
+import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RoleRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.ServiceCatalogTemplateSource;
@@ -15,15 +18,22 @@ import org.sirmax.application.port.SettingsRepository;
 import org.sirmax.application.port.UnitOfWork;
 import org.sirmax.application.port.UserRepository;
 import org.sirmax.application.security.Audit;
+import org.sirmax.application.usecase.AddProcedureNote;
+import org.sirmax.application.usecase.AdvanceProcedure;
+import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.ConfigureServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraftVersion;
+import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
+import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
+import org.sirmax.application.usecase.StartProcedure;
+import org.sirmax.application.usecase.UpdateProcedureRequirement;
 import org.sirmax.infrastructure.AppPaths;
 import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
@@ -32,8 +42,10 @@ import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
 import org.sirmax.infrastructure.persistence.SqliteIdentificationRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationPartyRepository;
+import org.sirmax.infrastructure.persistence.SqliteNumberingRepository;
 import org.sirmax.infrastructure.persistence.SqliteOrganizationRepository;
 import org.sirmax.infrastructure.persistence.SqlitePersonRepository;
+import org.sirmax.infrastructure.persistence.SqliteProcedureRepository;
 import org.sirmax.infrastructure.persistence.SqliteRoleRepository;
 import org.sirmax.infrastructure.persistence.SqliteServiceCatalogRepository;
 import org.sirmax.infrastructure.persistence.SqliteSettingsRepository;
@@ -65,6 +77,9 @@ public final class CompositionRoot implements AutoCloseable {
     private final SettingsRepository settingsRepository;
     private final ServiceCatalogRepository serviceCatalogRepository;
     private final ServiceCatalogTemplateSource serviceCatalogTemplateSource;
+    private final ProcedureRepository procedureRepository;
+    private final NumberingRepository numberingRepository;
+    private final ProcedureFinance procedureFinance;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
 
@@ -77,6 +92,13 @@ public final class CompositionRoot implements AutoCloseable {
     private final CreateServiceDraftVersion createServiceDraftVersion;
     private final SetServiceAvailability setServiceAvailability;
     private final SeedServiceCatalog seedServiceCatalog;
+    private final StartProcedure startProcedure;
+    private final UpdateProcedureRequirement updateProcedureRequirement;
+    private final SaveProcedureForm saveProcedureForm;
+    private final AdvanceProcedure advanceProcedure;
+    private final AssignProcedure assignProcedure;
+    private final AddProcedureNote addProcedureNote;
+    private final FindDuplicatePeople findDuplicatePeople;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -91,6 +113,11 @@ public final class CompositionRoot implements AutoCloseable {
         this.settingsRepository = new SqliteSettingsRepository(database);
         this.serviceCatalogRepository = new SqliteServiceCatalogRepository(database);
         this.serviceCatalogTemplateSource = new JsonServiceCatalogTemplateSource();
+        this.procedureRepository = new SqliteProcedureRepository(database);
+        this.numberingRepository = new SqliteNumberingRepository(database, clock);
+        // Billing lands in Phase 6; until then nothing is invoiced, so a PAYMENT_CHECKPOINT
+        // step correctly refuses to advance rather than pretending the money arrived.
+        this.procedureFinance = ProcedureFinance.unbilled();
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -128,6 +155,37 @@ public final class CompositionRoot implements AutoCloseable {
                         clock,
                         unitOfWork,
                         audit);
+
+        this.startProcedure =
+                new StartProcedure(
+                        procedureRepository,
+                        serviceCatalogRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.updateProcedureRequirement =
+                new UpdateProcedureRequirement(procedureRepository, ids, clock, unitOfWork, audit);
+        this.saveProcedureForm =
+                new SaveProcedureForm(
+                        procedureRepository, serviceCatalogRepository, ids, clock, unitOfWork, audit);
+        this.advanceProcedure =
+                new AdvanceProcedure(
+                        procedureRepository,
+                        serviceCatalogRepository,
+                        procedureFinance,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.assignProcedure =
+                new AssignProcedure(
+                        procedureRepository, userRepository, ids, clock, unitOfWork, audit);
+        this.addProcedureNote =
+                new AddProcedureNote(procedureRepository, ids, clock, unitOfWork, audit);
+        this.findDuplicatePeople =
+                new FindDuplicatePeople(personRepository, identificationRepository);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -178,6 +236,42 @@ public final class CompositionRoot implements AutoCloseable {
 
     public SeedServiceCatalog seedServiceCatalog() {
         return seedServiceCatalog;
+    }
+
+    public StartProcedure startProcedure() {
+        return startProcedure;
+    }
+
+    public UpdateProcedureRequirement updateProcedureRequirement() {
+        return updateProcedureRequirement;
+    }
+
+    public SaveProcedureForm saveProcedureForm() {
+        return saveProcedureForm;
+    }
+
+    public AdvanceProcedure advanceProcedure() {
+        return advanceProcedure;
+    }
+
+    public AssignProcedure assignProcedure() {
+        return assignProcedure;
+    }
+
+    public AddProcedureNote addProcedureNote() {
+        return addProcedureNote;
+    }
+
+    public FindDuplicatePeople findDuplicatePeople() {
+        return findDuplicatePeople;
+    }
+
+    public ProcedureRepository procedureRepository() {
+        return procedureRepository;
+    }
+
+    public NumberingRepository numberingRepository() {
+        return numberingRepository;
     }
 
     public ServiceCatalogRepository serviceCatalogRepository() {
