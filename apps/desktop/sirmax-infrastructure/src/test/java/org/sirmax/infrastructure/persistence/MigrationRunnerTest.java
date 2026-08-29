@@ -38,7 +38,7 @@ class MigrationRunnerTest {
     void freshDatabaseGetsEveryMigration() {
         List<Integer> applied = runner.migrate(connection);
 
-        assertThat(applied).contains(1, 2, 3, 4);
+        assertThat(applied).contains(1, 2, 3, 4, 5);
         assertThat(intQuery("SELECT count(*) FROM schema_migrations WHERE success = 1"))
                 .isGreaterThanOrEqualTo(3);
         assertThat(intQuery("SELECT count(*) FROM permission")).isEqualTo(25);
@@ -47,8 +47,11 @@ class MigrationRunnerTest {
         assertThat(intQuery("SELECT count(*) FROM service_definition_version")).isZero();
         assertThat(intQuery("SELECT count(*) FROM procedure")).isZero();
         assertThat(intQuery("SELECT count(*) FROM procedure_requirement")).isZero();
-        // V0004 seeds the shared case-numbering sequence
-        assertThat(intQuery("SELECT count(*) FROM numbering_sequence")).isEqualTo(1);
+        // V0004 seeds the case sequence, V0005 the four billing ones
+        assertThat(intQuery("SELECT count(*) FROM numbering_sequence")).isEqualTo(5);
+        assertThat(intQuery("SELECT count(*) FROM invoice")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM payment")).isZero();
+        assertThat(intQuery("SELECT count(*) FROM cash_session")).isZero();
         // V0004 also adds the folded search key used by citizen search
         assertThat(intQuery("SELECT count(*) FROM person WHERE search_name IS NOT NULL")).isZero();
         assertThat(intQuery("SELECT count(*) FROM role WHERE is_system = 1")).isEqualTo(4);

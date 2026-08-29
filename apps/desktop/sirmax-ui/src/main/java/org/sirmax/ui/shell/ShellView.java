@@ -27,6 +27,8 @@ import org.sirmax.ui.nav.Navigator;
 import org.sirmax.ui.nav.RouteKey;
 import org.sirmax.ui.theme.Theme;
 import org.sirmax.ui.theme.ThemeManager;
+import org.sirmax.ui.view.BillingView;
+import org.sirmax.ui.view.CashView;
 import org.sirmax.ui.view.CitizensView;
 import org.sirmax.ui.view.DashboardView;
 import org.sirmax.ui.view.GlobalSearchView;
@@ -135,14 +137,16 @@ public final class ShellView extends StackPane {
             put(new NewProcedureView(services, session, navigator, toasts));
             put(new ProcedureDetailView(services, session, navigator, toasts));
             put(new CitizensView(services, session, navigator));
+            put(new BillingView(services, session, navigator, toasts));
+            put(new CashView(services, session, toasts));
         } else {
             put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
             put(new PlaceholderView(RouteKey.PROCEDURE_NEW, "procedures.new"));
             put(new PlaceholderView(RouteKey.PROCEDURE_DETAIL, "procedure.detail.title"));
             put(new PlaceholderView(RouteKey.CITIZENS, "nav.citizens"));
+            put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
+            put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
         }
-        put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
-        put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
         put(new PlaceholderView(RouteKey.DOCUMENTS, "nav.documents"));
         put(new PlaceholderView(RouteKey.DEPARTMENTS, "nav.departments"));
         put(new PlaceholderView(RouteKey.SETTINGS, "nav.settings"));

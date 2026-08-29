@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package org.sirmax.app;
 
+import org.sirmax.application.port.AuditRepository;
+import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.Clock;
 import org.sirmax.application.port.IdGenerator;
 import org.sirmax.application.port.IdentificationRepository;
@@ -26,18 +28,25 @@ import org.sirmax.application.usecase.ConfigureServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.FindDuplicatePeople;
+import org.sirmax.application.usecase.IssueInvoice;
+import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
+import org.sirmax.application.usecase.RefundPayment;
+import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
 import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.application.usecase.StartProcedure;
+import org.sirmax.application.usecase.VoidInvoice;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
 import org.sirmax.infrastructure.AppPaths;
 import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
+import org.sirmax.infrastructure.persistence.SqliteBillingRepository;
 import org.sirmax.infrastructure.persistence.JsonServiceCatalogTemplateSource;
+import org.sirmax.infrastructure.persistence.SqliteAuditRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
 import org.sirmax.infrastructure.persistence.SqliteIdentificationRepository;
@@ -80,6 +89,8 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final ServiceCatalogTemplateSource serviceCatalogTemplateSource;
     private final ProcedureRepository procedureRepository;
     private final NumberingRepository numberingRepository;
+    private final BillingRepository billingRepository;
+    private final AuditRepository auditRepository;
     private final ProcedureFinance procedureFinance;
     private final UnitOfWork unitOfWork;
     private final Audit audit;
@@ -100,6 +111,11 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final AssignProcedure assignProcedure;
     private final AddProcedureNote addProcedureNote;
     private final FindDuplicatePeople findDuplicatePeople;
+    private final IssueInvoice issueInvoice;
+    private final RegisterPayment registerPayment;
+    private final VoidInvoice voidInvoice;
+    private final RefundPayment refundPayment;
+    private final ManageCashSession manageCashSession;
 
     private CompositionRoot(SqliteDatabase database) {
         this.database = database;
@@ -116,9 +132,12 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.serviceCatalogTemplateSource = new JsonServiceCatalogTemplateSource();
         this.procedureRepository = new SqliteProcedureRepository(database);
         this.numberingRepository = new SqliteNumberingRepository(database, clock);
-        // Billing lands in Phase 6; until then nothing is invoiced, so a PAYMENT_CHECKPOINT
-        // step correctly refuses to advance rather than pretending the money arrived.
-        this.procedureFinance = ProcedureFinance.unbilled();
+        SqliteBillingRepository billing = new SqliteBillingRepository(database);
+        this.billingRepository = billing;
+        // The same adapter answers the workflow's payment checkpoint, straight from the invoice
+        // table — no billing state is duplicated onto the case.
+        this.procedureFinance = billing;
+        this.auditRepository = new SqliteAuditRepository(database);
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
 
@@ -187,6 +206,34 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
                 new AddProcedureNote(procedureRepository, ids, clock, unitOfWork, audit);
         this.findDuplicatePeople =
                 new FindDuplicatePeople(personRepository, identificationRepository);
+
+        this.issueInvoice =
+                new IssueInvoice(
+                        billingRepository,
+                        procedureRepository,
+                        serviceCatalogRepository,
+                        personRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.registerPayment =
+                new RegisterPayment(
+                        billingRepository,
+                        procedureRepository,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        unitOfWork,
+                        audit);
+        this.voidInvoice = new VoidInvoice(billingRepository, clock, unitOfWork, audit);
+        this.refundPayment =
+                new RefundPayment(
+                        billingRepository, numberingRepository, ids, clock, unitOfWork, audit);
+        this.manageCashSession =
+                new ManageCashSession(
+                        billingRepository, numberingRepository, ids, clock, unitOfWork, audit);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
@@ -277,6 +324,41 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     @Override
     public FindDuplicatePeople findDuplicatePeople() {
         return findDuplicatePeople;
+    }
+
+    @Override
+    public IssueInvoice issueInvoice() {
+        return issueInvoice;
+    }
+
+    @Override
+    public RegisterPayment registerPayment() {
+        return registerPayment;
+    }
+
+    @Override
+    public VoidInvoice voidInvoice() {
+        return voidInvoice;
+    }
+
+    @Override
+    public RefundPayment refundPayment() {
+        return refundPayment;
+    }
+
+    @Override
+    public ManageCashSession manageCashSession() {
+        return manageCashSession;
+    }
+
+    @Override
+    public BillingRepository billing() {
+        return billingRepository;
+    }
+
+    @Override
+    public AuditRepository auditTrail() {
+        return auditRepository;
     }
 
     public ProcedureRepository procedureRepository() {

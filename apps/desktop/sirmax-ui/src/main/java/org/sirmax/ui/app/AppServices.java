@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package org.sirmax.ui.app;
 
+import org.sirmax.application.port.AuditRepository;
+import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.UserRepository;
@@ -9,12 +11,17 @@ import org.sirmax.application.usecase.AdvanceProcedure;
 import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.FindDuplicatePeople;
+import org.sirmax.application.usecase.IssueInvoice;
+import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
+import org.sirmax.application.usecase.RefundPayment;
+import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.RegisterPerson;
 import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.StartProcedure;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
+import org.sirmax.application.usecase.VoidInvoice;
 
 /**
  * What the UI is allowed to reach for.
@@ -64,4 +71,20 @@ public interface AppServices {
     ProcedureRepository procedures();
 
     UserRepository users();
+
+    // ── billing, payments and cash ──
+    IssueInvoice issueInvoice();
+
+    RegisterPayment registerPayment();
+
+    VoidInvoice voidInvoice();
+
+    RefundPayment refundPayment();
+
+    ManageCashSession manageCashSession();
+
+    BillingRepository billing();
+
+    /** Read-only audit trail; every consumer must gate on {@code audit.read} first. */
+    AuditRepository auditTrail();
 }

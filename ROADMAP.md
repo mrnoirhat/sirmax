@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–5 ✅; Fase 6 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–6 ✅; Fase 7 en curso._
 
 ---
 
@@ -18,7 +18,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–5 ✅; Fase
 | 3 | Dominio central y base de datos | ✅ |
 | 4 | Motor configurable de servicios | ✅ |
 | 5 | Ciudadano y experiencia de front-office | ✅ |
-| 6 | Facturación, pagos y caja | ⚪ |
+| 6 | Facturación, pagos y caja | ✅ |
 | 7 | Módulos municipales especializados | ⚪ |
 | 8 | Documentos, PDF e impresión | ⚪ |
 | 9 | Backup, recuperación y Google Drive | ⚪ |
@@ -210,11 +210,30 @@ de requisitos, navegación service-first, colas/worklists, detalle de caso, hist
       real: SQLite en memoria, migraciones y casos de uso de verdad).
 - [ ] Tabla con paginación en servidor — llega con el primer listado que la necesite (Fase 7).
 
-## Fase 6 — Facturación, pagos y caja ⚪
+## Fase 6 — Facturación, pagos y caja ✅
 
 Cargo/liquidación, entidad factura, numeración, líneas, descuentos/cargos, métodos de pago, pago
 parcial, recibos, sesión de caja, conciliación, reembolsos/anulaciones/ajustes, auditoría de
 facturación.
+
+- [x] `V0005__billing.sql`: `invoice`, `invoice_line`, `payment`, `refund`, `cash_session`, y las
+      secuencias `FACT` / `REC` / `DEV` / `CAJA`. Dinero siempre `*_minor INTEGER` + `currency`.
+- [x] Dominio: `Invoice` (historia financiera congelada al emitir; sobrepago = cambio, no ingreso),
+      `InvoiceLine` (total congelado — §59F), `Payment`, `Refund`, `PaymentMethod`, `CashSession`
+      (la diferencia de cierre se **registra**, no se corrige).
+- [x] Casos de uso: `IssueInvoice` (motor de tasas de la versión del trámite + numeración en la
+      misma transacción), `RegisterPayment` (parcial, cambio, efectivo solo con caja abierta),
+      `VoidInvoice` (devolver antes de anular), `RefundPayment` (parcial; nunca edita el pago),
+      `ManageCashSession` (apertura/cierre + conciliación).
+- [x] `SqliteBillingRepository` — también implementa `ProcedureFinance`, así el checkpoint de pago
+      del flujo lee la tabla de facturas en vez de duplicar estado en el trámite.
+- [x] `AuditRepository` + `SqliteAuditRepository`: lectura del rastro (separada de `AuditSink`).
+- [x] UI: `BillingView` (facturas pendientes, cobro con cambio, devolución, anulación) y `CashView`
+      (apertura/cierre con conciliación explícita).
+- [x] `MunicipalLoopIT`: el bucle completo del §10 sobre el grafo real — ciudadano → trámite →
+      requisitos → tasa → factura → pago → auditoría, más pago parcial, devolución, anulación y
+      cuadre de caja.
+- [ ] Impresión de factura/recibo — Fase 8.
 
 ## Fase 7 — Módulos municipales especializados ⚪
 

@@ -164,6 +164,11 @@ public final class AdvanceProcedure implements UseCase<AdvanceProcedure.Command,
             procedures.appendEvent(
                     ProcedureEvent.stepChange(
                             ids.newId(), procedure.id(), userId, fromStep, destination.get(), now));
+            // Landing on an unsettled payment checkpoint parks the case there, so the worklist
+            // says "pendiente de pago" rather than a generic "en proceso".
+            if (isUnpaidCheckpoint(procedure, destination.get())) {
+                procedure.blockOnPayment(now);
+            }
         } else {
             ProcedureOutcome outcome =
                     switch (c.kind()) {
@@ -199,6 +204,15 @@ public final class AdvanceProcedure implements UseCase<AdvanceProcedure.Command,
                 destination.orElse(procedure.status().name()),
                 c.reason().orElse(null));
         return procedure;
+    }
+
+    /** {@code true} when the destination step holds for money that has not arrived. */
+    private boolean isUnpaidCheckpoint(Procedure procedure, String stepKey) {
+        return catalog.findVersionById(procedure.serviceVersionId())
+                .flatMap(v -> v.workflow().step(stepKey))
+                .filter(WorkflowStep::isPaymentCheckpoint)
+                .map(step -> !finance.stateOf(procedure.id()).paid())
+                .orElse(false);
     }
 
     /** Payment facts are merged into the rule variables so guards can read {@code paid}. */

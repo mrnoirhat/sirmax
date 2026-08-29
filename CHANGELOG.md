@@ -8,6 +8,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 6 ✅ — Facturación, pagos y caja.**
+  - `V0005__billing.sql`: facturas, líneas, pagos, devoluciones y sesiones de caja; dinero como
+    unidades menores enteras + ISO-4217, nunca coma flotante.
+  - Dominio `Invoice` / `InvoiceLine` / `Payment` / `Refund` / `CashSession`: la historia financiera
+    de una factura emitida no cambia en silencio; el sobrepago es **cambio**, no ingreso; la
+    diferencia de caja se registra en lugar de corregirse.
+  - Casos de uso `IssueInvoice`, `RegisterPayment`, `VoidInvoice`, `RefundPayment`,
+    `ManageCashSession`.
+  - `SqliteBillingRepository` (que además implementa `ProcedureFinance`) y `SqliteAuditRepository`.
+  - UI `BillingView` y `CashView`; `MunicipalLoopIT` cubre el bucle municipal completo.
 - **Fase 5 ✅ — Ciudadano y front-office.**
   - `V0004__procedure.sql`: trámites, checklist materializado, valores de formulario, línea de
     tiempo, adjuntos, `numbering_sequence` y `person.search_name` (clave plegada).
