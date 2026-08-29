@@ -10,7 +10,7 @@ junit = "5.11.4"
 assertj = "3.27.3"
 archunit = "1.5.0"
 sqliteJdbc = "3.49.1.0"
-jackson = "2.18.2"
+jackson = "2.22.2"
 # Phase 8: real PDFs, not screenshots (master prompt §59E). Both Apache-2.0.
 pdfbox = "3.0.3"
 zxing = "3.5.3"
