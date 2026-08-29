@@ -2,6 +2,8 @@
 package org.sirmax.ui.app;
 
 import org.sirmax.application.port.AssetRepository;
+import org.sirmax.application.port.BackupRepository;
+import org.sirmax.application.port.CloudBackupTarget;
 import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.DocumentPrinter;
@@ -15,10 +17,12 @@ import org.sirmax.application.usecase.AdvanceProcedure;
 import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.ConductInspection;
+import org.sirmax.application.usecase.CreateBackup;
 import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.GrantAgreement;
 import org.sirmax.application.usecase.IssueDocument;
 import org.sirmax.application.usecase.IssueInvoice;
+import org.sirmax.application.usecase.ManageBackupPolicy;
 import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
@@ -26,6 +30,7 @@ import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.RegisterDocument;
 import org.sirmax.application.usecase.RegisterPerson;
+import org.sirmax.application.usecase.RestoreBackup;
 import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.StartProcedure;
@@ -120,4 +125,16 @@ public interface AppServices {
 
     /** Only the printer-profile screen needs this, to list the workstation's Windows queues. */
     DocumentPrinter printer();
+
+    // ── backup and recovery ──
+    CreateBackup createBackup();
+
+    RestoreBackup restoreBackup();
+
+    ManageBackupPolicy manageBackupPolicy();
+
+    BackupRepository backups();
+
+    /** So the settings screen can say whether an account is connected, and to which folder. */
+    CloudBackupTarget cloudBackups();
 }

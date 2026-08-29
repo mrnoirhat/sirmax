@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–8 ✅; Fase 9 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–9 ✅; Fase 10 en curso._
 
 ---
 
@@ -21,7 +21,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–8 ✅; Fase
 | 6 | Facturación, pagos y caja | ✅ |
 | 7 | Módulos municipales especializados | ✅ |
 | 8 | Documentos, PDF e impresión | ✅ |
-| 9 | Backup, recuperación y Google Drive | ⚪ |
+| 9 | Backup, recuperación y Google Drive | ✅ |
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ⚪ |
 | 11 | Empaquetado para Windows | ⚪ |
 | 12 | Productivización de landing + docs | ⚪ |
@@ -294,10 +294,28 @@ renderizador no lee nada más.
 - [x] `DocumentPrintingIT`: PDF real en ambos formatos, la garantía §59F con un rebranding de por
       medio, reimpresión sin renumerar ni duplicar el pago, y el rastro de auditoría.
 
-## Fase 9 — Backup, recuperación y Google Drive ⚪
+## Fase 9 — Backup, recuperación y Google Drive ✅
 
 Backups locales, historial, validación, compresión, cifrado, hash de integridad, restauración
 segura, Google OAuth, carpeta de Drive, programación automática.
+
+- [x] `V0008__backup.sql`: `backup_record` (con hash, huella de filas y estado), `restore_record`
+      (§42 paso 7) y `backup_schedule` (una fila; subida a Drive **apagada** por defecto).
+- [x] Dominio `backup`: `BackupRecord`, `BackupKind` (EMERGENCY es de primera clase porque §42 la
+      hace un paso), `BackupStatus` (incluye `PRUNED`: un backup purgado no es un backup fallido),
+      `BackupSchedule` (tolerante con la hora — un PC apagado a las 20:00 respalda al encenderse).
+- [x] `SqliteBackupEngine`: `VACUUM INTO` (no una copia del fichero) → huella → gzip → AES-256-GCM
+      → SHA-256. GCM autentica además de cifrar: un archivo alterado **falla al descifrar** en vez
+      de restaurar datos corruptos. La frase de paso nunca se almacena.
+- [x] `GoogleDriveBackupTarget` sobre la API REST con `HttpClient` (sin arrastrar el árbol de
+      dependencias del cliente oficial); credenciales del municipio en `SecretStore`, cifrado en
+      reposo con clave ligada a máquina y usuario (§43).
+- [x] Casos de uso `CreateBackup` (valida releyendo: un backup no leído es una promesa, no una
+      copia), `RestoreBackup` (secuencia §42 completa) y `ManageBackupPolicy` (programación,
+      retención, Drive).
+- [x] `SqliteBackupEngineTest` y `BackupRecoveryIT` sobre ficheros reales: cifrado ilegible sin
+      frase, frase incorrecta que falla sin tocar la base, archivo manipulado rechazado, y la
+      restauración que **reinscribe su propia procedencia** en la base recuperada.
 
 ## Fase 10 — Seguridad, auditoría y fiabilidad ⚪
 

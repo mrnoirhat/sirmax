@@ -8,6 +8,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 9 ✅ — Backup, recuperación y Google Drive.**
+  - `SqliteBackupEngine`: `VACUUM INTO` → gzip → AES-256-GCM → SHA-256. Un archivo alterado falla
+    al descifrar en vez de restaurar basura; la frase de paso nunca se guarda.
+  - `RestoreBackup` sigue la secuencia §42 al pie de la letra y reinscribe su procedencia en la base
+    recuperada, para que la copia de emergencia siga siendo localizable.
+  - `GoogleDriveBackupTarget` (REST + `HttpClient`) y `SecretStore` cifrado en reposo. La subida
+    fuera de sede está **apagada** por defecto (§41).
+  - `V0008__backup.sql`, `SqliteBackupRepository`, `CreateBackup`, `ManageBackupPolicy`.
+  - `SqliteDatabase.reopen()`: una restauración cambia el fichero bajo la aplicación.
 - **Fase 8 ✅ — Documentos, PDF e impresión.**
   - `DocumentSnapshot`: una factura emitida guarda la marca institucional, el ciudadano, las líneas
     y los totales congelados. Un rebranding en 2029 no reescribe un documento de 2026 (§59F).

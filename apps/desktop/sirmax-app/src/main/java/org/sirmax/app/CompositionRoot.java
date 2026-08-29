@@ -2,9 +2,12 @@
 package org.sirmax.app;
 
 import org.sirmax.application.port.AssetRepository;
+import org.sirmax.application.port.BackupEngine;
+import org.sirmax.application.port.BackupRepository;
 import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.Clock;
+import org.sirmax.application.port.CloudBackupTarget;
 import org.sirmax.application.port.DocumentPrinter;
 import org.sirmax.application.port.DocumentRenderer;
 import org.sirmax.application.port.DocumentRepository;
@@ -30,6 +33,7 @@ import org.sirmax.application.usecase.AdvanceProcedure;
 import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.ConductInspection;
+import org.sirmax.application.usecase.CreateBackup;
 import org.sirmax.application.usecase.ConfigureServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraft;
 import org.sirmax.application.usecase.CreateServiceDraftVersion;
@@ -37,6 +41,7 @@ import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.GrantAgreement;
 import org.sirmax.application.usecase.IssueDocument;
 import org.sirmax.application.usecase.IssueInvoice;
+import org.sirmax.application.usecase.ManageBackupPolicy;
 import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
@@ -45,6 +50,7 @@ import org.sirmax.application.usecase.RegisterDocument;
 import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RegisterPerson;
+import org.sirmax.application.usecase.RestoreBackup;
 import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
@@ -57,8 +63,12 @@ import org.sirmax.infrastructure.UuidV7IdGenerator;
 import org.sirmax.infrastructure.persistence.JdbcUnitOfWork;
 import org.sirmax.infrastructure.persistence.SqliteBillingRepository;
 import org.sirmax.infrastructure.persistence.JsonServiceCatalogTemplateSource;
+import org.sirmax.infrastructure.backup.GoogleDriveBackupTarget;
+import org.sirmax.infrastructure.backup.SecretStore;
+import org.sirmax.infrastructure.backup.SqliteBackupEngine;
 import org.sirmax.infrastructure.persistence.SqliteAssetRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditRepository;
+import org.sirmax.infrastructure.persistence.SqliteBackupRepository;
 import org.sirmax.infrastructure.persistence.SqliteAuditSink;
 import org.sirmax.infrastructure.persistence.SqliteDatabase;
 import org.sirmax.infrastructure.persistence.SqliteDocumentRepository;
@@ -110,6 +120,9 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final AssetRepository assetRepository;
     private final RegistryRepository registryRepository;
     private final DocumentRepository documentRepository;
+    private final BackupRepository backupRepository;
+    private final BackupEngine backupEngine;
+    private final CloudBackupTarget cloudBackupTarget;
     private final DocumentRenderer documentRenderer;
     private final DocumentPrinter documentPrinter;
     private final ProcedureFinance procedureFinance;
@@ -143,9 +156,15 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     private final ConductInspection conductInspection;
     private final IssueDocument issueDocument;
     private final PrintDocument printDocument;
+    private final CreateBackup createBackup;
+    private final RestoreBackup restoreBackup;
+    private final ManageBackupPolicy manageBackupPolicy;
 
-    private CompositionRoot(SqliteDatabase database) {
+    private final AppPaths paths;
+
+    private CompositionRoot(SqliteDatabase database, AppPaths paths) {
         this.database = database;
+        this.paths = paths;
         database.migrate();
 
         this.userRepository = new SqliteUserRepository(database);
@@ -169,6 +188,10 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         this.registryRepository = new SqliteRegistryRepository(database);
         this.documentRepository = new SqliteDocumentRepository(database);
         this.documentRenderer = new PdfDocumentRenderer();
+        this.backupRepository = new SqliteBackupRepository(database);
+        this.backupEngine =
+                new SqliteBackupEngine(database, paths.backupsDir(), paths.databaseFile());
+        this.cloudBackupTarget = new GoogleDriveBackupTarget(new SecretStore(paths.dataDir()));
         this.documentPrinter = new JavaPrintServiceDocumentPrinter();
         this.unitOfWork = new JdbcUnitOfWork(database);
         this.audit = new Audit(new SqliteAuditSink(database), clock, ids);
@@ -312,16 +335,38 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
                         clock,
                         unitOfWork,
                         audit);
+
+        this.createBackup =
+                new CreateBackup(
+                        backupRepository,
+                        backupEngine,
+                        cloudBackupTarget,
+                        numberingRepository,
+                        ids,
+                        clock,
+                        audit);
+        this.restoreBackup =
+                new RestoreBackup(backupRepository, backupEngine, createBackup, ids, clock, audit);
+        this.manageBackupPolicy =
+                new ManageBackupPolicy(
+                        backupRepository, backupEngine, cloudBackupTarget, createBackup, clock, audit);
     }
 
     /** Wire against the on-disk database under the platform data directory. */
     public static CompositionRoot bootstrapDefault() {
-        return new CompositionRoot(SqliteDatabase.openAt(AppPaths.resolveDefault().databaseFile()));
+        AppPaths paths = AppPaths.resolveDefault();
+        return new CompositionRoot(SqliteDatabase.openAt(paths.databaseFile()), paths);
     }
 
     /** Wire against an already-open database (tests pass an in-memory one). */
     public static CompositionRoot bootstrap(SqliteDatabase database) {
-        return new CompositionRoot(database);
+        // Tests run against an in-memory database but still need somewhere real for archives.
+        return new CompositionRoot(database, AppPaths.resolveDefault());
+    }
+
+    /** Wire against an already-open database with a specific data directory (backup tests). */
+    public static CompositionRoot bootstrap(SqliteDatabase database, AppPaths paths) {
+        return new CompositionRoot(database, paths);
     }
 
     @Override
@@ -467,6 +512,31 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     @Override
     public PrintDocument printDocument() {
         return printDocument;
+    }
+
+    @Override
+    public CreateBackup createBackup() {
+        return createBackup;
+    }
+
+    @Override
+    public RestoreBackup restoreBackup() {
+        return restoreBackup;
+    }
+
+    @Override
+    public ManageBackupPolicy manageBackupPolicy() {
+        return manageBackupPolicy;
+    }
+
+    @Override
+    public BackupRepository backups() {
+        return backupRepository;
+    }
+
+    @Override
+    public CloudBackupTarget cloudBackups() {
+        return cloudBackupTarget;
     }
 
     @Override
