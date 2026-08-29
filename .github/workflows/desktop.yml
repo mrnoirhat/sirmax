@@ -31,23 +31,23 @@ jobs:
         working-directory: apps/desktop
         shell: bash # so ./gradlew (not .bat) resolves on the Windows runner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "25"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build, test and static analysis
         run: ./gradlew --no-daemon build
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-test-reports
           path: apps/desktop/**/build/reports/
@@ -65,16 +65,16 @@ jobs:
         working-directory: apps/desktop
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "25"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # WiX is not on the GitHub runner and the MSI needs it. The app image does
       # not, so this proves the part that can be proved on every push: a trimmed
@@ -84,7 +84,7 @@ jobs:
         run: ./gradlew --no-daemon verifyReleaseArtifacts
 
       - name: Upload the app image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sirmax-app-image
           path: apps/desktop/sirmax-app/build/app-image/

@@ -4,17 +4,25 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 const REPO = "https://github.com/mrnoirhat/sirmax";
+const LANDING = "https://sirmax.vercel.app";
+
+// The documentation is published twice, and the two need different base paths:
+// Vercel serves it at the root of its own domain, GitHub Pages serves it under
+// /sirmax/. A single hard-coded baseUrl silently breaks every asset URL on
+// whichever of the two it was not written for, so the target picks it.
+const target = process.env.DOCS_TARGET ?? "vercel";
+const deployment =
+  target === "github-pages"
+    ? { url: "https://mrnoirhat.github.io", baseUrl: "/sirmax/" }
+    : { url: "https://sirmax-docs.vercel.app", baseUrl: "/" };
 
 const config: Config = {
   title: "SIRMAX",
   tagline: "La gestión municipal, simplificada.",
   // favicon: "img/favicon.ico", // added with the real asset in Phase 12
 
-  // GitHub Pages for mrnoirhat/sirmax. A custom domain (docs.sirmax.org) can be
-  // pointed here later by adding a CNAME; until someone actually owns it, naming
-  // it here would only produce asset URLs that 404.
-  url: "https://mrnoirhat.github.io",
-  baseUrl: "/sirmax/",
+  url: deployment.url,
+  baseUrl: deployment.baseUrl,
 
   organizationName: "mrnoirhat",
   projectName: "sirmax",
@@ -60,7 +68,8 @@ const config: Config = {
       title: "SIRMAX",
       items: [
         { type: "docSidebar", sidebarId: "docs", position: "left", label: "Documentación" },
-        { href: "https://sirmax.org", label: "Sitio web", position: "right" },
+        { href: LANDING, label: "Sitio web", position: "right" },
+        { href: `${REPO}/releases/latest`, label: "Descargar", position: "right" },
         { href: REPO, label: "GitHub", position: "right" },
       ],
     },
@@ -78,6 +87,8 @@ const config: Config = {
         {
           title: "Proyecto",
           items: [
+            { label: "Sitio web", href: LANDING },
+            { label: "Descargar SIRMAX", href: `${REPO}/releases/latest` },
             { label: "GitHub", href: REPO },
             { label: "Issues", href: `${REPO}/issues` },
             { label: "Roadmap", href: `${REPO}/blob/main/ROADMAP.md` },
