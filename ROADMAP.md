@@ -4,7 +4,7 @@ Estado de la construcción por fases. Este documento es la **fuente de verdad de
 
 Leyenda: ✅ completada · 🟡 en curso · ⚪ pendiente · 🔵 planificada para 1.0 · ⏭️ post-1.0
 
-_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–11 ✅; Fase 12 en curso._
+_Última actualización: 2026-08-29 — rama `experiment`. Fases 0–12 ✅; Fase 13 en curso._
 
 ---
 
@@ -24,7 +24,7 @@ _Última actualización: 2026-08-29 — rama `experiment`. Fases 0–11 ✅; Fas
 | 9 | Backup, recuperación y Google Drive | ✅ |
 | 10 | Endurecimiento de seguridad, auditoría y fiabilidad | ✅ |
 | 11 | Empaquetado para Windows | ✅ |
-| 12 | Productivización de landing + docs | ⚪ |
+| 12 | Productivización de landing + docs | ✅ |
 | 13 | Hardening | ⚪ |
 | 14 | Release 1.0 | ⚪ |
 
@@ -370,10 +370,36 @@ Ver [`docs/PACKAGING.md`](./docs/PACKAGING.md).
       migraciones y abrió la ventana.
 - [ ] MSI firmado — requiere un certificado del ayuntamiento; se documenta en la Fase 14.
 
-## Fase 12 — Productivización de landing + docs ⚪
+## Fase 12 — Productivización de landing + docs ✅
 
 Landing lista para Vercel, SEO, capturas, CTAs de GitHub, despliegue de Docusaurus, enlaces cruzados,
 alineación release/documentación.
+
+- [x] **Documentación de usuario real** en lugar de plantillas: trámites, ciudadanos, facturación,
+      caja, impresión, documentos oficiales, registro de documentos, copias, restauración y
+      seguridad. Escrita desde el comportamiento construido, incluyendo *por qué* cada regla es
+      así (el conteo de caja no viene rellenado; la frase de cifrado no se guarda; un ejecutable
+      renombrado se rechaza).
+- [x] **Capturas reales** generadas con `Scene.snapshot()` desde las propias escenas JavaFX
+      (`ScreenshotGenerator`, opt-in con `-Dsirmax.screenshots=true`). Se descartó la captura de
+      escritorio: en esta máquina producía imágenes que **no coincidían** con lo que la aplicación
+      dibuja, lo cual es peor que no tener captura porque parece autorizada.
+- [x] Despliegue de Docusaurus a GitHub Pages **solo desde `main`** (§67: documentación y release
+      dicen lo mismo). `url`/`baseUrl` corregidos a la URL que existe de verdad; el dominio propio
+      se añade con un CNAME cuando alguien lo registre.
+- [x] Enlace cruzado landing → docs corregido: apuntaba a `/docs`, una ruta que en el sitio
+      desplegado da 404.
+- [x] SEO ya presente (metadata, Open Graph, `robots.ts`, `sitemap.ts`) y CTAs de GitHub
+      obligatorios.
+
+### Hallazgos de esta fase, ya corregidos
+
+- La ventana por defecto (1200×780) **no cabía en una pantalla de 1280×720**, hardware muy común en
+  un mostrador municipal: el botón principal del primer arranque quedaba fuera de pantalla y la
+  instalación no se podía completar. Ahora la ventana se ajusta a la pantalla y se centra.
+- La tarjeta de acceso se estiraba a todo el alto de la ventana. `LoginViewLayoutTest` la mide
+  ahora **con la hoja de estilos real** — sin ella el test medía un layout que la aplicación nunca
+  renderiza, que es justo cómo una tarjeta mal colocada sobrevive a un test en verde.
 
 ## Fase 13 — Hardening ⚪
 

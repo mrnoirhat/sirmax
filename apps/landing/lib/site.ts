@@ -16,7 +16,9 @@ export const site = {
   discussions: "https://github.com/mrnoirhat/sirmax/discussions",
   contributing: "https://github.com/mrnoirhat/sirmax/blob/main/CONTRIBUTING.md",
   roadmap: "https://github.com/mrnoirhat/sirmax/blob/main/ROADMAP.md",
-  docs: "/docs",
+  // The documentation is a separate Docusaurus site on GitHub Pages, not a route
+  // of this one. Linking to "/docs" would 404 on the deployed landing.
+  docs: "https://mrnoirhat.github.io/sirmax/",
   locale: "es-DO",
 } as const;
 

@@ -39,18 +39,34 @@ public final class SirmaxApplication extends Application {
         services = appServices;
     }
 
+    /** Comfortable on a modern monitor; shrunk below when the screen is smaller. */
+    private static final double PREFERRED_WIDTH = 1200;
+
+    private static final double PREFERRED_HEIGHT = 780;
+
     @Override
     public void start(Stage stage) {
-        scene = new Scene(loginOrShell(), 1200, 780);
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        // Municipal counters run on old hardware — 1280x720 is common, and 780 is taller than
+        // that. Opening a window bigger than the screen puts the primary button off the bottom
+        // edge, which on the first-run setup screen means the install cannot be completed.
+        double width = Math.min(PREFERRED_WIDTH, screen.getWidth());
+        double height = Math.min(PREFERRED_HEIGHT, screen.getHeight());
+
+        scene = new Scene(loginOrShell(), width, height);
         var stylesheet = SirmaxApplication.class.getResource("/org/sirmax/ui/theme/sirmax.css");
         if (stylesheet != null) {
             scene.getStylesheets().add(stylesheet.toExternalForm());
         }
 
         stage.setTitle(Messages.get("app.title"));
-        stage.setMinWidth(1000);
-        stage.setMinHeight(640);
+        stage.setMinWidth(Math.min(1000, screen.getWidth()));
+        stage.setMinHeight(Math.min(640, screen.getHeight()));
         stage.setScene(scene);
+        // Centre on the visual bounds, which exclude the taskbar. Letting the window default to
+        // (0,0) on a small screen hides the title bar behind it.
+        stage.setX(screen.getMinX() + (screen.getWidth() - width) / 2);
+        stage.setY(screen.getMinY() + (screen.getHeight() - height) / 2);
         stage.show();
     }
 

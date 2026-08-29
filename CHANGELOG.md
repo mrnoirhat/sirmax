@@ -8,6 +8,20 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [Unreleased]
 
 ### Added
+- **Fase 12 ✅ — Landing y documentación a producción.**
+  - Guía de usuario real (trámites, ciudadanos, facturación, caja, impresión, documentos, registro,
+    copias, restauración, seguridad) en lugar de plantillas.
+  - `ScreenshotGenerator`: capturas fieles desde `Scene.snapshot()`, no del escritorio.
+  - Docusaurus se despliega a GitHub Pages desde `main`; `url`/`baseUrl` y el enlace landing → docs
+    corregidos a rutas que existen.
+
+### Fixed
+- La ventana por defecto no cabía en pantallas de 1280×720 y dejaba el botón de primer arranque
+  fuera de pantalla. Ahora se ajusta al tamaño real de la pantalla y se centra.
+- La tarjeta de acceso se estiraba a todo el alto de la ventana.
+- `LoginViewLayoutTest` mide el layout con la hoja de estilos real.
+
+### Added
 - **Fase 11 ✅ — Empaquetado para Windows.**
   - `jlinkRuntime` (runtime recortado), `packageAppImage` (carpeta autocontenida, siempre
     disponible) y `packageWindows` (MSI; se salta con un mensaje si falta WiX).

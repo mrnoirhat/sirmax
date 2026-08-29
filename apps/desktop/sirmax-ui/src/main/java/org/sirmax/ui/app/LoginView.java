@@ -69,7 +69,9 @@ public final class LoginView extends StackPane {
                         new FormField("login.password", password),
                         errorLabel(),
                         Buttons.primary("login.submit", this::signIn));
-        card.setMaxWidth(420);
+        // A StackPane stretches its children unless told otherwise; without this the card grows
+        // to the full window height and the sign-in button ends up floating above empty space.
+        card.setMaxSize(420, javafx.scene.layout.Region.USE_PREF_SIZE);
         return card;
     }
 
@@ -88,7 +90,7 @@ public final class LoginView extends StackPane {
                         new FormField("setup.confirm", confirm),
                         errorLabel(),
                         Buttons.primary("setup.submit", this::provision));
-        card.setMaxWidth(460);
+        card.setMaxSize(460, javafx.scene.layout.Region.USE_PREF_SIZE);
         return card;
     }
 

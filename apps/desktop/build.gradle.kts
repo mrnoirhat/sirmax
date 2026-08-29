@@ -39,5 +39,10 @@ subprojects {
         testLogging {
             events("passed", "skipped", "failed")
         }
+        // Opt-in switches reach the test JVM: -D on the Gradle command line otherwise sets a
+        // property on Gradle's own JVM, where no test can see it.
+        listOf("sirmax.screenshots").forEach { key ->
+            System.getProperty(key)?.let { systemProperty(key, it) }
+        }
     }
 }
