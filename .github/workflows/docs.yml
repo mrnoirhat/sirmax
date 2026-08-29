@@ -57,28 +57,27 @@ jobs:
           path: apps/docs/build
           if-no-files-found: error
 
-      # Turns Pages on for the repository if nobody has yet. Without this the
-      # deploy job fails with "Get Pages site failed" on a repository that has
-      # never published, which is every repository the first time — a red build
-      # caused by a setting rather than by the code.
-      - name: Configure GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      # The Pages artifact is only produced from main: documentation and the
-      # released application have to say the same thing (§67), and experiment
-      # says whatever is being tried out this week.
+      # Publishing needs one manual step first, because enabling Pages is a
+      # repository-administration action and GITHUB_TOKEN cannot do it:
+      #
+      #   1. Settings → Pages → Build and deployment → Source: GitHub Actions
+      #   2. Settings → Secrets and variables → Actions → Variables:
+      #      PUBLISH_DOCS = true
+      #
+      # Until then the docs are still built, typechecked and link-checked on
+      # every push — the workflow just does not try to publish. A release build
+      # going red because nobody has visited a settings page would say the code
+      # is broken when it is not, and a red build that means nothing is a build
+      # people stop reading.
       - name: Package for GitHub Pages
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && vars.PUBLISH_DOCS == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/docs/build
 
   deploy:
     name: Deploy to GitHub Pages
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.PUBLISH_DOCS == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:
