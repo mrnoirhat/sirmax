@@ -7,6 +7,29 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-29
+
+### Added
+- Descarga directa del instalador y del portable desde la landing, y workflow de
+  release que construye el MSI en CI y publica los artefactos con sus sumas SHA-256.
+- La landing, la documentación y GitHub enlazados entre sí con URLs que resuelven.
+
+### Fixed
+- **La documentación no cargaba sus assets.** Se publica en dos sitios con base
+  paths distintos — Vercel en la raíz, GitHub Pages bajo `/sirmax/` — y un único
+  `baseUrl` fijo rompe aquel para el que no fue escrito. Ahora lo elige el destino.
+- El README enlazaba a `#` en «Sitio web» y «Documentación», y sus badges de CI
+  apuntaban a `testing` en vez de a `main`.
+
+### Changed
+- Doce de las catorce actualizaciones de Dependabot aplicadas: JUnit 6, Jackson
+  2.22, Next 16, React 19.2, AssertJ, SLF4J, Logback y las acciones de GitHub.
+- **Retenidas con motivo**: TypeScript 7 (Docusaurus 3.10 publica un tsconfig con
+  `baseUrl`, que la 7 eliminó) y ESLint 10 (`eslint-plugin-react`, que llega vía
+  `eslint-config-next` 16, usa la API de contexto de la 9).
+- `next lint` desapareció en Next 16: el lint llama a ESLint directamente y la
+  configuración migró a flat config.
+
 ## [1.0.0] - 2026-08-29
 
 ### Added
