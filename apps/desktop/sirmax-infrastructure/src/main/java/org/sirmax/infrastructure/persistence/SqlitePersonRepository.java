@@ -14,6 +14,7 @@ import org.sirmax.domain.common.ArchiveStatus;
 import org.sirmax.domain.identity.Person;
 import org.sirmax.domain.identity.PersonName;
 import org.sirmax.domain.identity.Sex;
+import org.sirmax.shared.text.Normalization;
 
 public final class SqlitePersonRepository implements PersonRepository {
 
@@ -28,17 +29,19 @@ public final class SqlitePersonRepository implements PersonRepository {
         JdbcHelper.update(
                 db.connection(),
                 "INSERT INTO person"
-                    + " (id, given_names, family_names, full_name, birth_date, sex, notes,"
-                    + "  archive_status, created_at, updated_at)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    + " (id, given_names, family_names, full_name, search_name, birth_date, sex,"
+                    + "  notes, archive_status, created_at, updated_at)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                     + " ON CONFLICT(id) DO UPDATE SET given_names=excluded.given_names,"
                     + " family_names=excluded.family_names, full_name=excluded.full_name,"
+                    + " search_name=excluded.search_name,"
                     + " birth_date=excluded.birth_date, sex=excluded.sex, notes=excluded.notes,"
                     + " archive_status=excluded.archive_status, updated_at=excluded.updated_at",
                 p.id(),
                 p.name().givenNames(),
                 p.name().familyNames(),
                 p.fullName(),
+                Normalization.fold(p.fullName()),
                 p.birthDate().map(LocalDate::toString).orElse(null),
                 p.sex().map(Enum::name).orElse(null),
                 p.notes().orElse(null),
@@ -67,13 +70,13 @@ public final class SqlitePersonRepository implements PersonRepository {
                     limit,
                     offset);
         }
-        String like = "%" + q + "%";
+        // Match on the folded key so "Pena" finds "Peña" and "jose" finds "José".
+        String like = "%" + Normalization.fold(q) + "%";
         return JdbcHelper.queryList(
                 db.connection(),
-                "SELECT * FROM person WHERE full_name LIKE ? OR family_names LIKE ?"
+                "SELECT * FROM person WHERE search_name LIKE ?"
                         + " ORDER BY full_name LIMIT ? OFFSET ?",
                 SqlitePersonRepository::mapPerson,
-                like,
                 like,
                 limit,
                 offset);
@@ -85,11 +88,10 @@ public final class SqlitePersonRepository implements PersonRepository {
         if (q.isEmpty()) {
             return JdbcHelper.queryLong(db.connection(), "SELECT count(*) FROM person");
         }
-        String like = "%" + q + "%";
+        String like = "%" + Normalization.fold(q) + "%";
         return JdbcHelper.queryLong(
                 db.connection(),
-                "SELECT count(*) FROM person WHERE full_name LIKE ? OR family_names LIKE ?",
-                like,
+                "SELECT count(*) FROM person WHERE search_name LIKE ?",
                 like);
     }
 

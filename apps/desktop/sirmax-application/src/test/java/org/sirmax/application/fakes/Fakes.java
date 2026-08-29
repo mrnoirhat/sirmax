@@ -263,9 +263,15 @@ public final class Fakes {
 
         @Override
         public List<Person> search(String query, int limit, int offset) {
-            String q = query == null ? "" : query.toLowerCase();
+            // Folded exactly like the SQLite adapter's search_name column, or the fake would
+            // find accented names the real repository misses.
+            String q = org.sirmax.shared.text.Normalization.fold(query);
             return byId.values().stream()
-                    .filter(p -> q.isBlank() || p.fullName().toLowerCase().contains(q))
+                    .filter(
+                            p ->
+                                    q.isBlank()
+                                            || org.sirmax.shared.text.Normalization.fold(p.fullName())
+                                                    .contains(q))
                     .skip(offset)
                     .limit(limit)
                     .toList();
@@ -398,6 +404,173 @@ public final class Fakes {
                             .max()
                             .orElse(0)
                     + 1;
+        }
+    }
+
+    /** In-memory numbering that mirrors the SQLite adapter's allocate-then-advance contract. */
+    public static final class InMemoryNumbering
+            implements org.sirmax.application.port.NumberingRepository {
+        public final Map<String, org.sirmax.domain.numbering.NumberingSequence> byCode =
+                new LinkedHashMap<>();
+        private final Clock clock;
+
+        public InMemoryNumbering(Clock clock) {
+            this.clock = clock;
+        }
+
+        @Override
+        public String allocate(String sequenceCode, String defaultPrefix, int year) {
+            var sequence =
+                    byCode.computeIfAbsent(
+                            sequenceCode,
+                            code ->
+                                    org.sirmax.domain.numbering.NumberingSequence.create(
+                                            code, defaultPrefix, clock.now()));
+            return sequence.allocate(year, clock.now());
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.numbering.NumberingSequence> findByCode(String code) {
+            return Optional.ofNullable(byCode.get(code));
+        }
+
+        @Override
+        public void save(org.sirmax.domain.numbering.NumberingSequence sequence) {
+            byCode.put(sequence.code(), sequence);
+        }
+
+        @Override
+        public List<org.sirmax.domain.numbering.NumberingSequence> listAll() {
+            return List.copyOf(byCode.values());
+        }
+    }
+
+    /** In-memory cases, checklist, form answers, timeline and attachments. */
+    public static final class InMemoryProcedures
+            implements org.sirmax.application.port.ProcedureRepository {
+        public final Map<String, org.sirmax.domain.procedure.Procedure> byId = new LinkedHashMap<>();
+        public final List<org.sirmax.domain.procedure.ProcedureRequirementItem> requirements =
+                new ArrayList<>();
+        public final Map<String, Map<String, String>> formValues = new LinkedHashMap<>();
+        public final List<org.sirmax.domain.procedure.ProcedureEvent> events = new ArrayList<>();
+        public final List<org.sirmax.domain.procedure.ProcedureAttachment> attachments =
+                new ArrayList<>();
+
+        @Override
+        public void save(org.sirmax.domain.procedure.Procedure procedure) {
+            byId.put(procedure.id(), procedure);
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.procedure.Procedure> findById(String id) {
+            return Optional.ofNullable(byId.get(id));
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.procedure.Procedure> findByCode(String code) {
+            return byId.values().stream().filter(p -> p.code().equals(code)).findFirst();
+        }
+
+        @Override
+        public List<org.sirmax.domain.procedure.Procedure> findByApplicant(
+                PartyRef applicant, int limit) {
+            return byId.values().stream()
+                    .filter(p -> p.applicant().equals(applicant))
+                    .limit(limit)
+                    .toList();
+        }
+
+        @Override
+        public List<org.sirmax.domain.procedure.Procedure> search(
+                org.sirmax.application.port.ProcedureQuery query) {
+            return byId.values().stream()
+                    .filter(p -> matches(p, query))
+                    .skip(query.offset())
+                    .limit(query.limit())
+                    .toList();
+        }
+
+        @Override
+        public long countSearch(org.sirmax.application.port.ProcedureQuery query) {
+            return byId.values().stream().filter(p -> matches(p, query)).count();
+        }
+
+        private static boolean matches(
+                org.sirmax.domain.procedure.Procedure p,
+                org.sirmax.application.port.ProcedureQuery q) {
+            if (q.statuses().isEmpty() ? p.status().isTerminal() : !q.statuses().contains(p.status())) {
+                return false;
+            }
+            if (q.assignedUserId().isPresent()
+                    && !q.assignedUserId().equals(p.assignedUserId())) {
+                return false;
+            }
+            if (q.departmentId().isPresent() && !q.departmentId().equals(p.departmentId())) {
+                return false;
+            }
+            if (q.serviceDefinitionId().isPresent()
+                    && !q.serviceDefinitionId().get().equals(p.serviceDefinitionId())) {
+                return false;
+            }
+            if (q.unassignedOnly() && p.assignedUserId().isPresent()) {
+                return false;
+            }
+            return !q.text().isPresent() || p.code().contains(q.text().get());
+        }
+
+        @Override
+        public void saveRequirement(
+                org.sirmax.domain.procedure.ProcedureRequirementItem item) {
+            requirements.removeIf(
+                    i ->
+                            i.procedureId().equals(item.procedureId())
+                                    && i.requirementKey().equals(item.requirementKey()));
+            requirements.add(item);
+        }
+
+        @Override
+        public List<org.sirmax.domain.procedure.ProcedureRequirementItem> findRequirements(
+                String procedureId) {
+            return requirements.stream().filter(i -> i.procedureId().equals(procedureId)).toList();
+        }
+
+        @Override
+        public Optional<org.sirmax.domain.procedure.ProcedureRequirementItem> findRequirement(
+                String procedureId, String key) {
+            return findRequirements(procedureId).stream()
+                    .filter(i -> i.requirementKey().equals(key))
+                    .findFirst();
+        }
+
+        @Override
+        public void saveFormValues(String procedureId, Map<String, String> values) {
+            formValues.computeIfAbsent(procedureId, k -> new LinkedHashMap<>()).putAll(values);
+        }
+
+        @Override
+        public Map<String, String> findFormValues(String procedureId) {
+            return Map.copyOf(formValues.getOrDefault(procedureId, Map.of()));
+        }
+
+        @Override
+        public void appendEvent(org.sirmax.domain.procedure.ProcedureEvent event) {
+            events.add(event);
+        }
+
+        @Override
+        public List<org.sirmax.domain.procedure.ProcedureEvent> findEvents(String procedureId) {
+            return events.stream().filter(e -> e.procedureId().equals(procedureId)).toList();
+        }
+
+        @Override
+        public void saveAttachment(org.sirmax.domain.procedure.ProcedureAttachment attachment) {
+            attachments.add(attachment);
+        }
+
+        @Override
+        public List<org.sirmax.domain.procedure.ProcedureAttachment> findAttachments(
+                String procedureId) {
+            return attachments.stream().filter(a -> a.procedureId().equals(procedureId)).toList();
         }
     }
 }

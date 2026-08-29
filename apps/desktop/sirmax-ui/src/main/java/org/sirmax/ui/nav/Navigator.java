@@ -16,6 +16,15 @@ public interface Navigator {
 
     void navigate(RouteKey target);
 
+    /**
+     * Navigate to a route that needs one piece of context — a case id, a citizen id. The target
+     * view reads it back with {@link #argument()} when the shell mounts it.
+     */
+    void navigate(RouteKey target, String argument);
+
+    /** The argument the current route was opened with, if any. */
+    java.util.Optional<String> argument();
+
     boolean canGoBack();
 
     /** Go to the previous route; no-op if there is none. */

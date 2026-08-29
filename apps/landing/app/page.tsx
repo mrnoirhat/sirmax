@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import Image from "next/image";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Section, FeatureGrid } from "@/components/Section";
@@ -38,6 +39,42 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ── Screenshots ── */}
+        <Section
+          id="capturas"
+          eyebrow="Cómo se ve"
+          title="Navegación por tareas, no por menús"
+          lead="La pantalla de inicio pregunta qué necesitas hacer. Ningún operador debería tener
+            que traducir «cobrar una certificación» a un recorrido por submenús."
+        >
+          <figure className="shot">
+            <Image
+              src="/screenshots/sirmax-shell.png"
+              alt="Pantalla de inicio de SIRMAX con navegación por tareas y las acciones más
+                frecuentes de un ayuntamiento"
+              width={1200}
+              height={780}
+              priority
+            />
+            <figcaption>
+              Inicio: las tareas que un mostrador municipal hace todos los días, sin submenús.
+            </figcaption>
+          </figure>
+          <figure className="shot">
+            <Image
+              src="/screenshots/sirmax-primer-arranque.png"
+              alt="Pantalla de configuración inicial de SIRMAX, donde se crea el municipio y la
+                cuenta administradora"
+              width={1200}
+              height={780}
+            />
+            <figcaption>
+              Primer arranque: se crea el municipio y la cuenta administradora. Nada más que
+              instalar.
+            </figcaption>
+          </figure>
+        </Section>
 
         {/* ── Problem ── */}
         <Section
