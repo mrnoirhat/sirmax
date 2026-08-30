@@ -7,6 +7,61 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-08-30
+
+### Added
+- **Firma de código con la SignPath Foundation.** El ejecutable y el instalador se
+  firman desde el propio build. La fundación custodia el certificado en un HSM al
+  que el proyecto no tiene acceso, y cada firma exige aprobación manual. El paso
+  se salta sin fallar mientras no exista el secreto: una release sin firmar es
+  peor que una firmada, pero una que no se puede cortar es peor que las dos.
+  - [`docs/CODE-SIGNING-POLICY.md`](docs/CODE-SIGNING-POLICY.md) — el documento que
+    SignPath exige publicado, y que permite a un ayuntamiento comprobar que el
+    archivo descargado salió de este repositorio.
+  - [`docs/SIGNPATH-APPLICATION.md`](docs/SIGNPATH-APPLICATION.md) — la solicitud,
+    con el estado de cada requisito.
+- **Ayuda → Acerca de**, con la versión leída del manifiesto del jar para que no
+  pueda desviarse de lo compilado.
+- Documentación completa: las 26 páginas que decían «en construcción» tienen
+  contenido real. No queda ningún aviso de obra en el sitio.
+
+### Changed
+- **El panel muestra trámites reales.** Antes eran cuatro cifras fijas (2, 4, 7,
+  12) heredadas de la demo del sistema de diseño, montadas en la aplicación real.
+  Un número inventado en un panel no se distingue de uno real y alguien acaba
+  planificando la mañana con él. Ahora cuenta vencidos, sin asignar, asignados a
+  ti y abiertos, y cada tarjeta abre la lista.
+- Pase de diseño con la paleta actual: profundidad en las tarjetas, estados al
+  pasar por encima, más aire en las filas de tabla, y regla lateral además del
+  tinte en la navegación seleccionada — el color no puede ser la única señal (§12).
+- Dependencias al día: PDFBox 3.0.8, ZXing 3.5.4, sqlite-jdbc 3.53.4.0,
+  TypeScript 6.0.3, CodeQL Action v4.
+
+### Fixed
+- **La columna Roles imprimía UUIDs** en lugar de nombres de rol.
+- **El nombre del editor en la firma estaba mal escrito.**
+- **TypeScript 6 estaba bloqueado por error.** Se había descartado junto al 7
+  suponiendo la misma causa. El `baseUrl` que rompía estaba en dos sitios: el
+  nuestro, que se quitó, y el que publica Docusaurus, para el que TypeScript 6
+  trae `ignoreDeprecations: "6.0"`. El bloqueo se mantiene solo para el 7, donde
+  la opción desaparece.
+- **La acción de SignPath v2 habría roto la firma en silencio.** Declara
+  `connector-url` como obligatorio; como el paso está desactivado hasta que exista
+  el secreto, el fallo habría aparecido en la primera release firmada con CI en
+  verde todo el tiempo.
+
+### Documentation
+- `docs/SIGNING.md` corrige dos afirmaciones que eran falsas, verificadas contra
+  la documentación de Microsoft y la de SignPath:
+  - **Sí existe firma de código gratuita** para proyectos libres que califiquen.
+  - **Un certificado EV ya no evita el aviso de SmartScreen**; Microsoft retiró
+    ese comportamiento y desaconseja pagar el sobreprecio por ese motivo.
+
+  Consecuencia que el documento ahora deja clara: fuera de la Microsoft Store
+  ninguna opción garantiza que no avise el primer día. Un certificado de una CA
+  consigue que el aviso muestre un editor verificable y que desaparezca en
+  semanas, no que no aparezca.
+
 ## [1.0.2] - 2026-08-30
 
 ### Added
