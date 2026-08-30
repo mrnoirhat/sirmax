@@ -29,6 +29,10 @@ jobs:
       run:
         working-directory: apps/desktop
         shell: bash # so ./gradlew (not .bat) resolves on the Windows runner
+    env:
+      # Job-level, not step-level: a step's own `env:` is not in scope for that step's `if:`,
+      # which is evaluated first. Empty until the SignPath application is approved.
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -63,6 +67,32 @@ jobs:
       - name: Package and verify
         run: ./gradlew --no-daemon verifyReleaseArtifacts
 
+      - name: Upload unsigned artifacts for signing
+        id: upload-unsigned
+        uses: actions/upload-artifact@v7
+        with:
+          name: sirmax-unsigned
+          path: apps/desktop/sirmax-app/build/installer/
+          if-no-files-found: error
+
+      # SignPath Foundation signs the artifacts with its own certificate, held in an HSM the
+      # project never has access to. Gated on the secret so the release still builds and publishes
+      # before the application is approved — an unsigned release is worse than a signed one, but a
+      # release that cannot be cut at all is worse than both.
+      - name: Sign with SignPath
+        if: env.SIGNPATH_API_TOKEN != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: sirmax
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.upload-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: apps/desktop/sirmax-app/build/installer
+
+      # Checksums are computed *after* signing: a signature rewrites the file, so a hash taken
+      # before it would never match what anyone downloads.
       - name: Checksums
         shell: pwsh
         working-directory: apps/desktop/sirmax-app/build/installer

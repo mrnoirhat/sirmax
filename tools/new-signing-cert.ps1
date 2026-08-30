@@ -12,7 +12,7 @@
     Idempotent: running it again reports the existing certificate instead of creating a second one.
 #>
 param(
-    [string] $CommonName = 'Andriezr Glava Montero (Mrnoirhat)',
+    [string] $CommonName = 'Andriezer Galva Montero (Mrnoirhat)',
     [string] $Organization = 'SIRMAX',
     [string] $Country = 'DO',
     [int]    $Years = 5

@@ -47,7 +47,9 @@ el acceso directo y la entrada del menú Inicio.
 SIRMAX es software libre sin certificado comercial. Comprueba la suma SHA-256,
 pulsa **Más información** y luego **Ejecutar de todas formas**. El detalle
 completo está en
-[SIGNING.md](https://github.com/mrnoirhat/sirmax/blob/main/docs/SIGNING.md).
+[SIGNING.md](https://github.com/mrnoirhat/sirmax/blob/main/docs/SIGNING.md), y
+cómo se firma cada release en la
+[política de firma](https://github.com/mrnoirhat/sirmax/blob/main/docs/CODE-SIGNING-POLICY.md).
 :::
 
 ## Dónde quedan los datos
