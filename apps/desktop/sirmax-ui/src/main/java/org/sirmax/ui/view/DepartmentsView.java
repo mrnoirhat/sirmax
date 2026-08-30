@@ -114,7 +114,7 @@ public final class DepartmentsView implements SirmaxView {
                                 userCol(
                                         "departments.column.roles",
                                         260,
-                                        u -> String.join(", ", services.users().roleIdsOf(u.id())))));
+                                        this::roleNames)));
 
         HBox actions = new HBox(8);
         actions.setAlignment(Pos.CENTER_LEFT);
@@ -230,6 +230,16 @@ public final class DepartmentsView implements SirmaxView {
         services.organization().save(department);
         toasts.success("departments.archived_ok", department.name());
         refresh();
+    }
+
+    /** Role names, not ids: a column of UUIDs tells an administrator nothing. */
+    private String roleNames(AppUser user) {
+        List<String> names =
+                services.roles().rolesOf(user.id()).stream()
+                        .map(org.sirmax.domain.security.Role::name)
+                        .sorted()
+                        .toList();
+        return names.isEmpty() ? "—" : String.join(", ", names);
     }
 
     // ---- helpers ---------------------------------------------------------

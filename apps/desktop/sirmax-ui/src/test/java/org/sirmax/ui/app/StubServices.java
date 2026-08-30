@@ -83,6 +83,11 @@ final class StubServices implements AppServices {
     }
 
     @Override
+    public org.sirmax.application.port.RoleRepository roles() {
+        throw notNeeded();
+    }
+
+    @Override
     public org.sirmax.application.port.OrganizationRepository organization() {
         throw notNeeded();
     }

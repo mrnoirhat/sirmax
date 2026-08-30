@@ -38,6 +38,8 @@ public final class Styles {
     // components
     public static final String CARD = "sirmax-card";
     public static final String TASK_CARD = "sirmax-taskcard";
+    /** A card that is also a button: a dashboard count you can open. */
+    public static final String TILE = "sirmax-tile";
     public static final String BANNER = "sirmax-banner";
     public static final String BANNER_TITLE = "sirmax-banner-title";
     public static final String TOAST = "sirmax-toast";

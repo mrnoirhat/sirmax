@@ -6,6 +6,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -47,12 +48,34 @@ public final class AppMenuBar extends MenuBar {
         MenuItem shortcuts = item("menu.help.shortcuts", showShortcuts);
         shortcuts.setAccelerator(new KeyCodeCombination(KeyCode.F1));
         MenuItem styleGuide = item("menu.help.styleguide", showStyleGuide);
+        MenuItem about = item("menu.help.about", AppMenuBar::showAbout);
         styleGuide.setAccelerator(
                 new KeyCodeCombination(
                         KeyCode.G, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-        help.getItems().addAll(shortcuts, styleGuide);
+        help.getItems().addAll(shortcuts, styleGuide, new SeparatorMenuItem(), about);
 
         getMenus().addAll(file, view, help);
+    }
+
+    /**
+     * Version and licence.
+     *
+     * <p>The version is the first thing a support request needs and the last thing anyone can find
+     * — «Ayuda → Acerca de» is where people look, so it has to be there. It is read from the jar's
+     * manifest, so it cannot drift from what was actually built.
+     */
+    private static void showAbout() {
+        String version =
+                java.util.Optional.ofNullable(AppMenuBar.class.getPackage().getImplementationVersion())
+                        .orElseGet(() -> Messages.get("about.version_unknown"));
+        javafx.scene.control.Alert alert =
+                new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle(Messages.get("menu.help.about"));
+        alert.setHeaderText(Messages.get("app.title"));
+        alert.setContentText(Messages.get("about.body", version));
+        alert.getDialogPane().getStylesheets().addAll(
+                AppMenuBar.class.getResource("/org/sirmax/ui/theme/sirmax.css").toExternalForm());
+        alert.showAndWait();
     }
 
     private static MenuItem item(String labelKey, Runnable action) {
