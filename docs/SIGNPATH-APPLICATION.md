@@ -57,7 +57,8 @@ gh variable set SIGNPATH_ORGANIZATION_ID --repo mrnoirhat/sirmax --body "<el-id>
 
 Y comprobar que el *project slug* y el *signing policy slug* que SignPath asigne
 coinciden con los del workflow (`sirmax` y `release-signing`); si no, ajústalos
-en `.github/workflows/release.yml`.
+en `.github/workflows/release.yml`. El `connector-url` ya está puesto y es el
+endpoint de producción.
 
 A partir de ahí, cada etiqueta `vX.Y.Z` sube el artefacto a SignPath, espera tu
 aprobación manual y descarga el binario firmado antes de calcular las sumas —el
