@@ -7,6 +7,57 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-30
+
+### Added
+- **Las cinco pantallas de administración**, que hasta ahora eran marcadores:
+  - *Servicios* (§22, §54–§55): el catálogo del ayuntamiento y el alta de servicios.
+    Una versión publicada no se edita, porque cada trámite fija la versión con la que
+    se abrió (§39); cambiar un servicio vivo es una versión nueva, y la pantalla lo
+    impone en vez de explicarlo.
+  - *Documentos* (§46, §59D, §59F): búsqueda por número o código de verificación,
+    reimpresión con motivo obligatorio y marca COPIA, e historial de impresión.
+    También los perfiles de impresora.
+  - *Configuración* (§41–§42, §59C): identidad del ayuntamiento, tema, programación
+    e historial de copias, política de seguridad y verificación de la cadena de
+    auditoría.
+  - *Departamentos* (§21): alta y archivado — nunca borrado, porque los trámites ya
+    enrutados siguen refiriéndose a ellos.
+  - *Reportes* (§36): cobros por medio de pago y por servicio, trámites por estado y
+    lo pendiente de cobro, todo sobre un mismo rango de fechas y exportable a CSV.
+- **Emisión de facturas desde el mostrador.** `IssueInvoice` existía y no se llamaba
+  desde ninguna parte, así que un trámite que requería pago podía abrirse pero nunca
+  cobrarse. Facturación ahora empieza por los casos pendientes de facturar, y excluye
+  los que ya tienen factura: reemitir le daría al ciudadano dos documentos por un
+  mismo cargo.
+- **Marca e icono** en la aplicación de escritorio, la landing y la documentación.
+  Se dibujan desde una sola geometría en Java2D, de modo que se regeneran en una
+  máquina que solo tenga un JDK.
+- Auditoría automática de claves de traducción (`MessageKeyAuditTest`) y cobertura de
+  las pantallas nuevas contra el grafo real (`BackOfficeUiIT`).
+
+### Fixed
+- **Modo oscuro.** No existía ninguna regla para la barra de menú, así que JavaFX la
+  pintaba desde `modena.css`, que es clara sin condición: la única franja siempre
+  visible se quedaba en blanco. Lo mismo ocurría con las barras de desplazamiento,
+  los menús contextuales, los diálogos, los desplegables, los *spinners* y el
+  selector de fecha — todos son ventanas aparte o controles compuestos a los que el
+  sistema de tokens no llegaba.
+- **La landing no se desplegaba desde 1.0.1.** `vercel.json` fijaba
+  `outputDirectory` en `out` junto a `framework: nextjs`; Next con `output: "export"`
+  lo resuelve el propio builder de Vercel, y decirle además dónde está la salida lo
+  manda a buscar un `routes-manifest.json` que un export estático no genera. El build
+  aparecía en verde y fallaba en la última línea, así que parecía un problema de
+  caché.
+- La landing arrastraba una segunda sección `id="capturas"` de la Fase 2 — tres
+  recuadros punteados y un texto diciendo que el shell estaba en construcción — que
+  además hacía que el ancla `#capturas` no fuera única.
+- Tres constantes de enumeración (`charge.type.recargo`, `service.type.pago_externo`,
+  `backup.kind.pre_migration`) no tenían traducción y se mostraban como su clave.
+- Los checks obligatorios filtraban por rutas en `pull_request`. GitHub espera
+  indefinidamente por un check que nunca reporta, así que cualquier PR que no tocara
+  ese directorio habría quedado imposible de fusionar.
+
 ## [1.0.1] - 2026-08-29
 
 ### Added
