@@ -89,6 +89,15 @@ lo único que hay que fijar es el directorio raíz:
 Deja activado *Include files outside the Root Directory* — ambos son workspaces
 de npm y necesitan el `package-lock.json` de la raíz.
 
+**No fijes *Output Directory* en el proyecto de la landing**, ni en el panel ni
+en `vercel.json`. Next.js con `output: "export"` lo resuelve el propio builder de
+Vercel; si además se le dice que la salida es `out/`, el builder compila bien y
+después falla buscando `routes-manifest.json` dentro de `out/`, que un export
+estático no genera. El síntoma engaña: los logs muestran la compilación en verde
+y el error aparece al final, así que parece un problema del sitio y no de la
+configuración. Docusaurus sí necesita el suyo (`build`), porque ahí Vercel no
+tiene un builder propio que lo sepa.
+
 ---
 
 ## Lo que **no** hace falta configurar
