@@ -17,9 +17,11 @@ updates:
       # pull request every week and it gets closed every week, which trains everyone to ignore it.
       # Remove the entry — do not just bump it — once the blocker below is gone.
       #
-      # TypeScript 7 removed `baseUrl`, and @docusaurus/tsconfig (3.10.2, unchanged) still sets it
-      # inside the published package, so it cannot be fixed here. npm hoists one typescript across
-      # the workspace, so holding it for the docs holds it for the landing too.
+      # TypeScript 6 is applied, with `ignoreDeprecations: "6.0"` in apps/docs/tsconfig.json —
+      # @docusaurus/tsconfig (3.10.2) still sets `baseUrl`, which 6 makes an error and 7 removes
+      # outright. At 7 the flag stops helping, so the hold stays until Docusaurus ships a tsconfig
+      # without it. npm hoists one typescript across the workspace, so holding it for the docs
+      # holds it for the landing too.
       - dependency-name: "typescript"
         versions: ["7.x"]
       # eslint-plugin-react, which arrives through eslint-config-next, declares peer eslint

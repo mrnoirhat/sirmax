@@ -1,7 +1,14 @@
 {
   "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
-    "baseUrl": "."
+    // @docusaurus/tsconfig (3.10.2) still sets `baseUrl`, which TypeScript 6 turns into an error
+    // and TypeScript 7 removes outright. It is set inside the published package, so it cannot be
+    // fixed here. This is Microsoft's documented migration flag, and it is the whole reason the
+    // toolchain can move to 6 now instead of waiting on Docusaurus.
+    //
+    // Remove this — do not bump it to "7.0" — once Docusaurus ships a tsconfig without baseUrl.
+    // At TypeScript 7 the flag stops helping and the option is simply gone.
+    "ignoreDeprecations": "6.0"
   },
   "exclude": [".docusaurus", "build"]
 }
