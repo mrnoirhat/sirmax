@@ -19,7 +19,7 @@ const deployment =
 const config: Config = {
   title: "SIRMAX",
   tagline: "La gestión municipal, simplificada.",
-  // favicon: "img/favicon.ico", // added with the real asset in Phase 12
+  favicon: "img/favicon.ico",
 
   url: deployment.url,
   baseUrl: deployment.baseUrl,
@@ -66,6 +66,7 @@ const config: Config = {
     },
     navbar: {
       title: "SIRMAX",
+      logo: { alt: "SIRMAX", src: "img/logo.svg" },
       items: [
         { type: "docSidebar", sidebarId: "docs", position: "left", label: "Documentación" },
         { href: LANDING, label: "Sitio web", position: "right" },

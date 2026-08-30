@@ -58,6 +58,41 @@ final class StubServices implements AppServices {
     }
 
     @Override
+    public org.sirmax.application.usecase.CreateServiceDraft createServiceDraft() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.usecase.ConfigureServiceDraft configureServiceDraft() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.usecase.PublishServiceVersion publishServiceVersion() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.usecase.CreateServiceDraftVersion createServiceDraftVersion() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.usecase.SetServiceAvailability setServiceAvailability() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.port.OrganizationRepository organization() {
+        throw notNeeded();
+    }
+
+    @Override
+    public org.sirmax.application.port.SettingsRepository settings() {
+        throw notNeeded();
+    }
+
+    @Override
     public org.sirmax.application.usecase.StartProcedure startProcedure() {
         throw notNeeded();
     }

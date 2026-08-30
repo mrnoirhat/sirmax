@@ -9,6 +9,7 @@ import org.sirmax.application.security.Session;
 import org.sirmax.ui.app.AppServices;
 import org.sirmax.ui.app.LoginView;
 import org.sirmax.ui.app.UiSession;
+import org.sirmax.ui.brand.BrandMark;
 import org.sirmax.ui.i18n.Messages;
 import org.sirmax.ui.nav.RouteKey;
 import org.sirmax.ui.nav.ShellNavigator;
@@ -60,6 +61,7 @@ public final class SirmaxApplication extends Application {
         }
 
         stage.setTitle(Messages.get("app.title"));
+        BrandMark.apply(stage);
         stage.setMinWidth(Math.min(1000, screen.getWidth()));
         stage.setMinHeight(Math.min(640, screen.getHeight()));
         stage.setScene(scene);

@@ -5,11 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
-import javafx.application.Platform;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +44,6 @@ import org.sirmax.ui.view.ProceduresView;
  */
 class FrontOfficeUiIT {
 
-    private static boolean toolkitStarted;
-
     private SqliteDatabase database;
     private CompositionRoot root;
     private UiSession session;
@@ -59,12 +53,7 @@ class FrontOfficeUiIT {
 
     @BeforeAll
     static void fx() {
-        if (!toolkitStarted) {
-            CountDownLatch latch = new CountDownLatch(1);
-            Platform.startup(latch::countDown);
-            await(latch);
-            toolkitStarted = true;
-        }
+        FxToolkit.start();
     }
 
     @BeforeEach
@@ -255,34 +244,6 @@ class FrontOfficeUiIT {
     // ── JavaFX thread plumbing ──
 
     private static <T> T onFxThread(Supplier<T> work) {
-        AtomicReference<T> result = new AtomicReference<>();
-        AtomicReference<RuntimeException> failure = new AtomicReference<>();
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(
-                () -> {
-                    try {
-                        result.set(work.get());
-                    } catch (RuntimeException e) {
-                        failure.set(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-        await(latch);
-        if (failure.get() != null) {
-            throw failure.get();
-        }
-        return result.get();
-    }
-
-    private static void await(CountDownLatch latch) {
-        try {
-            if (!latch.await(20, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Timed out waiting for the JavaFX thread");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(e);
-        }
+        return FxToolkit.onFxThread(work);
     }
 }

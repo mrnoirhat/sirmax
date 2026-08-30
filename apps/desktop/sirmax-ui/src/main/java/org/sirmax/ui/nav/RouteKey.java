@@ -21,6 +21,8 @@ public enum RouteKey {
     DOCUMENTS,
     CITIZENS,
     DEPARTMENTS,
+    /** Authoring the service catalogue: what the municipality offers and what it charges. */
+    SERVICES,
     SETTINGS,
     REPORTS,
     /** Reached via the top-bar search box, not the task navigation. */

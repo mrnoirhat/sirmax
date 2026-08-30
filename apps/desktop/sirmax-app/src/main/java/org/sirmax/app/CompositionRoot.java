@@ -403,22 +403,27 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         return registerPerson;
     }
 
+    @Override
     public CreateServiceDraft createServiceDraft() {
         return createServiceDraft;
     }
 
+    @Override
     public ConfigureServiceDraft configureServiceDraft() {
         return configureServiceDraft;
     }
 
+    @Override
     public PublishServiceVersion publishServiceVersion() {
         return publishServiceVersion;
     }
 
+    @Override
     public CreateServiceDraftVersion createServiceDraftVersion() {
         return createServiceDraftVersion;
     }
 
+    @Override
     public SetServiceAvailability setServiceAvailability() {
         return setServiceAvailability;
     }
@@ -600,6 +605,16 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
     @Override
     public ServiceCatalogRepository serviceCatalog() {
         return serviceCatalogRepository;
+    }
+
+    @Override
+    public OrganizationRepository organization() {
+        return organizationRepository;
+    }
+
+    @Override
+    public SettingsRepository settings() {
+        return settingsRepository;
     }
 
     @Override

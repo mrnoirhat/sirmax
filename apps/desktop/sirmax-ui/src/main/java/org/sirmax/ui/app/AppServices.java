@@ -8,17 +8,22 @@ import org.sirmax.application.port.AuditRepository;
 import org.sirmax.application.port.BillingRepository;
 import org.sirmax.application.port.DocumentPrinter;
 import org.sirmax.application.port.DocumentRepository;
+import org.sirmax.application.port.OrganizationRepository;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RegistryRepository;
 import org.sirmax.application.port.SecurityPolicyRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
+import org.sirmax.application.port.SettingsRepository;
 import org.sirmax.application.port.UserRepository;
 import org.sirmax.application.usecase.AddProcedureNote;
 import org.sirmax.application.usecase.AdvanceProcedure;
 import org.sirmax.application.usecase.AssignProcedure;
 import org.sirmax.application.usecase.Authenticate;
 import org.sirmax.application.usecase.ConductInspection;
+import org.sirmax.application.usecase.ConfigureServiceDraft;
 import org.sirmax.application.usecase.CreateBackup;
+import org.sirmax.application.usecase.CreateServiceDraft;
+import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.FindDuplicatePeople;
 import org.sirmax.application.usecase.GrantAgreement;
 import org.sirmax.application.usecase.IssueDocument;
@@ -27,6 +32,7 @@ import org.sirmax.application.usecase.ManageBackupPolicy;
 import org.sirmax.application.usecase.ManageCashSession;
 import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.ProvisionInitialAdmin;
+import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterPayment;
 import org.sirmax.application.usecase.RegisterDocument;
@@ -34,6 +40,7 @@ import org.sirmax.application.usecase.RegisterPerson;
 import org.sirmax.application.usecase.RestoreBackup;
 import org.sirmax.application.usecase.SaveProcedureForm;
 import org.sirmax.application.usecase.SeedServiceCatalog;
+import org.sirmax.application.usecase.SetServiceAvailability;
 import org.sirmax.application.usecase.StartProcedure;
 import org.sirmax.application.usecase.TransferAgreement;
 import org.sirmax.application.usecase.UpdateProcedureRequirement;
@@ -71,6 +78,30 @@ public interface AppServices {
     ServiceCatalogRepository serviceCatalog();
 
     SeedServiceCatalog seedServiceCatalog();
+
+    /**
+     * Authoring a service (§22, §55). A definition is created as a draft, configured while it stays
+     * a draft, then published — and from then on it is immutable, because live procedures pin the
+     * version they were started under (§39). Changing a published service means a new draft version,
+     * never an edit.
+     */
+    CreateServiceDraft createServiceDraft();
+
+    ConfigureServiceDraft configureServiceDraft();
+
+    PublishServiceVersion publishServiceVersion();
+
+    CreateServiceDraftVersion createServiceDraftVersion();
+
+    SetServiceAvailability setServiceAvailability();
+
+    // ── organization ──
+
+    /** Institution profile and departments, for the settings and departments screens. */
+    OrganizationRepository organization();
+
+    /** Operator preferences that are not domain data (theme, printing defaults). */
+    SettingsRepository settings();
 
     // ── cases ──
     StartProcedure startProcedure();

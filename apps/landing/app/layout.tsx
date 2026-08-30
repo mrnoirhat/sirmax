@@ -30,14 +30,23 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
+    images: [{ url: "/logo-512.png", width: 512, height: 512, alt: site.name }],
   },
   twitter: {
     card: "summary_large_image",
+    images: ["/logo-512.png"],
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
   },
   robots: { index: true, follow: true },
   category: "government",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

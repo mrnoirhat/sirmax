@@ -43,6 +43,7 @@ import org.sirmax.ui.app.UiSession;
 import org.sirmax.ui.designsystem.Banner;
 import org.sirmax.ui.designsystem.Buttons;
 import org.sirmax.ui.designsystem.Cards;
+import org.sirmax.ui.designsystem.Enums;
 import org.sirmax.ui.designsystem.Styles;
 import org.sirmax.ui.designsystem.ToastHost;
 import org.sirmax.ui.designsystem.Typography;
@@ -152,8 +153,7 @@ public final class ProcedureDetailView implements SirmaxView {
         heading.setText(procedure.code() + "  ·  " + serviceName);
 
         String status =
-                Messages.get(
-                        "procedure.status." + procedure.status().name().toLowerCase(Locale.ROOT));
+                Enums.label("procedure.status", procedure.status());
         String step = procedure.currentStepKey().map(s -> "  ·  " + s).orElse("");
         String due =
                 procedure.dueDate()
@@ -326,7 +326,7 @@ public final class ProcedureDetailView implements SirmaxView {
             if (!mayPerform(transition.kind())) {
                 continue;
             }
-            String labelKey = "procedure.transition." + transition.kind().name().toLowerCase(Locale.ROOT);
+            String labelKey = Enums.key("procedure.transition", transition.kind());
             buttons.add(
                     transition.kind() == TransitionKind.ADVANCE
                                     || transition.kind() == TransitionKind.APPROVE
@@ -355,7 +355,7 @@ public final class ProcedureDetailView implements SirmaxView {
         Optional<String> reason = Optional.empty();
         if (kind == TransitionKind.REJECT || kind == TransitionKind.CANCEL) {
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle(Messages.get("procedure.transition." + kind.name().toLowerCase(Locale.ROOT)));
+            dialog.setTitle(Enums.label("procedure.transition", kind));
             dialog.setContentText(Messages.get("procedure.reason"));
             reason = dialog.showAndWait().filter(r -> !r.isBlank());
             if (reason.isEmpty()) {
@@ -413,7 +413,7 @@ public final class ProcedureDetailView implements SirmaxView {
         for (int i = events.size() - 1; i >= 0; i--) {
             ProcedureEvent event = events.get(i);
             String kind =
-                    Messages.get("procedure.event." + event.kind().name().toLowerCase(Locale.ROOT));
+                    Enums.label("procedure.event", event.kind());
             String detail = event.detail().map(d -> " — " + d).orElse("");
             timeline.getChildren()
                     .add(
