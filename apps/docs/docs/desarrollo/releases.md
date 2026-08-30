@@ -73,8 +73,18 @@ instala bien y luego no arranca.
 
 ## Firma
 
-Ver [SIGNING.md](https://github.com/mrnoirhat/sirmax/blob/main/docs/SIGNING.md). Se salta sin
-fallar cuando no hay certificado, porque CI no tiene ninguno.
+Las releases se firman a través de la **SignPath Foundation**, que custodia el
+certificado en un HSM al que el proyecto no tiene acceso. Cada firma requiere
+aprobación manual.
+
+- [Política de firma de código](https://github.com/mrnoirhat/sirmax/blob/main/docs/CODE-SIGNING-POLICY.md)
+  — qué se firma, de dónde sale el binario y quién puede aprobarlo.
+- [SIGNING.md](https://github.com/mrnoirhat/sirmax/blob/main/docs/SIGNING.md)
+  — el detalle de las opciones de certificado y qué consigue cada una.
+
+El paso de firma se salta sin fallar mientras no exista el secreto
+`SIGNPATH_API_TOKEN`: una release sin firmar es peor que una firmada, pero una
+release que no se puede cortar es peor que las dos.
 
 ## Versionado
 
