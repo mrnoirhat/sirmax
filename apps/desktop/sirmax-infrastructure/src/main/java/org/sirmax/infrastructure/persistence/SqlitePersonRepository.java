@@ -65,7 +65,10 @@ public final class SqlitePersonRepository implements PersonRepository {
         if (q.isEmpty()) {
             return JdbcHelper.queryList(
                     db.connection(),
-                    "SELECT * FROM person ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                    // Alphabetical, like the paper register it replaces. Ordering by creation
+                    // date answers "who did we add last", which is not the question anyone has
+                    // while looking at a list of citizens.
+                    "SELECT * FROM person ORDER BY full_name LIMIT ? OFFSET ?",
                     SqlitePersonRepository::mapPerson,
                     limit,
                     offset);

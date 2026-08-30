@@ -7,6 +7,55 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-08-30
+
+Corrige los defectos encontrados usando la aplicación instalada. Cada uno tiene
+una prueba en `ReportedDefectsIT` escrita antes del arreglo, que falla por el
+motivo reportado.
+
+### Fixed
+- **En modo oscuro el texto escrito era ilegible.** La regla de los campos de
+  entrada nunca fijó `-fx-text-fill`, así que el texto usaba el casi negro por
+  defecto de modena. En el tema claro pasa desapercibido; en el oscuro es gris
+  sobre oscuro. Afecta a todos los campos, áreas de texto, desplegables,
+  selectores de fecha y *spinners*.
+- **Ciudadanos abría en blanco.** La búsqueda descartaba cualquier consulta de
+  menos de dos caracteres, incluida la vacía — pero vacía significa «muéstrame el
+  registro», no «no busques». Ahora lista a todos al abrir, **en orden
+  alfabético**: ordenar por fecha de creación respondía «a quién dimos de alta
+  último», que no es la pregunta que se tiene delante de un registro de
+  ciudadanos.
+- **Documentos parecía vacío.** Solo sabía buscar por número o código de
+  verificación — correcto con el ciudadano delante con el papel en la mano, e
+  inútil para «qué emitimos hoy». Se añade `DocumentRepository.listRecent` y la
+  pantalla abre con los últimos emitidos.
+- **Activar/desactivar un servicio no alternaba.** El botón decidía desde
+  `isAvailable()`, que es falso mientras no haya versión publicada dijera lo que
+  dijera el indicador. Un servicio recién sembrado pedía siempre *activarse*: la
+  primera pulsación parecía no hacer nada y la segunda repetía lo mismo. Ahora lee
+  el estado de archivo, que es lo que el comando realmente cambia.
+- **La columna «Disponible» confundía dos cosas.** Decía «No» tanto para un
+  servicio apagado como para uno que solo tiene borrador, y tras cargar el
+  catálogo base **todas** las filas decían «No» sin que nada las cambiara. Son
+  situaciones distintas con remedios distintos, y ahora se distinguen: hay un
+  tercer estado, «Solo borrador».
+- **«Nueva versión» se ofrecía cuando no podía funcionar.** Solo se puede cortar
+  una versión nueva desde una publicada y sin borrador abierto; en cualquier otro
+  caso respondía «ya hay un borrador», que se lee como una negativa a editar en
+  lugar de como «el borrador está justo debajo». El botón se desactiva y el
+  borrador queda seleccionado.
+- **Trámites no explicaba por qué no había servicios.** El catálogo base se carga
+  como borradores y un borrador no puede tomar un caso, con razón: no tiene tasa
+  revisada ni condiciones publicadas. El desplegable quedaba vacío sin decir nada.
+  Ahora lo dice y señala dónde se arregla.
+
+### Added
+- **«Crear y publicar»** en el alta de servicios, con el monto en el propio
+  formulario. El catálogo base se sigue cargando como borradores —publicar cien
+  servicios con tasa cero sería peor que una lista vacía— pero un servicio simple
+  ya no obliga a un segundo viaje por el editor. Publicar sigue siendo explícito:
+  nada se publica sin pulsar un botón que lo dice.
+
 ## [1.0.3] - 2026-08-30
 
 ### Added
