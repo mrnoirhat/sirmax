@@ -5,7 +5,7 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
  * Documentation structure (master prompt §6 / §71). Two audiences: operators (plain, practical) and
  * developers (architecture, domain, database, tests, build, CI/CD, contribution).
  *
- * Most pages are stubs in Phase 1; content is written alongside the features in Phases 6 and 12.
+ * Every page carries real content; there are no stubs left.
  */
 const sidebars: SidebarsConfig = {
   docs: [

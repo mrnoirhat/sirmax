@@ -1,13 +1,18 @@
 ---
 title: "Administración"
-sidebar_position: 1
-description: "Configuración avanzada del municipio y de las reglas de negocio."
+sidebar_position: 5
+description: "Lo que se configura una vez y afecta a todo lo demás."
 ---
 
 # Administración
 
-Configuración avanzada del municipio y de las reglas de negocio.
+Dos cosas que se tocan poco y condicionan todo el resto:
 
-:::info Página en construcción
-Esta sección se está escribiendo junto con el código. Se documenta junto con la **Fase 4** (motor configurable de servicios). Ver [`ROADMAP.md`](https://github.com/mrnoirhat/sirmax/blob/main/ROADMAP.md).
-:::
+- **[Datos del ayuntamiento](./institucion.md)** — la identidad que sale impresa
+  en cada factura y cada certificación.
+- **[Reglas de negocio](./reglas-de-negocio.md)** — las invariantes que SIRMAX
+  impone y que conviene entender antes de pelearse con ellas.
+
+Para el reparto de permisos, ver
+[Usuarios y permisos](../guia-usuario/usuarios-y-permisos.md). Para el catálogo,
+[Servicios](../guia-usuario/servicios.md).

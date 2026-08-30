@@ -12,6 +12,20 @@ updates:
     groups:
       web-minor:
         update-types: [minor, patch]
+    ignore:
+      # Two majors that upstream cannot take yet. Without these rules Dependabot reopens the same
+      # pull request every week and it gets closed every week, which trains everyone to ignore it.
+      # Remove the entry — do not just bump it — once the blocker below is gone.
+      #
+      # TypeScript 7 removed `baseUrl`, and @docusaurus/tsconfig (3.10.2, unchanged) still sets it
+      # inside the published package, so it cannot be fixed here. npm hoists one typescript across
+      # the workspace, so holding it for the docs holds it for the landing too.
+      - dependency-name: "typescript"
+        versions: ["7.x"]
+      # eslint-plugin-react, which arrives through eslint-config-next, declares peer eslint
+      # "^3 || ... || ^9.7" — ESLint 10 is not in that range and the plugin throws on its rule API.
+      - dependency-name: "eslint"
+        versions: ["10.x"]
 
   - package-ecosystem: gradle
     directory: "/apps/desktop"

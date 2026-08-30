@@ -131,13 +131,13 @@ public final class ShellView extends StackPane {
 
     private void registerViews() {
         put(new HomeView(navigator));
-        put(new DashboardView());
         put(searchView);
         put(new StyleGuideView(toasts));
 
         // Feature views need the application graph. Without it (the Design System demo shell) the
         // routes fall back to their labelled placeholders rather than half-working screens.
         if (services != null) {
+            put(new DashboardView(services, session, navigator));
             put(new ProceduresView(services, session, navigator));
             put(new NewProcedureView(services, session, navigator, toasts));
             put(new ProcedureDetailView(services, session, navigator, toasts));
@@ -150,6 +150,7 @@ public final class ShellView extends StackPane {
             put(new SettingsView(services, session, toasts, themeManager));
             put(new ReportsView(services, session, toasts));
         } else {
+            put(new DashboardView());
             put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
             put(new PlaceholderView(RouteKey.PROCEDURE_NEW, "procedures.new"));
             put(new PlaceholderView(RouteKey.PROCEDURE_DETAIL, "procedure.detail.title"));
