@@ -104,6 +104,62 @@
 
 .scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; }
 
+/* Menu bar, menus and every popup.
+ *
+ * JavaFX styles these from modena.css, which is unconditionally light. Nothing
+ * in the token system reaches them, so in dark mode the strip across the top of
+ * the window — the one thing always on screen — stayed white while everything
+ * below it went dark. */
+.menu-bar {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: transparent transparent -sirmax-border transparent;
+    -fx-padding: 2 8 2 8;
+}
+.menu-bar > .container > .menu-button { -fx-background-color: transparent; }
+.menu-bar > .container > .menu-button > .label { -fx-text-fill: -sirmax-text; }
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -sirmax-surface-2;
+    -fx-background-radius: 6;
+}
+
+.context-menu {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 4;
+}
+.menu-item { -fx-background-radius: 6; -fx-padding: 6 12 6 12; }
+.menu-item > .label { -fx-text-fill: -sirmax-text; }
+.menu-item:focused, .menu-item:hovered { -fx-background-color: -sirmax-primary-soft; }
+.menu-item:focused > .label, .menu-item:hovered > .label { -fx-text-fill: -sirmax-text; }
+.menu-item:disabled > .label { -fx-text-fill: -sirmax-text-muted; }
+.context-menu .separator .line { -fx-border-color: -sirmax-border transparent transparent transparent; }
+.radio-menu-item:checked > .left-container > .radio,
+.check-menu-item:checked > .left-container > .check { -fx-background-color: -sirmax-primary; }
+
+/* Dialogs are separate windows, so they miss the scene's dark class entirely
+ * unless styled from their own root. */
+.dialog-pane {
+    -fx-background-color: -sirmax-bg;
+}
+.dialog-pane > .content.label,
+.dialog-pane > .header-panel > .label { -fx-text-fill: -sirmax-text; }
+.dialog-pane > .header-panel { -fx-background-color: -sirmax-surface; }
+.dialog-pane .button-bar .button { -fx-background-color: -sirmax-surface; }
+
+/* Scrollbars: modena paints these light grey on light grey, which on a dark
+ * surface reads as a bright stripe down the edge of every list. */
+.scroll-bar { -fx-background-color: transparent; }
+.scroll-bar > .thumb {
+    -fx-background-color: -sirmax-border-strong;
+    -fx-background-radius: 6;
+}
+.scroll-bar > .thumb:hover { -fx-background-color: -sirmax-text-muted; }
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button { -fx-background-color: transparent; -fx-opacity: 0; }
+
 .tooltip {
     -fx-background-color: #2b323c;
     -fx-text-fill: #ffffff;
@@ -120,10 +176,54 @@
     -fx-padding: 7 10 7 10;
     -fx-prompt-text-fill: -sirmax-text-muted;
 }
-.text-field:focused, .text-area:focused, .password-field:focused, .combo-box:focused {
+.text-field:focused, .text-area:focused, .password-field:focused, .combo-box:focused,
+.date-picker:focused, .spinner:focused {
     -fx-border-color: -sirmax-focus;
     -fx-border-width: 2;
 }
+
+/* Spinner and DatePicker are composites: the outer control picks up the rule above, but the
+ * editor and the arrow buttons inside it are separate regions that modena paints its own way —
+ * a grey gradient with its own border, which reads as a control from a different application
+ * sitting inside a SIRMAX form, and in dark mode as a bright block. */
+.spinner > .text-field,
+.date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -sirmax-text;
+    -fx-padding: 0;
+}
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button,
+.date-picker > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover,
+.date-picker > .arrow-button:hover { -fx-background-color: -sirmax-surface-2; }
+.spinner .increment-arrow,
+.spinner .decrement-arrow,
+.date-picker > .arrow-button > .arrow { -fx-background-color: -sirmax-text-muted; }
+
+/* The calendar popup is its own window, so it never sees the scene's dark class. */
+.date-picker-popup { -fx-background-color: -sirmax-surface; -fx-border-color: -sirmax-border; }
+.date-picker-popup > * > .month-year-pane { -fx-background-color: -sirmax-surface-2; }
+.date-picker-popup > * > .month-year-pane .label { -fx-text-fill: -sirmax-text; }
+.date-picker-popup > * > .month-year-pane .button > .left-arrow,
+.date-picker-popup > * > .month-year-pane .button > .right-arrow {
+    -fx-background-color: -sirmax-text-muted;
+}
+.date-picker-popup > * > .week-day-cell { -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text-muted; }
+.date-picker-popup > * > .day-name-cell { -fx-text-fill: -sirmax-text-muted; }
+.date-picker-popup > * > .day-cell { -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text; -fx-border-color: -sirmax-border; }
+.date-picker-popup > * > .day-cell:hover { -fx-background-color: -sirmax-primary-soft; }
+.date-picker-popup > * > .selected { -fx-background-color: -sirmax-primary;
+    -fx-text-fill: -sirmax-text-on-accent; }
+.date-picker-popup > * > .today { -fx-border-color: -sirmax-primary; -fx-border-width: 2; }
 
 /* Button — default (secondary) */
 .button {
@@ -278,6 +378,55 @@
 .sirmax-table .table-row-cell { -fx-background-color: -sirmax-surface; -fx-border-color: transparent transparent -sirmax-border transparent; }
 .sirmax-table .table-row-cell:selected { -fx-background-color: -sirmax-primary-soft; }
 .sirmax-table .table-row-cell:odd { -fx-background-color: derive(-sirmax-surface, -1.5%); }
+/* Cell text and the empty-table placeholder both default to near-black. */
+.sirmax-table .table-cell { -fx-text-fill: -sirmax-text; -fx-border-color: transparent; }
+.sirmax-table .placeholder .label { -fx-text-fill: -sirmax-text-muted; }
+
+/* ComboBox and ListView popups are separate windows, like context menus. */
+.combo-box .list-cell { -fx-text-fill: -sirmax-text; -fx-background-color: transparent; }
+.combo-box-popup .list-view {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border;
+    -fx-background-radius: 8;
+}
+.combo-box-popup .list-view .list-cell { -fx-text-fill: -sirmax-text; -fx-padding: 6 10 6 10; }
+.combo-box-popup .list-view .list-cell:filled:hover,
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -sirmax-primary-soft;
+}
+.list-view {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.list-view .list-cell { -fx-background-color: transparent; -fx-text-fill: -sirmax-text; -fx-padding: 6 10 6 10; }
+.list-view .list-cell:filled:selected { -fx-background-color: -sirmax-primary-soft; }
+
+/* Toggle buttons carry the saved queues in the worklist. */
+.toggle-button {
+    -fx-background-color: -sirmax-surface;
+    -fx-text-fill: -sirmax-text;
+    -fx-border-color: -sirmax-border-strong;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+    -fx-cursor: hand;
+}
+.toggle-button:selected {
+    -fx-background-color: -sirmax-primary;
+    -fx-text-fill: -sirmax-text-on-accent;
+    -fx-border-color: -sirmax-primary;
+}
+.check-box { -fx-text-fill: -sirmax-text; }
+.check-box > .box {
+    -fx-background-color: -sirmax-surface;
+    -fx-border-color: -sirmax-border-strong;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.check-box:selected > .box { -fx-background-color: -sirmax-primary; -fx-border-color: -sirmax-primary; }
+.check-box:selected > .box > .mark { -fx-background-color: -sirmax-text-on-accent; }
 
 /* Form field wrapper */
 .sirmax-field-label { -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: -sirmax-text-soft; }

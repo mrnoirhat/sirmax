@@ -13,7 +13,10 @@ description = "SIRMAX desktop composition root and launcher"
 
 javafx {
     version = libs.versions.javafx.get()
-    modules = listOf("javafx.controls", "javafx.fxml")
+    // javafx.swing is only used by the screenshot pass in the integration tests, which converts a
+    // scene snapshot to a BufferedImage. The plugin has no test-only scope, so it ships with the
+    // app; it costs a module on the jlink runtime and nothing at run time.
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 dependencies {
@@ -118,6 +121,9 @@ fun jpackageCommon(): List<String> = listOf(
     "--main-jar", tasks.named<Jar>("jar").get().archiveFileName.get(),
     "--main-class", "org.sirmax.app.Launcher",
     "--runtime-image", runtimeImageDir.get().asFile.absolutePath,
+    // The same .ico for the executable, the Start menu entry, the desktop shortcut and the
+    // installer, so the product is recognisable everywhere Windows shows it.
+    "--icon", file("src/main/resources/org/sirmax/app/sirmax.ico").absolutePath,
     // sqlite-jdbc and PDFBox load native code and reach for sun.misc.Unsafe. Granting access
     // explicitly keeps the warning off a municipal operator's first launch — and means the
     // application still starts when a future JDK turns that warning into a refusal.

@@ -1,0 +1,39 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!--
+  SIRMAX brand mark.
+
+  A municipal seal reduced to its load-bearing idea: a stamped document. The
+  outer square is the seal, the inner sheet the record it certifies, and the
+  band across it the entry in the register.
+
+  Built from flat shapes with no gradients, no shadows and no thin strokes,
+  because this mark has to survive being printed on a 58 mm impact receipt in
+  black and white at 180 dpi — the same constraint that shapes the receipt
+  template. Anything that needs colour to be legible is not a municipal mark.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img"
+     aria-labelledby="sirmax-logo-title">
+  <title id="sirmax-logo-title">SIRMAX</title>
+
+  <!-- Seal -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="#1d4ed8"/>
+
+  <!-- The record: a sheet, deliberately off-centre so the mark has a top edge
+       to read as a document rather than a plain frame. -->
+  <path d="M78 62h74l30 30v102a10 10 0 0 1-10 10H78a10 10 0 0 1-10-10V72a10 10 0 0 1 10-10z"
+        fill="#ffffff"/>
+
+  <!-- The folded corner. Its own colour, not a lighter tint, so it stays a
+       distinct shape when the whole mark is reduced to one ink. -->
+  <path d="M152 62l30 30h-30z" fill="#93c5fd"/>
+
+  <!-- The register entry: one band, weighted like a stamp rather than a rule.
+       It stays inside the sheet — a band that crosses the edge reads as a
+       rendering mistake at icon sizes, not as a stamp. -->
+  <rect x="92" y="152" width="66" height="20" rx="10" fill="#1d4ed8"/>
+
+  <!-- Two lines of the record above it, lighter and thinner, so the eye reads
+       the stamp as the emphasis. -->
+  <rect x="92" y="110" width="64" height="10" rx="5" fill="#c7d7f5"/>
+  <rect x="92" y="128" width="44" height="10" rx="5" fill="#c7d7f5"/>
+</svg>

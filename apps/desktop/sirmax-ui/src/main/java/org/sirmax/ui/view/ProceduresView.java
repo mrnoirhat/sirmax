@@ -26,6 +26,7 @@ import org.sirmax.ui.app.AppServices;
 import org.sirmax.ui.app.UiSession;
 import org.sirmax.ui.designsystem.Buttons;
 import org.sirmax.ui.designsystem.DataTable;
+import org.sirmax.ui.designsystem.Enums;
 import org.sirmax.ui.designsystem.Styles;
 import org.sirmax.ui.designsystem.Typography;
 import org.sirmax.ui.i18n.Messages;
@@ -151,7 +152,7 @@ public final class ProceduresView implements SirmaxView {
                 column(
                         "procedures.column.status",
                         150,
-                        p -> Messages.get("procedure.status." + p.status().name().toLowerCase(java.util.Locale.ROOT))),
+                        p -> Enums.label("procedure.status", p.status())),
                 column(
                         "procedures.column.step",
                         140,

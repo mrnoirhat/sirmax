@@ -74,6 +74,46 @@ export default function HomePage() {
               instalar.
             </figcaption>
           </figure>
+          <figure className="shot">
+            <Image
+              src="/screenshots/sirmax-servicios.png"
+              alt="Pantalla de servicios de SIRMAX: el catálogo del ayuntamiento y el editor de
+                una versión en borrador, con requisitos, plazo, vigencia y monto"
+              width={1200}
+              height={1812}
+            />
+            <figcaption>
+              Servicios: el ayuntamiento define lo que ofrece y lo que cobra. Una versión publicada
+              queda fija, porque los trámites abiertos conservan las condiciones que se le dijeron
+              al ciudadano.
+            </figcaption>
+          </figure>
+          <figure className="shot">
+            <Image
+              src="/screenshots/sirmax-reportes.png"
+              alt="Pantalla de reportes de SIRMAX con cobros por medio de pago, por servicio,
+                trámites por estado y lo pendiente de cobro"
+              width={1200}
+              height={1506}
+            />
+            <figcaption>
+              Reportes: cobros, caseload y deuda pendiente sobre un mismo rango de fechas, y todo
+              exportable a CSV.
+            </figcaption>
+          </figure>
+          <figure className="shot">
+            <Image
+              src="/screenshots/sirmax-configuracion-oscuro.png"
+              alt="Pantalla de configuración de SIRMAX en modo oscuro, con los datos del
+                ayuntamiento, las copias de seguridad y la política de seguridad"
+              width={1200}
+              height={2061}
+            />
+            <figcaption>
+              Modo oscuro, para el mostrador que trabaja de noche. Es el mismo sistema de tokens:
+              ningún control se queda claro.
+            </figcaption>
+          </figure>
         </Section>
 
         {/* ── Problem ── */}
@@ -269,21 +309,6 @@ export default function HomePage() {
               { title: "Monorepo", body: "Un repositorio: escritorio, landing, documentación, base de datos y CI/CD." },
             ]}
           />
-        </Section>
-
-        {/* ── Screenshots ── */}
-        <Section
-          id="capturas"
-          eyebrow="Capturas"
-          title="Cómo se ve"
-          lead="El shell y el design system están en construcción (Fase 2). Aquí irán capturas
-            reales del recorrido de mostrador, la facturación y la impresión."
-        >
-          <div className="placeholder-shots" aria-hidden="true">
-            <div className="placeholder-shot">Inicio · ¿Qué necesitas hacer?</div>
-            <div className="placeholder-shot">Trámite · checklist de requisitos</div>
-            <div className="placeholder-shot">Cobro · factura y recibo</div>
-          </div>
         </Section>
 
         {/* ── Roadmap ── */}

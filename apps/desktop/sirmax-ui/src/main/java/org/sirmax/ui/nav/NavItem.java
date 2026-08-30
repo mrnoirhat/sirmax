@@ -44,6 +44,7 @@ public record NavItem(RouteKey key, String labelKey, Section section) {
                 new NavItem(RouteKey.DOCUMENTS, "nav.documents", Section.TASKS),
                 new NavItem(RouteKey.CITIZENS, "nav.citizens", Section.TASKS),
                 new NavItem(RouteKey.DEPARTMENTS, "nav.departments", Section.ADMIN),
+                new NavItem(RouteKey.SERVICES, "nav.services", Section.ADMIN),
                 new NavItem(RouteKey.SETTINGS, "nav.settings", Section.ADMIN),
                 new NavItem(RouteKey.REPORTS, "nav.reports", Section.ADMIN));
     }

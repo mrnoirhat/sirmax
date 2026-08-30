@@ -55,6 +55,16 @@ class ScreenshotGenerator {
     }
 
     @Test
+    void shellDark() throws IOException {
+        // Dark mode gets its own shot because the failures it has are invisible in
+        // light mode: a control JavaFX styles from modena.css stays white, and only
+        // a rendered dark screen shows it.
+        capture(
+                "sirmax-shell-oscuro.png",
+                new ShellView(new ShellNavigator(RouteKey.HOME), Theme.DARK));
+    }
+
+    @Test
     void shell() throws IOException {
         // The Design System shell, with no application graph behind it: the feature views need a
         // database, and a screenshot of seeded demo data would be advertising, not documentation.

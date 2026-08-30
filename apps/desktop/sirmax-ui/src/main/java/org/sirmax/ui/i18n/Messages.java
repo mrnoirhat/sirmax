@@ -17,7 +17,8 @@ import org.sirmax.shared.i18n.MessageKey;
  */
 public final class Messages {
 
-    private static final String BUNDLE = "org.sirmax.ui.i18n.messages";
+    /** Package-visible so the key audit can load the same bundle this class does. */
+    static final String BUNDLE = "org.sirmax.ui.i18n.messages";
     private static volatile ResourceBundle bundle = load(Locale.getDefault());
 
     private Messages() {}

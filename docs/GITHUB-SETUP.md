@@ -39,6 +39,12 @@ Qué activa, y por qué cada cosa:
 | Sin `force push` ni borrado | El historial de `main` es el registro de qué se publicó. |
 | Se aplica a administradores | Una protección que el dueño se salta no protege de la prisa del dueño, que es de quien hay que protegerse. |
 
+Los cuatro workflows filtran por rutas en `push`, pero **no** en `pull_request`.
+Tiene que ser así: GitHub espera indefinidamente por un check obligatorio que
+nunca reporta, de modo que un filtro de rutas en el disparador de PR convierte
+«protegida» en «imposible de fusionar» para cualquier cambio que no toque ese
+directorio.
+
 ## 2. Publicar la documentación en GitHub Pages
 
 ```bash
