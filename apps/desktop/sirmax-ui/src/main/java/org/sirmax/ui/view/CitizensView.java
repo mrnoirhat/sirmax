@@ -70,6 +70,10 @@ public final class CitizensView implements SirmaxView {
 
     @Override
     public Parent node() {
+        // Load the register on open. Waiting for a search left the screen blank, which reads as
+        // "there are no citizens" rather than "type something" — and the first thing anyone wants
+        // to know on opening a register is who is in it.
+        runSearch("");
         return root;
     }
 
@@ -155,14 +159,20 @@ public final class CitizensView implements SirmaxView {
         return col;
     }
 
-    /** Run the people search; short queries are ignored so the table does not thrash on one letter. */
+    /**
+     * Run the people search.
+     *
+     * <p>A one-letter query is ignored so the table does not thrash while someone types. An
+     * <em>empty</em> one is not the same thing: it means "show me the register", and the repository
+     * already answers it with everyone, alphabetically. Lumping the two together left the screen
+     * blank until you searched, which reads as "there are no citizens".
+     */
     public void runSearch(String query) {
-        if (query == null || query.strip().length() < 2) {
-            results.setItems(FXCollections.emptyObservableList());
-            summary.setText("");
+        String q = query == null ? "" : query.strip();
+        if (q.length() == 1) {
             return;
         }
-        List<Person> found = services.people().search(query.strip(), PAGE_SIZE, 0);
+        List<Person> found = services.people().search(q, PAGE_SIZE, 0);
         results.setItems(FXCollections.observableArrayList(found));
         summary.setText(Messages.get("common.count.results", found.size()));
     }
@@ -194,4 +204,9 @@ public final class CitizensView implements SirmaxView {
     public int historyCount() {
         return history.getItems().size();
     }
+    /** Exposed for tests: the names on screen, in the order they are shown. */
+    public java.util.List<String> displayedNames() {
+        return results.getItems().stream().map(org.sirmax.domain.identity.Person::fullName).toList();
+    }
+
 }

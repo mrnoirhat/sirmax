@@ -55,6 +55,9 @@ import org.sirmax.ui.nav.RouteKey;
  */
 public final class DocumentsView implements SirmaxView {
 
+    /** How many recent documents the screen lists before anyone searches. */
+    private static final int PAGE_SIZE = 100;
+
     private static final DateTimeFormatter STAMP =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
 
@@ -101,7 +104,26 @@ public final class DocumentsView implements SirmaxView {
     @Override
     public Parent node() {
         refreshProfiles();
+        showRecent();
         return root;
+    }
+
+    /**
+     * The documents issued most recently.
+     *
+     * <p>The screen used to open empty and wait for a number. That is the right tool when a citizen
+     * is holding the paper, and no help at all for "what did we issue today" — which left the
+     * impression that there were no documents.
+     */
+    public void showRecent() {
+        List<IssuedDocument> recent = services.documents().listRecent(PAGE_SIZE, 0);
+        results.setItems(FXCollections.observableArrayList(recent));
+        if (recent.isEmpty()) {
+            outcome.show(Banner.Severity.INFO, "documents.none_yet", "documents.none_yet.hint");
+        } else {
+            outcome.hide();
+            results.getSelectionModel().selectFirst();
+        }
     }
 
     // ---- construction ----------------------------------------------------
@@ -280,7 +302,7 @@ public final class DocumentsView implements SirmaxView {
     private void search() {
         String raw = query.getText();
         if (raw == null || raw.isBlank()) {
-            toasts.warning("documents.query_required");
+            showRecent();
             return;
         }
         String term = raw.strip();

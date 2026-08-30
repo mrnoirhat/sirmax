@@ -27,6 +27,15 @@ public interface DocumentRepository {
 
     List<IssuedDocument> findForProcedure(String procedureId);
 
+    /**
+     * The most recently issued documents, newest first.
+     *
+     * <p>The screen could only look a document up by number or verification code, which is right
+     * when a citizen is standing there holding one — and useless for "what did we issue today".
+     * Recency is the order that answers that; the register is not browsed alphabetically.
+     */
+    List<IssuedDocument> listRecent(int limit, int offset);
+
     // ── print history (§59D) ──
 
     /**

@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -25,6 +26,7 @@ import org.sirmax.application.usecase.CreateServiceDraftVersion;
 import org.sirmax.application.usecase.PublishServiceVersion;
 import org.sirmax.application.usecase.SeedServiceCatalog;
 import org.sirmax.application.usecase.SetServiceAvailability;
+import org.sirmax.domain.common.ArchiveStatus;
 import org.sirmax.domain.finance.ChargeType;
 import org.sirmax.domain.finance.FeeRule;
 import org.sirmax.domain.security.Permission;
@@ -85,7 +87,9 @@ public final class ServicesView implements SirmaxView {
     private final TextField newName = new TextField();
     private final ComboBox<ServiceCategory> newCategory = new ComboBox<>();
     private final ComboBox<ServiceType> newType = new ComboBox<>();
+    private final TextField newFee = new TextField();
     private final VBox createBox = new VBox(10);
+    private Button newVersionButton;
 
     // ── draft editor ──
     private final CheckBox requiresPayment = new CheckBox();
@@ -144,7 +148,8 @@ public final class ServicesView implements SirmaxView {
             catalogActions
                     .getChildren()
                     .addAll(
-                            Buttons.secondary("services.new_version", this::newDraftVersion),
+                            newVersionButton =
+                                    Buttons.secondary("services.new_version", this::newDraftVersion),
                             Buttons.secondary("services.toggle_active", this::toggleAvailability),
                             Buttons.secondary("services.seed", this::seedCatalog));
         }
@@ -178,16 +183,28 @@ public final class ServicesView implements SirmaxView {
                                         d -> Enums.label("service.type", d.serviceType())),
                                 col(
                                         "services.column.available",
-                                        110,
-                                        d ->
-                                                Messages.get(
-                                                        d.isAvailable()
-                                                                ? "services.available"
-                                                                : "services.unavailable"))));
+                                        150,
+                                        ServicesView::availability)));
         definitions
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, old, definition) -> showDefinition(definition));
+    }
+
+    /**
+     * Three states, not two.
+     *
+     * <p>"No" for both a switched-off service and one that simply has no published version yet was
+     * the whole confusion: after loading the base catalogue every row said "No" and nothing the
+     * operator pressed changed it. They are different situations with different remedies.
+     */
+    private static String availability(ServiceDefinition definition) {
+        if (definition.archiveStatus() != ArchiveStatus.ACTIVE) {
+            return Messages.get("services.unavailable");
+        }
+        return definition.currentVersionId().isPresent()
+                ? Messages.get("services.available")
+                : Messages.get("services.draft_only");
     }
 
     private void buildVersionTable() {
@@ -248,9 +265,29 @@ public final class ServicesView implements SirmaxView {
                         new FormField("services.name", newName),
                         new FormField("services.category", newCategory),
                         new FormField("services.type", newType),
-                        Buttons.primary("services.create.submit", this::createService));
+                        new FormField("services.fee_amount", newFee, "services.create.fee.hint"),
+                        createActions());
         createBox.setVisible(session.can(Permission.SERVICE_CONFIGURE));
         createBox.setManaged(createBox.isVisible());
+    }
+
+    /**
+     * Two ways out of the create form, because there are two situations.
+     *
+     * <p>"Crear borrador" is right when the service still needs requirements, a workflow or a
+     * reviewed fee. "Crear y publicar" is right for the common small case — a service with one
+     * fixed fee, or a free one — where forcing a second trip through the editor to publish is
+     * ceremony. Publishing is still explicit: nothing is ever published without the operator
+     * pressing a button that says so.
+     */
+    private HBox createActions() {
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        actions.getChildren()
+                .addAll(
+                        Buttons.primary("services.create.submit", () -> createService(true)),
+                        Buttons.secondary("services.create.draft", () -> createService(false)));
+        return actions;
     }
 
     private void buildEditor() {
@@ -338,6 +375,13 @@ public final class ServicesView implements SirmaxView {
         versions.setItems(FXCollections.observableArrayList(list));
         // Land on the draft when there is one: it is the only thing that can be edited, and the
         // reason anyone opened this screen.
+        boolean hasDraft = list.stream().anyMatch(v -> v.status().isEditable());
+        if (newVersionButton != null) {
+            // A new version can only be cut from a published one, and only when no draft is open.
+            // Leaving the button enabled meant pressing it answered "ya hay un borrador", which
+            // reads as a refusal to edit rather than as "the draft is right there below".
+            newVersionButton.setDisable(hasDraft || definition.currentVersionId().isEmpty());
+        }
         list.stream()
                 .filter(v -> v.status().isEditable())
                 .findFirst()
@@ -397,7 +441,7 @@ public final class ServicesView implements SirmaxView {
 
     // ---- actions ---------------------------------------------------------
 
-    private void createService() {
+    private void createService(boolean publishNow) {
         if (isBlank(newCode)) {
             toasts.error("services.code_required");
             return;
@@ -428,17 +472,78 @@ public final class ServicesView implements SirmaxView {
             return;
         }
 
-        toasts.success("services.created", newName.getText().strip());
         String definitionId = result.orElseThrow().definitionId();
+        String draftVersionId = result.orElseThrow().draftVersionId();
+        String createdName = newName.getText().strip();
+
+        if (publishNow && !applyFeeAndPublish(draftVersionId, createdName)) {
+            // The draft exists and is selected below; the operator finishes it in the editor.
+            refresh();
+            selectDefinition(definitionId);
+            return;
+        }
+        toasts.success(publishNow ? "services.created_published" : "services.created", createdName);
+
         newCode.clear();
         newName.clear();
+        newFee.clear();
         refresh();
         // Drop the operator straight into the draft they just made. Creating a service and then
         // hunting for it in the list is two steps where one was meant.
+        selectDefinition(definitionId);
+    }
+
+    private void selectDefinition(String definitionId) {
         definitions.getItems().stream()
                 .filter(d -> d.id().equals(definitionId))
                 .findFirst()
                 .ifPresent(d -> definitions.getSelectionModel().select(d));
+    }
+
+    /**
+     * Puts the create form's fee on the draft and publishes it.
+     *
+     * <p>Returns {@code false} when either step is refused, having already reported why — the draft
+     * survives either way, so a rejected publish costs the operator the button press and not the
+     * work.
+     */
+    private boolean applyFeeAndPublish(String versionId, String serviceName) {
+        Optional<List<FeeRule>> fees = feeRulesFrom(newFee.getText(), versionId, serviceName);
+        if (fees == null) {
+            return false;
+        }
+        Result<ServiceDefinitionVersion> configured =
+                services.configureServiceDraft()
+                        .execute(
+                                new ConfigureServiceDraft.Command(
+                                        session.require(),
+                                        versionId,
+                                        Optional.empty(),
+                                        Optional.of(!fees.orElseThrow().isEmpty()),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        fees,
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        "desktop.services"));
+        if (configured instanceof Result.Err<ServiceDefinitionVersion> err) {
+            toasts.error(err.messageKey());
+            return false;
+        }
+        Result<ServiceDefinitionVersion> published =
+                services.publishServiceVersion()
+                        .execute(
+                                new PublishServiceVersion.Command(
+                                        session.require(), versionId, "desktop.services"));
+        if (published instanceof Result.Err<ServiceDefinitionVersion> err) {
+            toasts.error(err.messageKey());
+            return false;
+        }
+        return true;
     }
 
     private void saveDraft() {
@@ -504,16 +609,20 @@ public final class ServicesView implements SirmaxView {
         if (definition == null) {
             return;
         }
-        boolean wasAvailable = definition.isAvailable();
+        // `isAvailable()` is false whenever there is no published version, whatever the flag says.
+        // Deciding the toggle from it meant a draft-only service always asked to be *activated*:
+        // the first press appeared to do nothing and the second repeated the same request.
+        // The flag the command actually sets is the archive status, so that is what it must read.
+        boolean wasActive = definition.archiveStatus() == ArchiveStatus.ACTIVE;
         Result<ServiceDefinition> result =
                 services.setServiceAvailability()
                         .execute(
                                 new SetServiceAvailability.Command(
                                         session.require(),
                                         definition.id(),
-                                        !wasAvailable,
+                                        !wasActive,
                                         "desktop.services"));
-        report(result, wasAvailable ? "services.deactivated" : "services.activated");
+        report(result, wasActive ? "services.deactivated" : "services.activated");
     }
 
     private void seedCatalog() {
@@ -584,7 +693,17 @@ public final class ServicesView implements SirmaxView {
 
     /** {@code null} signals a parse failure the caller must abort on; empty means "no fee". */
     private Optional<List<FeeRule>> feeRules(ServiceDefinitionVersion version) {
-        String raw = feeAmount.getText();
+        return feeRulesFrom(
+                feeAmount.getText(), version.id(), text(feeConcept).orElseGet(this::selectedDefinitionName));
+    }
+
+    /**
+     * A fixed fee from a typed amount, shared by the editor and the create form.
+     *
+     * <p>{@code null} signals a parse failure the caller must abort on, having reported it; an
+     * empty list means the service is free, which is a real answer and not a missing one.
+     */
+    private Optional<List<FeeRule>> feeRulesFrom(String raw, String versionId, String concept) {
         if (raw == null || raw.isBlank()) {
             return Optional.of(List.of());
         }
@@ -595,12 +714,10 @@ public final class ServicesView implements SirmaxView {
             toasts.error("services.invalid_fee");
             return null;
         }
-        String concept =
-                text(feeConcept).orElseGet(this::selectedDefinitionName);
         return Optional.of(
                 List.of(
                         FeeRule.fixed(
-                                version.id() + "-fee",
+                                versionId + "-fee",
                                 feeChargeType.getValue(),
                                 concept,
                                 CURRENCY,
