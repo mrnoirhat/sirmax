@@ -108,6 +108,16 @@ public final class SqliteDocumentRepository implements DocumentRepository {
                 procedureId);
     }
 
+    @Override
+    public List<IssuedDocument> listRecent(int limit, int offset) {
+        return JdbcHelper.queryList(
+                db.connection(),
+                "SELECT * FROM issued_document ORDER BY issued_at DESC LIMIT ? OFFSET ?",
+                this::mapDocument,
+                limit,
+                offset);
+    }
+
     // ── print history ──
 
     @Override

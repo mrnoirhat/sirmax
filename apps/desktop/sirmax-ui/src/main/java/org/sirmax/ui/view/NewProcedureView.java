@@ -189,7 +189,12 @@ public final class NewProcedureView implements SirmaxView {
                         .toList();
         serviceBox.setItems(FXCollections.observableArrayList(available));
         if (available.isEmpty()) {
-            toasts.warning("procedures.new.no_services");
+            // An empty combo with a passing toast leaves the operator with no idea what to do. The
+            // usual cause is a freshly seeded catalogue, where everything is still a draft — so say
+            // that, and say where to fix it.
+            boolean anyServiceAtAll = !services.serviceCatalog().listDefinitions(false).isEmpty();
+            toasts.warning(
+                    anyServiceAtAll ? "services.no_published" : "procedures.new.no_services");
         }
     }
 
@@ -329,4 +334,9 @@ public final class NewProcedureView implements SirmaxView {
         HBox.setHgrow(r, Priority.ALWAYS);
         return r;
     }
+    /** Exposed for tests: how many services the operator can actually pick. */
+    public int availableServiceCount() {
+        return serviceBox.getItems().size();
+    }
+
 }

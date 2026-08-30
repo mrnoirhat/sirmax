@@ -175,7 +175,16 @@
     -fx-background-radius: 8;
     -fx-padding: 7 10 7 10;
     -fx-prompt-text-fill: -sirmax-text-muted;
+    /* Without this the typed text keeps modena's near-black default. On the light theme that
+     * passes unnoticed; on the dark one it is grey-on-dark and effectively unreadable, which is
+     * how it shipped. The token is the only correct value here — it follows the theme. */
+    -fx-text-fill: -sirmax-text;
 }
+/* The editable part of a composite control is a separate node and does not inherit the above. */
+.text-area .content { -fx-background-color: -sirmax-surface; }
+.text-area .text, .text-field .text, .password-field .text { -fx-fill: -sirmax-text; }
+.combo-box > .list-cell { -fx-text-fill: -sirmax-text; }
+.combo-box-base:editable > .text-field { -fx-text-fill: -sirmax-text; }
 .text-field:focused, .text-area:focused, .password-field:focused, .combo-box:focused,
 .date-picker:focused, .spinner:focused {
     -fx-border-color: -sirmax-focus;
