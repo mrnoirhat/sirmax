@@ -15,10 +15,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.sirmax.application.port.ProcedureQuery;
 import org.sirmax.application.usecase.IssueDocument;
+import org.sirmax.application.usecase.IssueInvoice;
 import org.sirmax.application.usecase.PrintDocument;
 import org.sirmax.application.usecase.RefundPayment;
 import org.sirmax.application.usecase.RegisterPayment;
@@ -30,6 +30,9 @@ import org.sirmax.domain.document.DocumentKind;
 import org.sirmax.domain.document.IssuedDocument;
 import org.sirmax.domain.document.PaperFormat;
 import org.sirmax.domain.finance.PaymentMethod;
+import org.sirmax.domain.procedure.Procedure;
+import org.sirmax.domain.procedure.ProcedureStatus;
+import org.sirmax.domain.service.ServiceDefinition;
 import org.sirmax.domain.security.Permission;
 import org.sirmax.shared.Money;
 import org.sirmax.shared.Result;
@@ -38,6 +41,7 @@ import org.sirmax.ui.app.UiSession;
 import org.sirmax.ui.designsystem.Banner;
 import org.sirmax.ui.designsystem.Buttons;
 import org.sirmax.ui.designsystem.Cards;
+import org.sirmax.ui.designsystem.Enums;
 import org.sirmax.ui.designsystem.DataTable;
 import org.sirmax.ui.designsystem.FormField;
 import org.sirmax.ui.designsystem.Styles;
@@ -56,6 +60,11 @@ import org.sirmax.ui.nav.RouteKey;
  *
  * <p>Change owed back is shown as its own line after a cash payment. A cashier who has to compute it
  * mentally will eventually get it wrong.
+ *
+ * <p>Above the invoices sit the cases waiting to be billed. An invoice always belongs to a
+ * procedure — there is no ad-hoc invoice in SIRMAX, because a charge with no case behind it is a
+ * charge nobody can later explain — so this is where billing starts, and without it a case that
+ * requires payment could be opened but never collected on.
  */
 public final class BillingView implements SirmaxView {
 
@@ -66,6 +75,7 @@ public final class BillingView implements SirmaxView {
     private final Navigator navigator;
     private final ToastHost toasts;
 
+    private final TableView<Procedure> pending = new TableView<>();
     private final TableView<Invoice> invoices = new TableView<>();
     private final TableView<Payment> payments = new TableView<>();
     private final ComboBox<PaymentMethod> method = new ComboBox<>();
@@ -103,6 +113,7 @@ public final class BillingView implements SirmaxView {
     }
 
     private void build() {
+        buildPendingTable();
         buildInvoiceTable();
         buildPaymentTable();
         buildCollectForm();
@@ -112,6 +123,11 @@ public final class BillingView implements SirmaxView {
         root.getChildren()
                 .addAll(
                         Typography.title("billing.title"),
+                        Cards.card(
+                                Typography.subtitle("billing.pending"),
+                                Typography.muted("billing.pending.explain"),
+                                pending,
+                                pendingActions()),
                         Cards.card(Typography.subtitle("billing.invoices"), invoices),
                         outcome,
                         Cards.card(
@@ -120,6 +136,81 @@ public final class BillingView implements SirmaxView {
                                 collectBox,
                                 Typography.subtitle("billing.payments"),
                                 payments));
+    }
+
+    private HBox pendingActions() {
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        if (session.can(Permission.INVOICE_ISSUE)) {
+            actions.getChildren().add(Buttons.primary("billing.issue", this::issueInvoice));
+        }
+        return actions;
+    }
+
+    private void buildPendingTable() {
+        DataTable.styled(pending);
+        pending.setPrefHeight(180);
+        pending.getColumns()
+                .addAll(
+                        List.of(
+                                procedureColumn("billing.column.case", 160, Procedure::code),
+                                procedureColumn(
+                                        "billing.column.service", 260, this::serviceName),
+                                procedureColumn(
+                                        "billing.column.case_status",
+                                        160,
+                                        p -> Enums.label("procedure.status", p.status()))));
+    }
+
+    private String serviceName(Procedure procedure) {
+        return services.serviceCatalog()
+                .findDefinitionById(procedure.serviceDefinitionId())
+                .map(ServiceDefinition::name)
+                .orElse("—");
+    }
+
+    private TableColumn<Procedure, String> procedureColumn(
+            String headerKey, double width, java.util.function.Function<Procedure, String> value) {
+        TableColumn<Procedure, String> col = new TableColumn<>(Messages.get(headerKey));
+        col.setPrefWidth(width);
+        col.setCellValueFactory(c -> new SimpleStringProperty(value.apply(c.getValue())));
+        return col;
+    }
+
+    /**
+     * Issue the invoice for the selected case. The amount comes from the service version the case
+     * pinned when it was opened (§39), never from this screen: a fee typed at a counter is a fee
+     * nobody can reconcile against what the citizen was told.
+     */
+    private void issueInvoice() {
+        Procedure procedure = pending.getSelectionModel().getSelectedItem();
+        if (procedure == null) {
+            toasts.warning("billing.pick_case");
+            return;
+        }
+        Result<Invoice> result =
+                services.issueInvoice()
+                        .execute(
+                                new IssueInvoice.Command(
+                                        session.require(),
+                                        procedure.id(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        Optional.empty(),
+                                        "desktop.billing"));
+        if (result instanceof Result.Err<Invoice> err) {
+            toasts.error(err.messageKey());
+            return;
+        }
+        Invoice issued = result.orElseThrow();
+        toasts.success("billing.issued", issued.number().orElse(issued.id()));
+        refresh();
+        // Land on the invoice just issued: the next thing the cashier does is take the money.
+        invoices.getItems().stream()
+                .filter(i -> i.id().equals(issued.id()))
+                .findFirst()
+                .ifPresent(i -> invoices.getSelectionModel().select(i));
     }
 
     private void buildInvoiceTable() {
@@ -133,12 +224,7 @@ public final class BillingView implements SirmaxView {
                                 column(
                                         "billing.column.status",
                                         140,
-                                        i ->
-                                                Messages.get(
-                                                        "invoice.status."
-                                                                + i.status()
-                                                                        .name()
-                                                                        .toLowerCase(Locale.ROOT))),
+                                        i -> Enums.label("invoice.status", i.status())),
                                 column("billing.column.total", 120, i -> i.total().toString()),
                                 column("billing.column.balance", 120, i -> i.balance().toString())));
         invoices.getSelectionModel()
@@ -156,30 +242,20 @@ public final class BillingView implements SirmaxView {
                                 paymentColumn(
                                         "billing.column.method",
                                         140,
-                                        p ->
-                                                Messages.get(
-                                                        "payment.method."
-                                                                + p.method()
-                                                                        .name()
-                                                                        .toLowerCase(Locale.ROOT))),
+                                        p -> Enums.label("payment.method", p.method())),
                                 paymentColumn(
                                         "billing.column.amount", 120, p -> p.amount().toString()),
                                 paymentColumn(
                                         "billing.column.payment_status",
                                         120,
-                                        p ->
-                                                Messages.get(
-                                                        "payment.status."
-                                                                + p.status()
-                                                                        .name()
-                                                                        .toLowerCase(Locale.ROOT)))));
+                                        p -> Enums.label("payment.status", p.status()))));
     }
 
     private void buildCollectForm() {
         method.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
         method.setValue(PaymentMethod.CASH);
-        method.setCellFactory(list -> methodCell());
-        method.setButtonCell(methodCell());
+        method.setCellFactory(list -> Enums.cell("payment.method"));
+        method.setButtonCell(Enums.cell("payment.method"));
         // Only cash has change to give, and only non-cash needs a reference number.
         method.valueProperty().addListener((obs, old, value) -> updateMethodFields(value));
 
@@ -213,20 +289,6 @@ public final class BillingView implements SirmaxView {
                         new FormField("billing.reference", reference),
                         actions);
         updateMethodFields(PaymentMethod.CASH);
-    }
-
-    private javafx.scene.control.ListCell<PaymentMethod> methodCell() {
-        return new javafx.scene.control.ListCell<>() {
-            @Override
-            protected void updateItem(PaymentMethod item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(
-                        empty || item == null
-                                ? null
-                                : Messages.get(
-                                        "payment.method." + item.name().toLowerCase(Locale.ROOT)));
-            }
-        };
     }
 
     private void updateMethodFields(PaymentMethod value) {
@@ -265,6 +327,31 @@ public final class BillingView implements SirmaxView {
                                 PAGE_SIZE,
                                 0);
         invoices.setItems(FXCollections.observableArrayList(open));
+        pending.setItems(FXCollections.observableArrayList(casesAwaitingInvoice()));
+    }
+
+    /**
+     * Cases that are waiting on payment and have no invoice yet.
+     *
+     * <p>The "no invoice yet" half matters: re-issuing would give the citizen two documents for one
+     * charge, and the second one is the one that gets paid twice.
+     */
+    private List<Procedure> casesAwaitingInvoice() {
+        return services.procedures()
+                .search(
+                        new ProcedureQuery(
+                                Optional.empty(),
+                                List.of(ProcedureStatus.WAITING_PAYMENT),
+                                Optional.empty(),
+                                Optional.empty(),
+                                Optional.empty(),
+                                false,
+                                false,
+                                PAGE_SIZE,
+                                0))
+                .stream()
+                .filter(p -> services.billing().findInvoicesByProcedure(p.id()).isEmpty())
+                .toList();
     }
 
     private void showInvoice(Invoice invoice) {
@@ -464,12 +551,6 @@ public final class BillingView implements SirmaxView {
 
     private static Optional<String> text(TextField field) {
         return Optional.ofNullable(field.getText()).filter(s -> !s.isBlank());
-    }
-
-    private static Region spacer() {
-        Region r = new Region();
-        HBox.setHgrow(r, Priority.ALWAYS);
-        return r;
     }
 
     /** Exposed for tests: how many invoices the counter list holds. */

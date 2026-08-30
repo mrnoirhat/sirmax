@@ -99,9 +99,13 @@ h3 {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 800;
   font-size: 1.15rem;
   color: var(--primary);
+  text-decoration: none;
 }
 
 .nav ul {

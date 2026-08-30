@@ -20,6 +20,7 @@ import org.sirmax.ui.app.AppServices;
 import org.sirmax.ui.app.UiSession;
 import org.sirmax.ui.designsystem.Cards;
 import org.sirmax.ui.designsystem.DataTable;
+import org.sirmax.ui.designsystem.Enums;
 import org.sirmax.ui.designsystem.Styles;
 import org.sirmax.ui.designsystem.Typography;
 import org.sirmax.ui.i18n.Messages;
@@ -128,14 +129,7 @@ public final class CitizensView implements SirmaxView {
                                         history,
                                         "procedures.column.status",
                                         160,
-                                        p ->
-                                                Messages.get(
-                                                        "procedure.status."
-                                                                + p.status()
-                                                                        .name()
-                                                                        .toLowerCase(
-                                                                                java.util.Locale
-                                                                                        .ROOT)))));
+                                        p -> Enums.label("procedure.status", p.status()))));
         history.setRowFactory(
                 t -> {
                     var row = new javafx.scene.control.TableRow<Procedure>();

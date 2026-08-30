@@ -31,12 +31,17 @@ import org.sirmax.ui.view.BillingView;
 import org.sirmax.ui.view.CashView;
 import org.sirmax.ui.view.CitizensView;
 import org.sirmax.ui.view.DashboardView;
+import org.sirmax.ui.view.DepartmentsView;
+import org.sirmax.ui.view.DocumentsView;
 import org.sirmax.ui.view.GlobalSearchView;
 import org.sirmax.ui.view.HomeView;
 import org.sirmax.ui.view.NewProcedureView;
 import org.sirmax.ui.view.PlaceholderView;
 import org.sirmax.ui.view.ProcedureDetailView;
 import org.sirmax.ui.view.ProceduresView;
+import org.sirmax.ui.view.ReportsView;
+import org.sirmax.ui.view.ServicesView;
+import org.sirmax.ui.view.SettingsView;
 import org.sirmax.ui.view.SirmaxView;
 import org.sirmax.ui.view.StyleGuideView;
 
@@ -139,6 +144,11 @@ public final class ShellView extends StackPane {
             put(new CitizensView(services, session, navigator));
             put(new BillingView(services, session, navigator, toasts));
             put(new CashView(services, session, toasts));
+            put(new DocumentsView(services, session, toasts));
+            put(new ServicesView(services, session, toasts));
+            put(new DepartmentsView(services, session, toasts));
+            put(new SettingsView(services, session, toasts, themeManager));
+            put(new ReportsView(services, session, toasts));
         } else {
             put(new PlaceholderView(RouteKey.PROCEDURES, "nav.procedures"));
             put(new PlaceholderView(RouteKey.PROCEDURE_NEW, "procedures.new"));
@@ -146,11 +156,12 @@ public final class ShellView extends StackPane {
             put(new PlaceholderView(RouteKey.CITIZENS, "nav.citizens"));
             put(new PlaceholderView(RouteKey.BILLING, "nav.billing"));
             put(new PlaceholderView(RouteKey.CASH, "nav.cash"));
+            put(new PlaceholderView(RouteKey.DOCUMENTS, "nav.documents"));
+            put(new PlaceholderView(RouteKey.SERVICES, "nav.services"));
+            put(new PlaceholderView(RouteKey.DEPARTMENTS, "nav.departments"));
+            put(new PlaceholderView(RouteKey.SETTINGS, "nav.settings"));
+            put(new PlaceholderView(RouteKey.REPORTS, "nav.reports"));
         }
-        put(new PlaceholderView(RouteKey.DOCUMENTS, "nav.documents"));
-        put(new PlaceholderView(RouteKey.DEPARTMENTS, "nav.departments"));
-        put(new PlaceholderView(RouteKey.SETTINGS, "nav.settings"));
-        put(new PlaceholderView(RouteKey.REPORTS, "nav.reports"));
     }
 
     private void put(SirmaxView view) {
