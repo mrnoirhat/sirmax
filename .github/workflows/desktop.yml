@@ -8,11 +8,11 @@ on:
       - "apps/desktop/**"
       - "database/**"
       - ".github/workflows/desktop.yml"
+  # No paths filter on pull_request, deliberately. These four workflows are the required
+  # checks on main, and GitHub waits forever for a required check that never reports — so a
+  # path-filtered PR trigger turns "protected" into "unmergeable" for any change that misses
+  # this directory. Pushes keep their filter, where skipping is free of that consequence.
   pull_request:
-    paths:
-      - "apps/desktop/**"
-      - "database/**"
-      - ".github/workflows/desktop.yml"
   workflow_dispatch:
 
 permissions:
