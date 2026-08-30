@@ -28,7 +28,7 @@
 param(
     [string] $AppImage,
     [string] $Msi,
-    [string] $Subject = 'Andriezr',
+    [string] $Subject = 'Andriezer',
     [string] $TimestampServer = 'http://timestamp.digicert.com'
 )
 
