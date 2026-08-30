@@ -270,7 +270,7 @@
 .sirmax-topbar {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: transparent transparent -sirmax-border transparent;
-    -fx-padding: 8 16 8 16;
+    -fx-padding: 10 18 10 18;
 }
 .sirmax-brand { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: -sirmax-primary; }
 
@@ -308,6 +308,11 @@
     -fx-background-color: -sirmax-primary-soft;
     -fx-text-fill: -sirmax-primary;
     -fx-font-weight: bold;
+    /* A left rule as well as the tint. Printed or on a failing monitor the tint can vanish, and
+     * then colour would be the only thing saying where you are — which §12 forbids. */
+    -fx-border-color: transparent transparent transparent -sirmax-primary;
+    -fx-border-width: 0 0 0 3;
+    -fx-padding: 8 10 8 7;
 }
 
 .sirmax-content { -fx-background-color: -sirmax-bg; -fx-padding: 28; }
@@ -321,7 +326,20 @@
     -fx-border-color: -sirmax-border;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
-    -fx-padding: 16;
+    -fx-padding: 18 20 18 20;
+    /* A shadow this soft is not decoration: it separates the card from the page without a
+     * heavier border, which on a screen full of tables is the difference between reading rows
+     * and counting lines. Kept low-contrast so it disappears in dark mode instead of glowing. */
+    -fx-effect: dropshadow(gaussian, rgba(31, 36, 48, 0.06), 10, 0.0, 0, 2);
+}
+
+/* A count tile is a card you can press, so it has to say so before it is pressed. */
+.sirmax-tile {
+    -fx-padding: 16 18 16 18;
+}
+.sirmax-tile:hover {
+    -fx-border-color: -sirmax-primary;
+    -fx-effect: dropshadow(gaussian, rgba(31, 95, 166, 0.18), 14, 0.0, 0, 3);
 }
 
 .sirmax-taskcard {
@@ -369,6 +387,7 @@
 .sirmax-table .column-header-background { -fx-background-color: -sirmax-surface-2; }
 .sirmax-table .column-header, .sirmax-table .filler { -fx-background-color: transparent; }
 .sirmax-table .column-header .label { -fx-font-weight: bold; -fx-text-fill: -sirmax-text-soft; }
+.sirmax-table .column-header { -fx-padding: 4 0 4 0; }
 .sirmax-table {
     -fx-background-color: -sirmax-surface;
     -fx-border-color: -sirmax-border;
@@ -376,6 +395,8 @@
     -fx-background-radius: 8;
 }
 .sirmax-table .table-row-cell { -fx-background-color: -sirmax-surface; -fx-border-color: transparent transparent -sirmax-border transparent; }
+.sirmax-table .table-row-cell { -fx-cell-size: 32px; }
+.sirmax-table .table-row-cell:hover { -fx-background-color: -sirmax-surface-2; }
 .sirmax-table .table-row-cell:selected { -fx-background-color: -sirmax-primary-soft; }
 .sirmax-table .table-row-cell:odd { -fx-background-color: derive(-sirmax-surface, -1.5%); }
 /* Cell text and the empty-table placeholder both default to near-black. */

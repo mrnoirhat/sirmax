@@ -11,6 +11,7 @@ import org.sirmax.application.port.DocumentRepository;
 import org.sirmax.application.port.OrganizationRepository;
 import org.sirmax.application.port.ProcedureRepository;
 import org.sirmax.application.port.RegistryRepository;
+import org.sirmax.application.port.RoleRepository;
 import org.sirmax.application.port.SecurityPolicyRepository;
 import org.sirmax.application.port.ServiceCatalogRepository;
 import org.sirmax.application.port.SettingsRepository;
@@ -119,6 +120,9 @@ public interface AppServices {
     ProcedureRepository procedures();
 
     UserRepository users();
+
+    /** So the personnel list can name a user's roles instead of printing their ids. */
+    RoleRepository roles();
 
     // ── billing, payments and cash ──
     IssueInvoice issueInvoice();

@@ -214,6 +214,41 @@ val packageWindows by tasks.registering(Exec::class) {
 }
 
 /**
+ * Authenticode-signs the launcher and the installer, when a signing certificate is available.
+ *
+ * Deliberately skipped rather than failed when there is no certificate: CI has none, and a release
+ * pipeline that goes red because a developer machine holds the only key would stop the build for
+ * everyone. The signature is a property of the artifact, not of whether the code compiles.
+ *
+ * Runs between packaging and the ZIP, so the portable archive contains the *signed* launcher —
+ * zipping first would ship an unsigned executable inside a signed-looking download.
+ */
+val signWindowsArtifacts by tasks.registering(Exec::class) {
+    group = "distribution"
+    description = "Signs SIRMAX.exe and the MSI with the developer's code-signing certificate"
+    dependsOn(packageAppImage, packageWindows)
+
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows }
+    isIgnoreExitValue = true
+
+    val script = rootProject.file("../../tools/sign-windows.ps1")
+    commandLine(
+        "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script.absolutePath,
+        "-AppImage", File(appImageDir.get().asFile, "SIRMAX").absolutePath,
+        "-Msi", File(installerDir.get().asFile, "SIRMAX-$appVersion.msi").absolutePath
+    )
+
+    doLast {
+        val code = executionResult.get().exitValue
+        if (code == 2) {
+            logger.lifecycle("Sin certificado de firma; los artefactos quedan sin firmar.")
+        } else if (code != 0) {
+            logger.warn("La firma terminó con código $code; revisa la salida de arriba.")
+        }
+    }
+}
+
+/**
  * Zips the app image, so the portable download is one file rather than a folder
  * a browser cannot deliver.
  */
@@ -221,6 +256,8 @@ val packageZip by tasks.registering(Zip::class) {
     group = "distribution"
     description = "Packs the self-contained SIRMAX folder into a single downloadable archive"
     dependsOn(packageAppImage)
+    // Signing rewrites SIRMAX.exe in place, so it has to happen before the folder is zipped.
+    mustRunAfter(signWindowsArtifacts)
 
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows }
 
@@ -239,7 +276,7 @@ val packageZip by tasks.registering(Zip::class) {
 val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the packaged artifacts look like real, runnable artifacts"
-    dependsOn(packageAppImage, packageZip, packageWindows)
+    dependsOn(packageAppImage, packageZip, packageWindows, signWindowsArtifacts)
 
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows }
 

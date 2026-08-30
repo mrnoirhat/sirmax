@@ -632,6 +632,11 @@ public final class CompositionRoot implements AppServices, AutoCloseable {
         return userRepository;
     }
 
+    @Override
+    public RoleRepository roles() {
+        return roleRepository;
+    }
+
     public ServiceCatalogTemplateSource serviceCatalogTemplateSource() {
         return serviceCatalogTemplateSource;
     }
