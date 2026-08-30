@@ -45,6 +45,23 @@ nunca reporta, de modo que un filtro de rutas en el disparador de PR convierte
 «protegida» en «imposible de fusionar» para cualquier cambio que no toque ese
 directorio.
 
+### Qué se protege en cada rama, y por qué no lo mismo
+
+| Rama | Protección | Motivo |
+| --- | --- | --- |
+| `main` | PR obligatorio + los cuatro checks + sin `force push` ni borrado | Es el registro de qué se publicó. |
+| `testing` | Sin `force push` ni borrado | Es la puerta del Release Gate; su historial no debe reescribirse. |
+| `experiment` | Sin `force push` ni borrado | Se trabaja aquí a diario, pero perder el historial sigue siendo irreversible. |
+
+`testing` y `experiment` **no** exigen checks a propósito. Exigirlos bloquea también
+el `push` directo — GitHub rechaza un commit cuyos checks todavía no han corrido —
+y eso obligaría a abrir un pull request para cada `experiment → testing`, que es
+justo lo que el flujo de tres ramas resuelve con un merge `--no-ff`. Los cuatro
+checks siguen siendo obligatorios donde importa, que es `main`.
+
+Las tres tienen `enforce_admins` activado: una protección que el dueño se salta no
+protege de la prisa del dueño.
+
 ## 2. Publicar la documentación en GitHub Pages
 
 ```bash
