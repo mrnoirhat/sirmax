@@ -11,7 +11,7 @@ export const site = {
     "copias de seguridad. Diseñada para ayuntamientos de República Dominicana.",
   url: "https://sirmax.vercel.app",
   /** The version the download buttons link to. Bump on every release. */
-  version: "1.0.1",
+  version: "1.0.2",
   repo: "https://github.com/mrnoirhat/sirmax",
   releases: "https://github.com/mrnoirhat/sirmax/releases",
   issues: "https://github.com/mrnoirhat/sirmax/issues",

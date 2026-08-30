@@ -82,6 +82,47 @@ class LoginViewLayoutTest {
         return scene;
     }
 
+    /**
+     * The window SIRMAX actually opens on a small, DPI-scaled display.
+     *
+     * <p>The other cases use the preferred 1200x780. A municipal counter is more likely to be a
+     * 1280x720 panel at 150% scaling, where JavaFX reports 1280x672 of usable logical space — so
+     * {@code SirmaxApplication} clamps the window to that, and the setup card has to fit the
+     * clamped size, not the preferred one. This is the geometry a first install is judged on.
+     */
+    @Test
+    void theSetupCardFitsTheSmallestWindowSirmaxWillOpen() {
+        double width = 1280;
+        double height = 672;
+
+        double[] g =
+                FxTestSupport.onFxThread(
+                        () -> {
+                            LoginView view = new LoginView(new StubServices(true), session -> {});
+                            Scene scene = new Scene(view, width, height);
+                            var css = LoginView.class.getResource("/org/sirmax/ui/theme/sirmax.css");
+                            if (css != null) {
+                                scene.getStylesheets().add(css.toExternalForm());
+                            }
+                            view.applyCss();
+                            view.layout();
+                            Region card = (Region) view.getChildrenUnmodifiable().get(0);
+                            return new double[] {
+                                card.getLayoutX(), card.getWidth(),
+                                card.getLayoutY(), card.getHeight()
+                            };
+                        });
+
+        double left = g[0], w = g[1], top = g[2], h = g[3];
+
+        assertThat(left).as("card left edge").isGreaterThanOrEqualTo(0);
+        assertThat(left + w).as("card right edge").isLessThanOrEqualTo(width);
+        assertThat(left).as("centred horizontally").isCloseTo(width - (left + w), within(1.0));
+        // The submit button lives at the bottom of the card. Off the bottom edge means the install
+        // cannot be completed, which is the failure this whole test class exists for.
+        assertThat(top + h).as("card bottom edge").isLessThanOrEqualTo(height);
+    }
+
     private static org.assertj.core.data.Offset<Double> within(double tolerance) {
         return org.assertj.core.data.Offset.offset(tolerance);
     }
