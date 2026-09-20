@@ -81,7 +81,7 @@ jobs:
       # release that cannot be cut at all is worse than both.
       - name: Sign with SignPath
         if: env.SIGNPATH_API_TOKEN != ''
-        uses: signpath/github-action-submit-signing-request@v2
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           # v2 made connector-url a declared input. It has a default, so omitting it works today —
           # it is written out anyway so a reader can see where the build talks to, which for the
